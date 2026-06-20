@@ -6,12 +6,12 @@
 
 ---- Services ----
 
+local ChangeHistoryService = game:GetService("ChangeHistoryService")
 local RunService = game:GetService("RunService")
 local ScriptEditorService = game:GetService("ScriptEditorService")
 local Selection = game:GetService("Selection")
 local ServerStorage = game:GetService("ServerStorage")
 local StudioService = game:GetService("StudioService")
-local ChangeHistoryService = game:GetService("ChangeHistoryService")
 local TweenService = game:GetService("TweenService")
 
 if RunService:IsRunning() then
@@ -58,8 +58,11 @@ local EXPAND_TWEEN = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirect
 local Toolbar = plugin:CreateToolbar("Blink Suite")
 local EditorButton = Toolbar:CreateButton("Editor", "Opens the configuration editor", "rbxassetid://118423040995617")
 EditorButton.ClickableWhenViewportHidden = true
-local ObservabilityButton =
-	Toolbar:CreateButton("Metrics", "Opens Blink generation and runtime metric guidance", "rbxassetid://118423040995617")
+local ObservabilityButton = Toolbar:CreateButton(
+	"Metrics",
+	"Opens Blink generation and runtime metric guidance",
+	"rbxassetid://118423040995617"
+)
 ObservabilityButton.ClickableWhenViewportHidden = true
 
 local Template = script.Widget
@@ -117,7 +120,8 @@ ObservabilityText.TextWrapped = true
 ObservabilityText.TextXAlignment = Enum.TextXAlignment.Left
 ObservabilityText.TextYAlignment = Enum.TextYAlignment.Top
 ObservabilityText.Size = UDim2.fromScale(1, 1)
-ObservabilityText.Text = "Generate a Blink config to populate compiler metrics.\n\nRuntime modules now expose:\nStats()\nReport()\nStartReporter(seconds)"
+ObservabilityText.Text =
+	"Generate a Blink config to populate compiler metrics.\n\nRuntime modules now expose:\nStats()\nReport()\nStartReporter(seconds)"
 ObservabilityText.Parent = ObservabilityFrame
 
 local Side = EditorInterface.Side
@@ -331,7 +335,9 @@ local function GenerateFile(File: StringValue, Directory: Instance)
 
 	if not Success then
 		ShowError(tostring(Error))
-		SetObservabilityText(`Generation failed for {File.Name}\n\nParse time: {FormatDuration(ParseSeconds)}\n\n{tostring(Error)}`)
+		SetObservabilityText(
+			`Generation failed for {File.Name}\n\nParse time: {FormatDuration(ParseSeconds)}\n\n{tostring(Error)}`
+		)
 		return
 	end
 

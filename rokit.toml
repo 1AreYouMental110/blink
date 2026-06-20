@@ -7,5 +7,6 @@
 rojo = "rojo-rbx/rojo@7.6.0"
 lune = "filiptibell/lune@0.10.4"
 stylua = "JohnnyMorganz/StyLua@2.3.0"
+selene = "Kampfkarren/selene@0.31.0"
 darklua = "seaofvoices/darklua@0.17.2"
 run-in-roblox = "rojo-rbx/run-in-roblox@0.3.0"

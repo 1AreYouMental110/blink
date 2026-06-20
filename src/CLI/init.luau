@@ -58,7 +58,7 @@ local ARGUMENTS: { [string]: Argument } = {
 	},
 	Benchmark = {
 		Aliases = { "--benchmark" },
-		Description = "Compare protocol v1 and v2 generation size/timing",
+		Description = "Measure v2 generation size/timing against thresholds",
 	},
 	Strict = {
 		Aliases = { "--strict" },
@@ -78,11 +78,23 @@ local ARGUMENTS: { [string]: Argument } = {
 	},
 	Compatibility = {
 		Aliases = { "--compatibility" },
-		Description = "Print protocol and schema compatibility matrix",
+		Description = "Print strict v2 schema/hash compatibility checks",
 	},
 	SchemaDocs = {
 		Aliases = { "--schema-docs" },
 		Description = "Print generated schema documentation",
+	},
+	WriteLock = {
+		Aliases = { "--write-lock" },
+		Description = "Write blink.lock with v2 wire IDs and schema hashes",
+	},
+	CheckLock = {
+		Aliases = { "--check-lock" },
+		Description = "Fail if blink.lock differs from the current schema",
+	},
+	HardeningChecklist = {
+		Aliases = { "--hardening-checklist" },
+		Description = "Fail unsafe release configurations",
 	},
 	Ci = {
 		Aliases = { "--ci" },
@@ -182,6 +194,12 @@ elseif Arguments.Compatibility then
 	Compile.Compatibility(Path, CompileOptions)
 elseif Arguments.SchemaDocs then
 	Compile.SchemaDocs(Path, CompileOptions)
+elseif Arguments.WriteLock then
+	Compile.WriteLock(Path, CompileOptions)
+elseif Arguments.CheckLock then
+	Compile.CheckLock(Path, CompileOptions)
+elseif Arguments.HardeningChecklist then
+	Compile.HardeningChecklist(Path, CompileOptions)
 elseif Arguments.Ci then
 	Compile.Ci(Path, CompileOptions)
 elseif not Arguments.Watch then

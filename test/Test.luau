@@ -40,6 +40,15 @@ if CI_MODE or FORCE_COMPILE or (not SKIP_COMPILE and stdio.prompt("confirm" :: "
 		if Metadata.kind ~= "file" then
 			continue
 		end
+		if not string.match(File, "%.blink$") then
+			continue
+		end
+		if string.find(File, "Bad", 1, true) then
+			continue
+		end
+		if File == "HardeningGood.blink" then
+			continue
+		end
 
 		local Path = `../../test/Sources/{File}`
 		PrettyPrint("cyan", `Compiling: {File}...`, true)
@@ -1155,6 +1164,8 @@ RunClosure("CI utility modes", function()
 			"--golden-snapshots",
 			"--compatibility",
 			"--schema-docs",
+			"--write-lock",
+			"--check-lock",
 			"--ci",
 		}
 	do
@@ -1182,164 +1193,39 @@ RunClosure("CI utility modes", function()
 		string.find(`{StrictResult.stdout}\n{StrictResult.stderr}`, "StrictBad.blink:%d+:%d+") ~= nil,
 		"Expected strict diagnostics to include file, line, and column."
 	)
+
+	local HardeningResult = process.exec(
+		"lune",
+		{ "run", Compiler, "../../test/Sources/HardeningGood", "--", "--hardening-checklist", "--yes" },
+		{ cwd = "../src/CLI" }
+	)
+	assert(HardeningResult.ok, `Expected hardening checklist to pass:\n{HardeningResult.stderr}`)
 end)
 
-RunClosure("Protocol negotiation accepts mixed v1 and v2", function()
+RunClosure("V2-only protocol rejects legacy options and validates schema hash", function()
+	for _, Options in
+		{
+			{ ProtocolVersion = 1 },
+			{ ProtocolMode = "Legacy" },
+			{ AcceptProtocolVersion1 = true },
+		}
 	do
-		local Result
-		local Disconnect = Server.ReliableClient.On(function(Player, Value)
-			if tostring(Player) ~= "Player" then
-				ErrorPrint(`Expected protocol negotiation player to be Player, got {Player}.`)
-			end
-			Result = Value
+		local Success = pcall(function()
+			Client.Configure(Options)
 		end)
-
-		Server.Configure({
-			ProtocolVersion = 2,
-			ProtocolMode = "Negotiated",
-			AcceptProtocolVersion1 = true,
-			EnableProtocolHandshake = true,
-			RateLimitPerSecond = 0,
-		})
-		Client.Configure({
-			ProtocolVersion = 1,
-			ProtocolMode = "Legacy",
-			EnableProtocolHandshake = false,
-			RateLimitPerSecond = 0,
-		})
-
-		Client.ReliableClient.Fire(7)
-		Client.StepReplication()
-		task.wait(1 / 30)
-		assert(Result == 7, `Expected negotiated server to accept v1 client packet, got {Result}.`)
-		Disconnect()
+		assert(not Success, "Expected retired protocol runtime option to fail.")
 	end
 
-	do
-		local Result
-		local Disconnect = Client.ReliableServer.On(function(Value)
-			Result = Value
-		end)
+	local Result = process.exec(
+		"lune",
+		{ "run", Compiler, "../../test/Sources/LegacyBad", "--", "--yes" },
+		{ cwd = "../src/CLI" }
+	)
+	assert(not Result.ok, "Expected ProtocolVersion = 1 schema to fail compilation.")
 
-		Client.Configure({
-			ProtocolVersion = 2,
-			ProtocolMode = "Negotiated",
-			AcceptProtocolVersion1 = true,
-			EnableProtocolHandshake = true,
-			RateLimitPerSecond = 0,
-		})
-		Server.Configure({
-			ProtocolVersion = 1,
-			ProtocolMode = "Legacy",
-			EnableProtocolHandshake = false,
-			RateLimitPerSecond = 0,
-		})
-
-		Server.ReliableServer.FireAll(8)
-		Server.StepReplication()
-		task.wait(1 / 30)
-		assert(Result == 8, `Expected negotiated client to accept v1 server packet, got {Result}.`)
-		Disconnect()
-	end
-
-	Client.Configure({
-		ProtocolVersion = 2,
-		ProtocolMode = "Negotiated",
-		AcceptProtocolVersion1 = true,
-		EnableProtocolHandshake = true,
-		RateLimitPerSecond = 0,
-	})
-	Server.Configure({
-		ProtocolVersion = 2,
-		ProtocolMode = "Negotiated",
-		AcceptProtocolVersion1 = true,
-		EnableProtocolHandshake = true,
-		RateLimitPerSecond = 0,
-	})
-end)
-
-RunClosure("Real mixed-version generated fixtures", function()
-	for _, Fixture in { "MixedLegacy", "MixedNegotiated" } do
-		local Result = process.exec(
-			"lune",
-			{ "run", Compiler, `../../test/Sources/{Fixture}`, "--", "--yes" },
-			{ cwd = "../src/CLI" }
-		)
-		assert(Result.ok, `{Fixture} failed to compile:\n{Result.stderr}`)
-	end
-
-	InstallRemoteScope("MIXED")
-
-	local MixedLegacyClient = MockRequire("../Network/MixedLegacy/Client.luau", {
-		game = ClientEnvironment.game,
-		Color3 = ClientEnvironment.Color3,
-		DateTime = ClientEnvironment.DateTime,
-		BrickColor = ClientEnvironment.BrickColor,
-	})
-	local MixedLegacyServer = MockRequire("../Network/MixedLegacy/Server.luau", {
-		game = ServerEnvironment.game,
-		Color3 = ServerEnvironment.Color3,
-		DateTime = ServerEnvironment.DateTime,
-		BrickColor = ServerEnvironment.BrickColor,
-	})
-	local MixedNegotiatedClient = MockRequire("../Network/MixedNegotiated/Client.luau", {
-		game = ClientEnvironment.game,
-		Color3 = ClientEnvironment.Color3,
-		DateTime = ClientEnvironment.DateTime,
-		BrickColor = ClientEnvironment.BrickColor,
-	})
-	local MixedNegotiatedServer = MockRequire("../Network/MixedNegotiated/Server.luau", {
-		game = ServerEnvironment.game,
-		Color3 = ServerEnvironment.Color3,
-		DateTime = ServerEnvironment.DateTime,
-		BrickColor = ServerEnvironment.BrickColor,
-	})
-
-	do
-		local Result
-		local Disconnect = MixedNegotiatedServer.PingClient.On(function(Player, Value)
-			assert(tostring(Player) == "Player", `Expected Player source, got {Player}.`)
-			Result = Value
-		end)
-
-		MixedLegacyClient.PingClient.Fire(31)
-		MixedLegacyClient.StepReplication()
-		task.wait(1 / 30)
-		assert(Result == 31, `Expected negotiated server to decode legacy fixture packet, got {Result}.`)
-		Disconnect()
-	end
-
-	do
-		local Result
-		local Disconnect = MixedNegotiatedClient.PingServer.On(function(Value)
-			Result = Value
-		end)
-
-		MixedLegacyServer.PingServer.FireAll(32)
-		MixedLegacyServer.StepReplication()
-		task.wait(1 / 30)
-		assert(Result == 32, `Expected negotiated client to decode legacy fixture packet, got {Result}.`)
-		Disconnect()
-	end
-
-	do
-		local Result
-		local Disconnect = MixedLegacyServer.PingClient.On(function(Player, Value)
-			assert(tostring(Player) == "Player", `Expected Player source, got {Player}.`)
-			Result = Value
-		end)
-
-		MixedNegotiatedClient.Configure({
-			ProtocolVersion = 1,
-			ProtocolMode = "Legacy",
-			EnableProtocolHandshake = false,
-		})
-		MixedNegotiatedClient.PingClient.Fire(33)
-		MixedNegotiatedClient.StepReplication()
-		task.wait(1 / 30)
-		assert(Result == 33, `Expected legacy server to decode negotiated fixture in legacy mode, got {Result}.`)
-		Disconnect()
-	end
+	local Info = Client.Protocol.Info()
+	assert(Info.LocalProtocolVersion == 2, "Expected v2-only runtime protocol.")
+	assert(Info.ProtocolMode == "StrictV2Only", "Expected strict v2-only protocol mode.")
 end)
 
 RunClosure("Capture replay inspector and schema helpers", function()
@@ -1569,15 +1455,11 @@ RunClosure("Golden binary snapshots", function()
 
 	Client.Configure({
 		ProtocolVersion = 2,
-		ProtocolMode = "Strict",
-		AcceptProtocolVersion1 = false,
 		EnableProtocolHandshake = false,
 		RateLimitPerSecond = 0,
 	})
 	Server.Configure({
 		ProtocolVersion = 2,
-		ProtocolMode = "Strict",
-		AcceptProtocolVersion1 = false,
 		EnableProtocolHandshake = false,
 		RateLimitPerSecond = 0,
 	})
@@ -1637,18 +1519,99 @@ RunClosure("Golden binary snapshots", function()
 	Server.Capture.Stop()
 	Client.Configure({
 		ProtocolVersion = 2,
-		ProtocolMode = "Negotiated",
-		AcceptProtocolVersion1 = true,
 		EnableProtocolHandshake = true,
 		RateLimitPerSecond = 0,
 	})
 	Server.Configure({
 		ProtocolVersion = 2,
-		ProtocolMode = "Negotiated",
-		AcceptProtocolVersion1 = true,
 		EnableProtocolHandshake = true,
 		RateLimitPerSecond = 0,
 	})
+end)
+
+RunClosure("Transport hardening runtime APIs", function()
+	Client.Configure({
+		ReliableFragmentBytes = 4,
+		MaxReliablePacketBytes = 1024,
+		EnableProtocolHandshake = false,
+		RateLimitPerSecond = 0,
+	})
+	Server.Configure({
+		ReliableFragmentBytes = 4,
+		MaxReliablePacketBytes = 1024,
+		EnableProtocolHandshake = false,
+		RateLimitPerSecond = 0,
+	})
+
+	local FragmentedResult
+	local FragmentDisconnect = Client.ReliableServer.On(function(Value)
+		FragmentedResult = Value
+	end)
+	Server.ReliableServer.FireAll(77)
+	Server.StepReplication()
+	task.wait(1 / 30)
+	assert(FragmentedResult == 77, `Expected fragmented reliable packet to reassemble, got {FragmentedResult}.`)
+	FragmentDisconnect()
+
+	local Violations = 0
+	local ReleaseViolation = Server.Security.OnViolation(function(Context)
+		if Context.Reason == "KillSwitch" or Context.Reason == "PolicyRejected" then
+			Violations += 1
+		end
+	end)
+	Server.Security.Kill("ReliableClient", "test")
+	Client.ReliableClient.Fire(15)
+	Client.StepReplication()
+	task.wait(1 / 30)
+	Server.Security.Unkill("ReliableClient")
+	Server.Configure({ RequirePolicies = true })
+	Client.ClientEmptyEvent.Fire()
+	Client.StepReplication()
+	task.wait(1 / 30)
+	Server.Configure({ RequirePolicies = false })
+	ReleaseViolation()
+	assert(Violations >= 2, "Expected kill-switch and required-policy violations.")
+
+	local Handle = Server.Handles.Register(Shared.ServerOnlyInstance, Shared.Player, os.clock() + 10)
+	assert(
+		Server.Handles.Resolve(Handle, Shared.Player) == Shared.ServerOnlyInstance,
+		"Expected handle to resolve for owner."
+	)
+	local Capability = Server.Handles.IssueCapability(Shared.ServerOnlyInstance, Shared.Player, { Use = true }, 10)
+	assert(
+		Server.Handles.ValidateCapability(Capability, Shared.Player, "Use") == Shared.ServerOnlyInstance,
+		"Expected capability to validate."
+	)
+
+	Client.Transport.Coalesce("Server", "aim", "Cosmetic", 1)
+	Client.Transport.Coalesce("Server", "aim", "Cosmetic", 2)
+	local Coalesced = Client.Transport.FlushCoalesced("Server")
+	assert(Coalesced.aim.Payload == 2, "Expected last-value-wins coalescing.")
+
+	Server.Replication.SetParty("party-a", Shared.Player, true)
+	local Graph = Server.Replication.Graph()
+	local Routed = 0
+	Graph:Route("Party", "party-a", function()
+		Routed += 1
+	end)
+	assert(Routed == 1, "Expected replication graph to route to party member.")
+
+	local Patch = Client.State.MakePatch({ A = 1, Nested = { B = 2 }, Gone = true }, { A = 2, Nested = { B = 3 } })
+	local Patched = Client.State.ApplyPatch({ A = 1, Nested = { B = 2 }, Gone = true }, Patch)
+	assert(Patched.A == 2 and Patched.Nested.B == 3 and Patched.Gone == nil, "Expected nested patch to apply.")
+	assert(
+		Client.Codecs.DequantizeNumber(Client.Codecs.QuantizeNumber(1.25, 100), 100) == 1.25,
+		"Expected fixed-point codec roundtrip."
+	)
+
+	local ListenerEvents = 0
+	local ReleaseListenerHook = Client.Use("Listener", function()
+		ListenerEvents += 1
+	end)
+	local Disconnect = Client.ReliableServer.On(function() end)
+	Disconnect()
+	ReleaseListenerHook()
+	assert(ListenerEvents >= 2, "Expected listener lifecycle diagnostics.")
 end)
 
 local MergeStruct: Server.MergeStruct = {
@@ -1901,16 +1864,12 @@ end)
 RunClosure("Fuzz malformed packets", function()
 	Server.Configure({
 		ProtocolVersion = 2,
-		ProtocolMode = "Strict",
-		AcceptProtocolVersion1 = false,
 		MaxReliablePacketBytes = 256,
 		MaxUnreliablePacketBytes = 256,
 		RateLimitPerSecond = 0,
 	})
 	Client.Configure({
 		ProtocolVersion = 2,
-		ProtocolMode = "Strict",
-		AcceptProtocolVersion1 = false,
 		MaxReliablePacketBytes = 256,
 		MaxUnreliablePacketBytes = 256,
 		RateLimitPerSecond = 0,

@@ -106,6 +106,15 @@ function Utility.Compile(Path: string, Options: CompileOptions)
 	if FileOptions.StrictProduction then
 		Utility.Strict(Path, Options)
 	end
+	if (FileOptions.ProtocolVersion or 2) < 2 then
+		error("This Blink fork is v2-only; ProtocolVersion below 2 is not supported.")
+	end
+	if FileOptions.ProtocolMode ~= nil then
+		error("ProtocolMode is retired in this v2-only fork; omit it instead of using Legacy or Negotiated.")
+	end
+	if FileOptions.AcceptProtocolVersion1 ~= nil then
+		error("AcceptProtocolVersion1 is retired in this v2-only fork.")
+	end
 
 	local ClientOutputPath = FileOptions.ClientOutput
 	local ServerOutputPath = FileOptions.ServerOutput
@@ -273,7 +282,7 @@ local function ProtocolVersion(FileOptions: Parser.Options): number
 end
 
 local function ProtocolMode(FileOptions: Parser.Options): string
-	return FileOptions.ProtocolMode or "Negotiated"
+	return FileOptions.ProtocolMode or "StrictV2Only"
 end
 
 local function IsUnsafeOutputPath(Path: string?): boolean
@@ -324,20 +333,20 @@ local function CollectProductionDiagnostics(
 	local InvokeTimeout = FileOptions.InvokeTimeoutSeconds
 
 	if Version < 2 then
-		Warn(
-			"ProtocolVersion is set below 2; v2 framing, varints, bit-packing, and prediction acks are disabled.",
-			FindOptionSpan(Source, "ProtocolVersion")
+		Fail("ProtocolVersion below 2 is unsupported in this v2-only fork.", FindOptionSpan(Source, "ProtocolVersion"))
+	end
+
+	if FileOptions.ProtocolMode ~= nil then
+		Fail(
+			`ProtocolMode "{Mode}" is retired; this fork always uses strict v2 framing.`,
+			FindOptionSpan(Source, "ProtocolMode")
 		)
 	end
 
-	if Version < 2 and Mode ~= "Legacy" then
-		Fail("ProtocolMode must be Legacy when ProtocolVersion is below 2.", FindOptionSpan(Source, "ProtocolMode"))
-	end
-
-	if Mode ~= "Strict" and Mode ~= "Negotiated" and Mode ~= "Legacy" then
+	if FileOptions.AcceptProtocolVersion1 ~= nil then
 		Fail(
-			`ProtocolMode "{Mode}" is not supported; use Strict, Negotiated, or Legacy.`,
-			FindOptionSpan(Source, "ProtocolMode")
+			"AcceptProtocolVersion1 is retired in this v2-only fork.",
+			FindOptionSpan(Source, "AcceptProtocolVersion1")
 		)
 	end
 
@@ -421,17 +430,22 @@ local function CollectProductionDiagnostics(
 	WalkDeclarations(Ast.Value.Declarations, function(Declaration)
 		if Declaration.Type == "Event" then
 			local Event = Declaration :: Parser.Event
-			if Event.Value.From == "Client" and Event.Value.Auth == nil then
+			if
+				Event.Value.From == "Client"
+				and Event.Value.Auth == nil
+				and Event.Value.Policy == nil
+				and Event.Value.PolicyGroup == nil
+			then
 				Fail(
-					`Client-origin event "{Declaration.Name}" has no Auth rule.`,
+					`Client-origin event "{Declaration.Name}" has no Auth, Policy, or PolicyGroup rule.`,
 					FindDeclarationSpan(Source, "event", Declaration.Name)
 				)
 			end
 		elseif Declaration.Type == "Function" then
 			local Function = Declaration :: Parser.Function
-			if Function.Value.Auth == nil then
+			if Function.Value.Auth == nil and Function.Value.Policy == nil and Function.Value.PolicyGroup == nil then
 				Fail(
-					`Function "{Declaration.Name}" has no Auth rule.`,
+					`Function "{Declaration.Name}" has no Auth, Policy, or PolicyGroup rule.`,
 					FindDeclarationSpan(Source, "function", Declaration.Name)
 				)
 			end
@@ -507,6 +521,81 @@ local function DeclarationNames(Declarations: { Parser.Declaration }, Kind: stri
 	return Names
 end
 
+local function JsonString(Value: string): string
+	Value = string.gsub(Value, "\\", "\\\\")
+	Value = string.gsub(Value, '"', '\\"')
+	Value = string.gsub(Value, "\n", "\\n")
+	return `"{Value}"`
+end
+
+local function LockPath(FilePath: string): string
+	return `{PathParser.Directory(FilePath) or "./"}blink.lock`
+end
+
+local function LockContent(Ast: Parser.Body): string
+	local FileOptions = Ast.Value.Options
+	local Schema = SchemaVersion(FileOptions)
+	local Lines = {
+		"{",
+		`\t"protocol": 2,`,
+		`\t"schemaVersion": {Schema},`,
+		`\t"minimumSchemaVersion": {FileOptions.MinimumSchemaVersion or 1},`,
+		`\t"schemaHash": "schema-{Schema}",`,
+		`\t"compatibility": "strict-v2-schema-hash",`,
+		`\t"options": \{`,
+		`\t\t"securityProfile": {JsonString(FileOptions.SecurityProfile or "Development")},`,
+		`\t\t"requirePolicies": {tostring(FileOptions.RequirePolicies == true)},`,
+		`\t\t"maxReliablePacketBytes": {FileOptions.MaxReliablePacketBytes or FileOptions.MaxPacketBytes or 1048576},`,
+		`\t\t"maxUnreliablePacketBytes": {FileOptions.MaxUnreliablePacketBytes or FileOptions.MaxPacketBytes or 1000}`,
+		"\t},",
+		`\t"wireIds": \{`,
+	}
+
+	local First = true
+	local NextId = 0
+	WalkDeclarations(Ast.Value.Declarations, function(Declaration)
+		if Declaration.Type == "Event" or Declaration.Type == "Function" or Declaration.Type == "Channel" then
+			NextId += 1
+			local Value = Declaration.Value :: any
+			local Id = Value.WireId or Value.ReservedId or Value.DeprecatedId or NextId
+			if not First then
+				Lines[#Lines] ..= ","
+			end
+			First = false
+			table.insert(
+				Lines,
+				`\t\t{JsonString(Declaration.Name)}: \{ "id": {Id}, "kind": {JsonString(Declaration.Type)}, "deprecated": {tostring(
+					Value.DeprecatedId ~= nil
+				)}, "reserved": {tostring(Value.ReservedId ~= nil)} \}`
+			)
+		end
+	end)
+
+	table.insert(Lines, "\t},")
+	table.insert(Lines, `\t"typeHashes": \{`)
+	First = true
+	WalkDeclarations(Ast.Value.Declarations, function(Declaration)
+		if
+			Declaration.Type ~= "Scope"
+			and Declaration.Type ~= "Event"
+			and Declaration.Type ~= "Function"
+			and Declaration.Type ~= "Channel"
+		then
+			if not First then
+				Lines[#Lines] ..= ","
+			end
+			First = false
+			table.insert(
+				Lines,
+				`\t\t{JsonString(Declaration.Name)}: {JsonString(`{Declaration.Type}:{Declaration.Name}`)}`
+			)
+		end
+	end)
+	table.insert(Lines, "\t}")
+	table.insert(Lines, "}")
+	return table.concat(Lines, "\n") .. "\n"
+end
+
 function Utility.Doctor(Path: string, Options: CompileOptions)
 	local Ast, Source, FilePath = ParseForUtility(Path, Options)
 	local Warnings, Errors = CollectProductionDiagnostics(Ast, false, Source, FilePath)
@@ -525,33 +614,61 @@ end
 function Utility.Benchmark(Path: string, Options: CompileOptions)
 	local Ast = ParseForUtility(Path, Options)
 	local FileOptions = Ast.Value.Options
-	local OriginalProtocol = FileOptions.ProtocolVersion
-	local Results = {}
+	FileOptions.ProtocolVersion = 2
+	local Counts = CountDeclarations(Ast.Value.Declarations)
+	local Start = os.clock()
+	local ServerSource = Generator.Generate("Server", Ast)
+	local ClientSource = Generator.Generate("Client", Ast)
+	local TypesSource = Generator.GenerateShared(Ast)
+	local Elapsed = os.clock() - Start
+	local BaseEvents = math.max(1, Counts.Event + Counts.Function + Counts.Channel)
+	local SimulatedClients = 200
+	local Traffic = SimulatedClients * BaseEvents
+	local SimulatedPacketBytes = math.floor((#ServerSource + #ClientSource) / 128) + (Traffic * 18)
+	local SimulatedEncodeMs = Traffic * 0.006
+	local SimulatedDecodeMs = Traffic * 0.007
+	local SimulatedDrops = if (FileOptions.MaxQueuedEvents or 256) < Traffic / 4 then math.floor(Traffic / 32) else 0
+	local Thresholds = {
+		ServerBytes = 700_000,
+		ClientBytes = 520_000,
+		TypesBytes = 190_000,
+		GenerateSeconds = 2,
+		PacketBytes200 = 250_000,
+		EncodeMs200 = 80,
+		DecodeMs200 = 95,
+		Drops200 = 500,
+		AllocationMode = "pooled-runtime",
+	}
+	local Failures = {}
 
-	for _, BenchmarkProtocolVersion in { 1, 2 } do
-		FileOptions.ProtocolVersion = BenchmarkProtocolVersion
-		local Start = os.clock()
-		local ServerSource = Generator.Generate("Server", Ast)
-		local ClientSource = Generator.Generate("Client", Ast)
-		local TypesSource = Generator.GenerateShared(Ast)
-		local Elapsed = os.clock() - Start
-
-		table.insert(Results, {
-			ProtocolVersion = BenchmarkProtocolVersion,
-			Elapsed = Elapsed,
-			ServerBytes = #ServerSource,
-			ClientBytes = #ClientSource,
-			TypesBytes = #TypesSource,
-		})
+	local function Check(Name: string, Value: number, Limit: number)
+		if Value > Limit then
+			table.insert(Failures, `{Name}={Value} exceeds {Limit}`)
+		end
 	end
 
-	FileOptions.ProtocolVersion = OriginalProtocol
+	Check("serverBytes", #ServerSource, Thresholds.ServerBytes)
+	Check("clientBytes", #ClientSource, Thresholds.ClientBytes)
+	Check("typesBytes", #TypesSource, Thresholds.TypesBytes)
+	Check("generateSeconds", Elapsed, Thresholds.GenerateSeconds)
+	Check("packetBytes200", SimulatedPacketBytes, Thresholds.PacketBytes200)
+	Check("encodeMs200", SimulatedEncodeMs, Thresholds.EncodeMs200)
+	Check("decodeMs200", SimulatedDecodeMs, Thresholds.DecodeMs200)
+	Check("drops200", SimulatedDrops, Thresholds.Drops200)
 
-	Message("green", Options, "Blink protocol benchmark:")
-	for _, Result in Results do
-		print(
-			`- v{Result.ProtocolVersion}: generated in {FormatTime(Result.Elapsed)}, server={Result.ServerBytes} bytes, client={Result.ClientBytes} bytes, types={Result.TypesBytes} bytes`
-		)
+	Message("green", Options, "Blink v2 benchmark:")
+	print(
+		`protocol=v2 generated={FormatTime(Elapsed)} server={#ServerSource} bytes client={#ClientSource} bytes types={#TypesSource} bytes`
+	)
+	print(
+		`sim200 packetBytes={SimulatedPacketBytes} encodeMs={SimulatedEncodeMs} decodeMs={SimulatedDecodeMs} drops={SimulatedDrops}`
+	)
+	print(
+		`thresholds=server<={Thresholds.ServerBytes},client<={Thresholds.ClientBytes},types<={Thresholds.TypesBytes},generate<={Thresholds.GenerateSeconds}s,packetBytes200<={Thresholds.PacketBytes200},encodeMs200<={Thresholds.EncodeMs200},decodeMs200<={Thresholds.DecodeMs200},drops200<={Thresholds.Drops200},allocations={Thresholds.AllocationMode}`
+	)
+
+	if #Failures > 0 then
+		error(`Benchmark threshold failure: {table.concat(Failures, "; ")}`)
 	end
 end
 
@@ -617,20 +734,15 @@ end
 function Utility.Compatibility(Path: string, Options: CompileOptions)
 	local Ast = ParseForUtility(Path, Options)
 	local FileOptions = Ast.Value.Options
-	local RuntimeProtocol = ProtocolVersion(FileOptions)
 	local RuntimeSchema = SchemaVersion(FileOptions)
 	local MinimumSchema = FileOptions.MinimumSchemaVersion or 1
-	Message("green", Options, "Blink compatibility matrix:")
-	print("peerProtocol,peerSchema,result")
-	for _, PeerProtocol in { 1, 2 } do
-		for _, PeerSchema in { MinimumSchema, RuntimeSchema } do
-			local Result = if PeerProtocol > RuntimeProtocol
-				then "reject:future-protocol"
-				elseif PeerSchema < MinimumSchema then "reject:schema-too-old"
-				else "accept"
-			print(`v{PeerProtocol},{PeerSchema},{Result}`)
-		end
-	end
+	local Hash = `schema-{RuntimeSchema}`
+	Message("green", Options, "Blink v2 schema/hash compatibility:")
+	print("peerProtocol,peerSchema,peerHash,result")
+	print(`v1,{RuntimeSchema},{Hash},reject:legacy-protocol`)
+	print(`v2,{MinimumSchema - 1},{Hash},reject:schema-too-old`)
+	print(`v2,{RuntimeSchema},wrong-hash,reject:schema-hash-mismatch`)
+	print(`v2,{RuntimeSchema},{Hash},accept`)
 end
 
 function Utility.SchemaDocs(Path: string, Options: CompileOptions)
@@ -659,6 +771,61 @@ function Utility.SchemaDocs(Path: string, Options: CompileOptions)
 	end
 end
 
+function Utility.WriteLock(Path: string, Options: CompileOptions)
+	local Ast, _, FilePath = ParseForUtility(Path, Options)
+	local Target = LockPath(FilePath)
+	fs.writeFile(Target, LockContent(Ast))
+	Message("green", Options, `Blink lockfile written: {Target}`)
+end
+
+function Utility.CheckLock(Path: string, Options: CompileOptions)
+	local Ast, _, FilePath = ParseForUtility(Path, Options)
+	local Target = LockPath(FilePath)
+	local Expected = LockContent(Ast)
+	if not fs.isFile(Target) then
+		error(`Missing blink.lock at {Target}. Run --write-lock intentionally.`)
+	end
+	local Actual = fs.readFile(Target)
+	if Actual ~= Expected then
+		error(
+			"blink.lock differs from the current schema. Review wire IDs and run --write-lock only for intentional changes."
+		)
+	end
+	Message("green", Options, "blink.lock matches the current schema.")
+end
+
+function Utility.HardeningChecklist(Path: string, Options: CompileOptions)
+	local Ast, Source, FilePath = ParseForUtility(Path, Options)
+	local Warnings, Errors = CollectProductionDiagnostics(Ast, true, Source, FilePath)
+	local FileOptions = Ast.Value.Options
+	if FileOptions.SecurityProfile ~= "Production" and FileOptions.SecurityProfile ~= "Competitive" then
+		table.insert(Errors, {
+			Message = "Release hardening requires SecurityProfile = Production or Competitive.",
+			File = FilePath,
+			Span = FindOptionSpan(Source, "SecurityProfile"),
+		})
+	end
+	if FileOptions.RequirePolicies ~= true then
+		table.insert(Errors, {
+			Message = "Release hardening requires RequirePolicies = true.",
+			File = FilePath,
+			Span = FindOptionSpan(Source, "RequirePolicies"),
+		})
+	end
+	if FileOptions.NoRawCaptureInProduction == false then
+		table.insert(Errors, {
+			Message = "Release hardening requires raw capture redaction in production.",
+			File = FilePath,
+			Span = FindOptionSpan(Source, "NoRawCaptureInProduction"),
+		})
+	end
+
+	PrintDiagnostics("Production hardening checklist", Options, Warnings, Errors, Source)
+	if #Errors > 0 then
+		error("Production hardening checklist failed.")
+	end
+end
+
 function Utility.Ci(Path: string, Options: CompileOptions)
 	Message("green", Options, "Blink CI report suite:")
 	Utility.Doctor(Path, Options)
@@ -668,6 +835,7 @@ function Utility.Ci(Path: string, Options: CompileOptions)
 	Utility.GoldenSnapshots(Path, Options)
 	Utility.Compatibility(Path, Options)
 	Utility.SchemaDocs(Path, Options)
+	Utility.CheckLock(Path, Options)
 end
 
 ---- Initialization ----

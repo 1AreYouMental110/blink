@@ -1,0 +1,18 @@
+std = "roblox"
+exclude = [
+	"Network/**",
+	"docs/**",
+	"benchmark/vendor/**",
+]
+
+[lints]
+deprecated = "allow"
+empty_loop = "allow"
+global_usage = "allow"
+if_same_then_else = "allow"
+mixed_table = "allow"
+multiple_statements = "allow"
+roblox_manual_fromscale_or_fromoffset = "allow"
+shadowing = "allow"
+unscoped_variables = "deny"
+unused_variable = "allow"

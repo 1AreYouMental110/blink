@@ -1,0 +1,31 @@
+option Casing = Pascal
+option ClientOutput = "Network/HardeningGoodClient.luau"
+option ServerOutput = "Network/HardeningGoodServer.luau"
+option SecurityProfile = Production
+option RequirePolicies = true
+option MaxPacketBytes = 65536
+option MaxUnreliablePacketBytes = 900
+option RateLimitPerSecond = 60
+option RateLimitBurst = 120
+option InvokeTimeoutSeconds = 10
+option SyncValidation = false
+option WriteValidations = false
+
+event DamageRequest {
+    From: Client,
+    Type: Reliable,
+    Call: SingleAsync,
+    Policy: "damage",
+    Risk: Damage,
+    Priority: Critical,
+    MaxPacketBytes: 128,
+    Data: u16
+}
+
+function InventoryQuery {
+    Yield: Coroutine,
+    Policy: "inventory",
+    Risk: Inventory,
+    Data: u16,
+    Return: u16
+}

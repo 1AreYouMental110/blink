@@ -1,0 +1,11 @@
+option Casing = Pascal
+option ClientOutput = "../../Network/LegacyBadClient.luau"
+option ServerOutput = "../../Network/LegacyBadServer.luau"
+option ProtocolVersion = 1
+
+event Ping {
+    From: Client,
+    Type: Reliable,
+    Call: SingleSync,
+    Data: u8
+}

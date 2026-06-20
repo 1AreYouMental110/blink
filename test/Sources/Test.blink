@@ -14,9 +14,11 @@ option MaxPendingInvokes = 256
 option InvokeTimeoutSeconds = 0
 option Version = 2
 option MinimumSchemaVersion = 1
-option ProtocolMode = Negotiated
 option CaptureRedactions = "Secret,Token,Password"
 option CaptureLimit = 256
+option ReliableFragmentBytes = 64
+option MaxInFlightFragments = 16
+option FragmentTimeoutSeconds = 5
 
 import "./Indexers"
 import "./Sub-Sources/Source"
@@ -473,6 +475,8 @@ event ReliableClient {
     From: Client,
     Type: Reliable,
     Call: SingleSync,
+    Policy: "damage",
+    Priority: Gameplay,
     Data: u8
 }
 
@@ -480,6 +484,9 @@ event UnreliableServer {
     From: Server,
     Type: Unreliable,
     Call: SingleSync,
+    Priority: Cosmetic,
+    ReliabilityMode: Latest,
+    CoalesceKey: "UnreliableServer",
     Data: u8
 }
 

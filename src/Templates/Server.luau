@@ -30,6 +30,7 @@ Players.PlayerRemoving:Connect(function(Player)
 end)
 
 local function StepReplication()
+    ProfileBegin("Blink.Flush.Server")
     RunStateFlushers()
     for Player, Send in PlayersMap do
         Load(Send)
@@ -39,14 +40,20 @@ local function StepReplication()
         if Send.Cursor <= 0 then
             continue
         end
+        if not RuntimeSupport.ShouldFlush(Player, "Reliable", Send.Cursor, "Gameplay") then
+            continue
+        end
 
         local Buffer = buffer.create(Send.Cursor)
         buffer.copy(Buffer, 0, Send.Buffer, 0, Send.Cursor)
         if RuntimeConfig.MaxReliablePacketBytes > 0 and Send.Cursor > RuntimeConfig.MaxReliablePacketBytes then
             DropPacket(Player, "Reliable", "MaxPacketBytes", Send.Cursor)
         elseif IsPlayerActive(Player) then
-            Reliable:FireClient(Player, Buffer, InstancePayload(Send.Instances))
-            TrackSend("Reliable", Send.Cursor, Player)
+            for _, Fragment in RuntimeSupport.FragmentReliablePacket(Player, Buffer, InstancePayload(Send.Instances)) do
+                Reliable:FireClient(Player, Fragment.Buffer, Fragment.Instances)
+                TrackSend("Reliable", buffer.len(Fragment.Buffer), Player)
+            end
+            RuntimeSupport.RecordFlush(Player, "Reliable", Send.Cursor)
         end
 
         Send.Size = 64
@@ -58,5 +65,6 @@ local function StepReplication()
         Send.NextStringId = 1
         table.clear(Send.Instances)
     end
+    ProfileEnd()
 end
 ]]

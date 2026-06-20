@@ -20,18 +20,22 @@ local RecieveMessageStart = 0
 local RecieveFrameEnd = 0
 local RecieveFrameInstanceEnd = 0
 local RecievePredictionId: number? = nil
-local ActiveProtocolVersion: number? = nil
-local SendProtocolVersion: number? = nil
 
 local RecieveInstances = {}
 local RecieveInstanceCursor = 0
 local Allocate: (number) -> number
 local Read: (number) -> number
+local BeginMessage: (number) -> any
+local EndMessage: (any?) -> ()
+local GetGroupPlayers: (string) -> {Player}
+local GetInterestZonePlayers: (string, string) -> {Player}
 
 local Null = newproxy()
 local Tombstone = newproxy()
 local PREDICTION_ACK_INDEX = 255
 local CAPABILITY_HANDSHAKE_INDEX = 254
+local FRAGMENT_INDEX = 253
+local PROTOCOL_VERSION = 2
 local SERVER_PEER_KEY = "__server"
 
 type Entry = {
@@ -90,8 +94,41 @@ local Hooks: {[string]: {(...any) -> any}} = {
     Error = {},
     Predict = {},
     Ack = {},
-    Rollback = {}
+    Rollback = {},
+    Violation = {},
+    Telemetry = {},
+    Listener = {}
 }
+
+local TransportError = table.freeze({
+    InvalidBuffer = "InvalidBuffer",
+    InvalidInstances = "InvalidInstances",
+    MaxPacketBytes = "MaxPacketBytes",
+    MalformedPacket = "MalformedPacket",
+    MalformedHandshake = "MalformedHandshake",
+    IncompatibleProtocol = "IncompatibleProtocol",
+    FragmentTimeout = "FragmentTimeout",
+    FragmentOverflow = "FragmentOverflow",
+    ReplayDuplicate = "ReplayDuplicate",
+    ReplayStale = "ReplayStale",
+    QueueFull = "QueueFull",
+    Backpressure = "Backpressure",
+    RateLimit = "RateLimit",
+    PolicyRejected = "PolicyRejected",
+    AuthRejected = "AuthRejected",
+    KillSwitch = "KillSwitch",
+    Honeypot = "Honeypot",
+    Canonicalization = "Canonicalization",
+    DecodeBudget = "DecodeBudget",
+    MiddlewareRejected = "MiddlewareRejected",
+})
+
+local PriorityOrder = table.freeze({
+    Critical = 1,
+    Gameplay = 2,
+    Cosmetic = 3,
+    Background = 4,
+})
 
 local function IsPlayerActive(Player: any): boolean
     local Success, Parent = pcall(function()
@@ -119,10 +156,68 @@ local AuthRules: {[string]: (any) -> boolean} = {
     end
 }
 
-local Groups: {[string]: {[Player]: true}} = {}
-local InterestZones: {[string]: {[Player]: string}} = {}
-local InterestPositions: {[string]: {[Player]: Vector3}} = {}
-local RateLimitState: {[any]: {[string]: {Tokens: number, Updated: number}}} = {}
+local RuntimeState = {
+    Groups = {} :: {[string]: {[Player]: true}},
+    Parties = {} :: {[string]: {[Player]: true}},
+    Matches = {} :: {[string]: {[Player]: true}},
+    Teams = {} :: {[string]: {[Player]: true}},
+    StreamedCells = {} :: {[string]: {[Player]: true}},
+    ObjectOwners = {} :: {[any]: {[Player]: true}},
+    InterestZones = {} :: {[string]: {[Player]: string}},
+    InterestPositions = {} :: {[string]: {[Player]: Vector3}},
+    PlayerInterest = {
+        Group = {} :: {[Player]: string},
+        Party = {} :: {[Player]: string},
+        Match = {} :: {[Player]: string},
+        Team = {} :: {[Player]: string},
+        Zone = {} :: {[Player]: string},
+        Cell = {} :: {[Player]: string},
+    },
+    RateLimit = {} :: {[any]: {[string]: {Tokens: number, Updated: number}}},
+    StateFlushers = {} :: {() -> ()},
+    Prediction = {
+        NextId = 0,
+        Pending = {} :: {[number]: {
+            Name: string,
+            Payload: any,
+            Started: number
+        }}
+    },
+    StateChannels = {} :: {[string]: any},
+    PeerCapabilities = {} :: {[any]: any},
+    PeerHandshakesSent = {} :: {[any]: boolean},
+    Fragments = {} :: {[any]: {[number]: any}},
+    NextFragmentId = 0,
+    Transport = {} :: {[any]: any},
+    Coalesce = {} :: {[any]: {[string]: any}},
+    Replay = {} :: {[any]: {[string]: any}},
+    InvokeNonces = {} :: {[any]: {[string]: number}},
+    Abuse = {} :: {[any]: {[string]: number}},
+    Listeners = {} :: {[string]: {[any]: true}},
+    KilledRemotes = {} :: {[string]: string},
+    KilledPolicyGroups = {} :: {[string]: string},
+    PolicyRules = {} :: {[string]: (any) -> (boolean, string?)},
+    PolicyGroups = {} :: {[string]: {string}},
+    Idempotency = {} :: {[any]: {[string]: number}},
+    Handles = {} :: {[number]: any},
+    ObjectToHandle = {} :: {[any]: number},
+    Capabilities = {} :: {[number]: any},
+    NextHandleId = 0,
+    NextCapabilityId = 0,
+    Capture = {
+        Enabled = false,
+        Entries = {},
+        Redactions = {} :: {[string]: true},
+        Limit = 1024
+    },
+    Inspector = {
+        Enabled = false
+    },
+    SchemaMigrations = {} :: {[number]: (any) -> any},
+    SchemaDefaults = {} :: {[string]: any},
+    SchemaRenames = {} :: {[string]: string},
+    SchemaDeprecated = {} :: {[string]: true},
+}
 local Calls: {[number]: Invocation} = {}
 local PendingInvokes = 0
 local PendingInvokesByName: {[string]: number} = {}
@@ -131,33 +226,6 @@ local SendStringIds: {[string]: number} = {}
 local RecieveStrings: {[number]: string} = {}
 local NextSendStringId = 1
 local NextRecieveStringId = 1
-local StateFlushers: {() -> ()} = {}
-
-local PredictionState = {
-    NextId = 0,
-    Pending = {} :: {[number]: {
-        Name: string,
-        Payload: any,
-        Started: number
-    }}
-}
-
-local StateChannels: {[string]: any} = {}
-local PeerCapabilities: {[any]: any} = {}
-local PeerHandshakesSent: {[any]: boolean} = {}
-local CaptureState = {
-    Enabled = false,
-    Entries = {},
-    Redactions = {} :: {[string]: true},
-    Limit = 1024
-}
-local InspectorState = {
-    Enabled = false
-}
-local SchemaMigrations: {[number]: (any) -> any} = {}
-local SchemaDefaults: {[string]: any} = {}
-local SchemaRenames: {[string]: string} = {}
-local SchemaDeprecated: {[string]: true} = {}
 local RuntimeSupport = {}
 
 local function CloneBuffer(Source: buffer?, Start: number?, Size: number?): buffer?
@@ -185,7 +253,7 @@ local function CloneArray(Source: {any}?): {any}?
 end
 
 function RuntimeSupport.SetCaptureRedactions(Redactions: any)
-    table.clear(CaptureState.Redactions)
+    table.clear(RuntimeState.Capture.Redactions)
 
     if Redactions == nil or Redactions == "" then
         return
@@ -196,14 +264,14 @@ function RuntimeSupport.SetCaptureRedactions(Redactions: any)
             Field = string.gsub(Field, "^%s+", "")
             Field = string.gsub(Field, "%s+$", "")
             if Field ~= "" then
-                CaptureState.Redactions[Field] = true
+                RuntimeState.Capture.Redactions[Field] = true
             end
         end
         return
     end
 
     for _, Field in Redactions do
-        CaptureState.Redactions[tostring(Field)] = true
+        RuntimeState.Capture.Redactions[tostring(Field)] = true
     end
 end
 
@@ -247,7 +315,7 @@ function RuntimeSupport.SummarizeValue(Value: any, Depth: number?): string
         end
 
         local KeyText = tostring(Key)
-        local ChildText = if CaptureState.Redactions[KeyText] then "[redacted]" else RuntimeSupport.SummarizeValue(Child, Depth + 1)
+        local ChildText = if RuntimeState.Capture.Redactions[KeyText] then "[redacted]" else RuntimeSupport.SummarizeValue(Child, Depth + 1)
         table.insert(Parts, `{KeyText}={ChildText}`)
     end
 
@@ -256,41 +324,54 @@ function RuntimeSupport.SummarizeValue(Value: any, Depth: number?): string
 end
 
 function RuntimeSupport.RecordCapture(Entry: {[string]: any})
-    if not CaptureState.Enabled and not RuntimeConfig.EnablePacketCapture and not InspectorState.Enabled and not RuntimeConfig.EnableInspector then
+    if not RuntimeState.Capture.Enabled and not RuntimeConfig.EnablePacketCapture and not RuntimeState.Inspector.Enabled and not RuntimeConfig.EnableInspector then
         return
     end
 
-    if Entry.RawBuffer ~= nil then
+    local KeepRaw = not (RuntimeConfig.NoRawCaptureInProduction and RuntimeConfig.SecurityProfile ~= "Development")
+    if KeepRaw and Entry.RawBuffer ~= nil then
         Entry.Buffer = CloneBuffer(Entry.RawBuffer, Entry.RawBufferStart, Entry.RawBufferSize)
         Entry.RawBuffer = nil
         Entry.RawBufferStart = nil
         Entry.RawBufferSize = nil
+    elseif Entry.RawBuffer ~= nil then
+        Entry.RawBuffer = nil
+        Entry.RawBufferStart = nil
+        Entry.RawBufferSize = nil
+        Entry.RawRedacted = true
     end
-    if Entry.RawInstances ~= nil then
+    if KeepRaw and Entry.RawInstances ~= nil then
         Entry.Instances = CloneArray(Entry.RawInstances)
+        Entry.RawInstances = nil
+    elseif Entry.RawInstances ~= nil then
         Entry.RawInstances = nil
     end
 
     Entry.Time = os.clock()
-    Entry.ProtocolVersion = ActiveProtocolVersion or SendProtocolVersion or RuntimeConfig.ProtocolVersion
+    Entry.ProtocolVersion = PROTOCOL_VERSION
     Entry.SchemaVersion = RuntimeConfig.SchemaVersion
+    Entry.SchemaHash = RuntimeConfig.SchemaHash
+    Entry.Redaction = {
+        Raw = not KeepRaw,
+        Fields = table.clone(RuntimeState.Capture.Redactions)
+    }
     if Entry.Payload ~= nil then
         Entry.PayloadSummary = RuntimeSupport.SummarizeValue(Entry.Payload)
         Entry.Payload = nil
     end
 
-    table.insert(CaptureState.Entries, Entry)
-    local Limit = CaptureState.Limit or RuntimeConfig.CaptureLimit
-    while #CaptureState.Entries > Limit do
-        table.remove(CaptureState.Entries, 1)
+    table.insert(RuntimeState.Capture.Entries, Entry)
+    local Limit = RuntimeState.Capture.Limit or RuntimeConfig.CaptureLimit
+    while #RuntimeState.Capture.Entries > Limit do
+        table.remove(RuntimeState.Capture.Entries, 1)
     end
 end
 
 function RuntimeSupport.StartCapture(Options: {[string]: any}?)
-    CaptureState.Enabled = true
+    RuntimeState.Capture.Enabled = true
     if Options then
         if Options.Limit then
-            CaptureState.Limit = Options.Limit
+            RuntimeState.Capture.Limit = Options.Limit
         end
         if Options.Redactions then
             RuntimeSupport.SetCaptureRedactions(Options.Redactions)
@@ -299,15 +380,15 @@ function RuntimeSupport.StartCapture(Options: {[string]: any}?)
 end
 
 function RuntimeSupport.StopCapture()
-    CaptureState.Enabled = false
+    RuntimeState.Capture.Enabled = false
 end
 
 function RuntimeSupport.ClearCapture()
-    table.clear(CaptureState.Entries)
+    table.clear(RuntimeState.Capture.Entries)
 end
 
 function RuntimeSupport.CaptureEntries()
-    return table.clone(CaptureState.Entries)
+    return table.clone(RuntimeState.Capture.Entries)
 end
 
 function RuntimeSupport.ReplayCapture(Entries: {{[string]: any}}, Handlers: {[string]: (any) -> any}?)
@@ -388,6 +469,71 @@ local function RunHooks(Name: string, Payload: any): boolean
     return true
 end
 
+local function ProfileBegin(Name: string)
+    if not RuntimeConfig.EnableMicroProfiler then
+        return
+    end
+
+    local Debug = debug
+    if Debug and Debug.profilebegin then
+        pcall(Debug.profilebegin, Name)
+    end
+end
+
+local function ProfileEnd()
+    if not RuntimeConfig.EnableMicroProfiler then
+        return
+    end
+
+    local Debug = debug
+    if Debug and Debug.profileend then
+        pcall(Debug.profileend)
+    end
+end
+
+local function EmitTelemetry(Name: string, Payload: any)
+    RunHooks("Telemetry", {
+        Name = Name,
+        Payload = Payload,
+        Time = os.clock()
+    })
+end
+
+local function AbuseKey(Source: any): any
+    return RuntimeSupport.PeerKey(Source)
+end
+
+local function AddAbuse(Source: any, Name: string, Amount: number?): number
+    local Key = AbuseKey(Source)
+    local ByName = RuntimeState.Abuse[Key]
+    if ByName == nil then
+        ByName = {}
+        RuntimeState.Abuse[Key] = ByName
+    end
+
+    local Score = (ByName[Name] or 0) + (Amount or 1)
+    ByName[Name] = Score
+    return Score
+end
+
+local function ReportViolation(Source: any, Name: string, Channel: string, Reason: string, Size: number?, Action: string?): number
+    local Score = AddAbuse(Source, Name, 1)
+    local Payload = {
+        Reason = Reason,
+        Player = Source,
+        Event = Name,
+        Channel = Channel,
+        Score = Score,
+        Action = Action or "drop",
+        PayloadSize = Size or 0,
+        Time = os.clock()
+    }
+
+    RunHooks("Violation", Payload)
+    EmitTelemetry("security.violation", Payload)
+    return Score
+end
+
 local function DropPacket(Source: any, Channel: string, Reason: string, Size: number?)
     MetricAdd("DroppedPackets", Reason)
     if Reason == "RateLimit" then
@@ -419,9 +565,15 @@ local function DropPacket(Source: any, Channel: string, Reason: string, Size: nu
         Reason = Reason,
         Size = Size or 0
     })
+    ReportViolation(Source, Channel, Channel, Reason, Size, "drop")
 end
 
 local function BeforeSend(Name: string, Channel: string, Target: any?): boolean
+    if RuntimeState.KilledRemotes[Name] then
+        DropPacket(Target, Channel, TransportError.KillSwitch)
+        return false
+    end
+
     return RunHooks("BeforeSend", {
         Name = Name,
         Channel = Channel,
@@ -468,25 +620,831 @@ local function CheckAuth(RuleName: string?, Context: any): boolean
     return Result == true
 end
 
+local function ContextUserId(Context: any): number?
+    return TryGetUserId(Context.Source)
+end
+
+local function CheckCooldown(Source: any, Name: string, Seconds: number?): boolean
+    if Seconds == nil or Seconds <= 0 then
+        return true
+    end
+
+    local State = RuntimeState.InvokeNonces[RuntimeSupport.PeerKey(Source)]
+    if State == nil then
+        State = {}
+        RuntimeState.InvokeNonces[RuntimeSupport.PeerKey(Source)] = State
+    end
+
+    local Now = os.clock()
+    local Last = State[Name]
+    if Last ~= nil and Now - Last < Seconds then
+        return false
+    end
+
+    State[Name] = Now
+    return true
+end
+
+local function CheckReplay(Source: any, Name: string, Sequence: number?, Size: number?): boolean
+    if Sequence == nil then
+        return true
+    end
+
+    local Key = RuntimeSupport.PeerKey(Source)
+    local ByName = RuntimeState.Replay[Key]
+    if ByName == nil then
+        ByName = {}
+        RuntimeState.Replay[Key] = ByName
+    end
+
+    local Window = ByName[Name]
+    local Now = os.clock()
+    if Window == nil then
+        Window = {
+            Highest = -1,
+            Seen = {},
+            Time = {}
+        }
+        ByName[Name] = Window
+    end
+
+    for SeenSequence, SeenAt in Window.Time do
+        if Now - SeenAt >= RuntimeConfig.ReplayStaleSeconds then
+            Window.Seen[SeenSequence] = nil
+            Window.Time[SeenSequence] = nil
+        end
+    end
+
+    if Window.Seen[Sequence] then
+        DropPacket(Source, Name, TransportError.ReplayDuplicate, Size)
+        return false
+    end
+
+    if RuntimeConfig.ReplayWindowSize > 0 and Window.Highest - Sequence >= RuntimeConfig.ReplayWindowSize then
+        DropPacket(Source, Name, TransportError.ReplayStale, Size)
+        return false
+    end
+
+    Window.Highest = math.max(Window.Highest, Sequence)
+    Window.Seen[Sequence] = true
+    Window.Time[Sequence] = Now
+    return true
+end
+
+local function ValidateCanonicalValue(Source: any, Name: string, Channel: string, Value: any, Depth: number, Budget: any): boolean
+    Budget.Operations += 1
+    if Budget.Operations > RuntimeConfig.MaxDecodeOperations then
+        DropPacket(Source, Channel, TransportError.DecodeBudget, Budget.Bytes)
+        return false
+    end
+
+    local Kind = typeof(Value)
+    if Kind == "number" then
+        if Value ~= Value or Value == math.huge or Value == -math.huge then
+            DropPacket(Source, Channel, TransportError.Canonicalization, Budget.Bytes)
+            return false
+        end
+    elseif Kind == "string" then
+        Budget.Bytes += #Value
+        if #Value > RuntimeConfig.MaxPayloadStringBytes then
+            DropPacket(Source, Channel, TransportError.Canonicalization, Budget.Bytes)
+            return false
+        end
+    elseif Kind == "Vector3" then
+        if Value.X ~= Value.X or Value.Y ~= Value.Y or Value.Z ~= Value.Z then
+            DropPacket(Source, Channel, TransportError.Canonicalization, Budget.Bytes)
+            return false
+        end
+        if math.abs(Value.X) > 1e9 or math.abs(Value.Y) > 1e9 or math.abs(Value.Z) > 1e9 then
+            DropPacket(Source, Channel, TransportError.Canonicalization, Budget.Bytes)
+            return false
+        end
+    elseif Kind == "CFrame" then
+        local Position = Value.Position
+        if math.abs(Position.X) > 1e9 or math.abs(Position.Y) > 1e9 or math.abs(Position.Z) > 1e9 then
+            DropPacket(Source, Channel, TransportError.Canonicalization, Budget.Bytes)
+            return false
+        end
+    elseif Kind == "table" then
+        if Depth >= RuntimeConfig.MaxPayloadDepth then
+            DropPacket(Source, Channel, TransportError.Canonicalization, Budget.Bytes)
+            return false
+        end
+
+        local Count = 0
+        local MaxIndex = 0
+        for Key, Child in Value do
+            Count += 1
+            if Count > RuntimeConfig.MaxTableKeys then
+                DropPacket(Source, Channel, TransportError.Canonicalization, Budget.Bytes)
+                return false
+            end
+
+            if type(Key) == "number" then
+                MaxIndex = math.max(MaxIndex, Key)
+                if Key < 1 or Key % 1 ~= 0 then
+                    DropPacket(Source, Channel, TransportError.Canonicalization, Budget.Bytes)
+                    return false
+                end
+            elseif type(Key) ~= "string" and type(Key) ~= "boolean" then
+                DropPacket(Source, Channel, TransportError.Canonicalization, Budget.Bytes)
+                return false
+            end
+
+            if not ValidateCanonicalValue(Source, Name, Channel, Child, Depth + 1, Budget) then
+                return false
+            end
+        end
+
+        if MaxIndex > Count * 2 and Count > 0 then
+            DropPacket(Source, Channel, TransportError.Canonicalization, Budget.Bytes)
+            return false
+        end
+    elseif Kind == "EnumItem" then
+        return true
+    elseif Kind == "Instance" then
+        return true
+    elseif Kind == "buffer" then
+        Budget.Bytes += buffer.len(Value)
+    elseif Kind == "userdata" then
+        return true
+    elseif Kind ~= "nil" and Kind ~= "boolean" then
+        DropPacket(Source, Channel, TransportError.Canonicalization, Budget.Bytes)
+        return false
+    end
+
+    return true
+end
+
+function RuntimeSupport.ValidateDecodedPayload(Name: string, Source: any, Channel: string, Payload: any, Size: number?): boolean
+    return ValidateCanonicalValue(Source, Name, Channel, Payload, 0, {
+        Operations = 0,
+        Bytes = Size or 0
+    })
+end
+
+local function CheckPolicy(Source: any, Name: string, Channel: string, PolicyName: string?, PolicyGroup: string?, Constraints: any, Size: number?): boolean
+    if RuntimeState.KilledRemotes[Name] then
+        DropPacket(Source, Channel, TransportError.KillSwitch, Size)
+        return false
+    end
+
+    if PolicyGroup and RuntimeState.KilledPolicyGroups[PolicyGroup] then
+        DropPacket(Source, Channel, TransportError.KillSwitch, Size)
+        return false
+    end
+
+    if not CheckCooldown(Source, Name, Constraints.CooldownSeconds) then
+        DropPacket(Source, Channel, TransportError.PolicyRejected, Size)
+        return false
+    end
+
+    if not CheckReplay(Source, Name, RecievePredictionId, Size) then
+        return false
+    end
+
+    local Context = {
+        Source = Source,
+        Name = Name,
+        Channel = Channel,
+        Policy = PolicyName,
+        PolicyGroup = PolicyGroup,
+        Constraints = Constraints,
+        UserId = TryGetUserId(Source),
+        Size = Size or 0
+    }
+
+    if PolicyName and PolicyName ~= "" then
+        local Rule = RuntimeState.PolicyRules[PolicyName]
+        if Rule == nil then
+            DropPacket(Source, Channel, TransportError.PolicyRejected, Size)
+            return false
+        end
+
+        local Success, Allowed, Reason = pcall(Rule, Context)
+        if not Success or Allowed ~= true then
+            DropPacket(Source, Channel, Reason or TransportError.PolicyRejected, Size)
+            return false
+        end
+    elseif RuntimeConfig.RequirePolicies and Source ~= "Server" then
+        DropPacket(Source, Channel, TransportError.PolicyRejected, Size)
+        return false
+    end
+
+    if PolicyGroup and RuntimeState.PolicyGroups[PolicyGroup] then
+        for _, RuleName in RuntimeState.PolicyGroups[PolicyGroup] do
+            if not CheckPolicy(Source, Name, Channel, RuleName, nil, Constraints, Size) then
+                return false
+            end
+        end
+    end
+
+    return true
+end
+
+function RuntimeSupport.RegisterPolicy(Name: string, Callback: (any) -> (boolean, string?))
+    RuntimeState.PolicyRules[Name] = Callback
+end
+
+function RuntimeSupport.RegisterPolicyGroup(Name: string, Rules: {string})
+    RuntimeState.PolicyGroups[Name] = table.clone(Rules)
+end
+
+function RuntimeSupport.CheckIdempotency(Source: any, Key: string, TtlSeconds: number?): boolean
+    local Peer = RuntimeSupport.PeerKey(Source)
+    local State = RuntimeState.Idempotency[Peer]
+    if State == nil then
+        State = {}
+        RuntimeState.Idempotency[Peer] = State
+    end
+
+    local Now = os.clock()
+    local Ttl = TtlSeconds or 120
+    for Existing, ExpiresAt in State do
+        if ExpiresAt <= Now then
+            State[Existing] = nil
+        end
+    end
+
+    if State[Key] ~= nil then
+        return false
+    end
+
+    State[Key] = Now + Ttl
+    return true
+end
+
+function RuntimeSupport.RegisterHandle(Object: any, Owner: Player?, ExpiresAt: number?): number
+    local Existing = RuntimeState.ObjectToHandle[Object]
+    if Existing then
+        return Existing
+    end
+
+    RuntimeState.NextHandleId = (RuntimeState.NextHandleId + 1) % 2147483647
+    if RuntimeState.NextHandleId == 0 then
+        RuntimeState.NextHandleId = 1
+    end
+    RuntimeState.Handles[RuntimeState.NextHandleId] = {
+        Object = Object,
+        Owner = Owner,
+        ExpiresAt = ExpiresAt
+    }
+    RuntimeState.ObjectToHandle[Object] = RuntimeState.NextHandleId
+    return RuntimeState.NextHandleId
+end
+
+function RuntimeSupport.ResolveHandle(Handle: number, Player: Player?): any
+    local Entry = RuntimeState.Handles[Handle]
+    if Entry == nil then
+        return nil
+    end
+    if Entry.ExpiresAt and os.clock() >= Entry.ExpiresAt then
+        RuntimeState.Handles[Handle] = nil
+        RuntimeState.ObjectToHandle[Entry.Object] = nil
+        return nil
+    end
+    if Entry.Owner ~= nil and Player ~= nil and Entry.Owner ~= Player then
+        return nil
+    end
+
+    return Entry.Object
+end
+
+function RuntimeSupport.RevokeHandle(Handle: number)
+    local Entry = RuntimeState.Handles[Handle]
+    if Entry then
+        RuntimeState.ObjectToHandle[Entry.Object] = nil
+        RuntimeState.Handles[Handle] = nil
+    end
+end
+
+function RuntimeSupport.IssueCapability(Object: any, Owner: Player?, Permissions: {[string]: boolean}?, DurationSeconds: number?): number
+    RuntimeState.NextCapabilityId = (RuntimeState.NextCapabilityId + 1) % 2147483647
+    if RuntimeState.NextCapabilityId == 0 then
+        RuntimeState.NextCapabilityId = 1
+    end
+    RuntimeState.Capabilities[RuntimeState.NextCapabilityId] = {
+        Object = Object,
+        Owner = Owner,
+        Permissions = Permissions or {},
+        ExpiresAt = os.clock() + (DurationSeconds or 30)
+    }
+    return RuntimeState.NextCapabilityId
+end
+
+function RuntimeSupport.ValidateCapability(Capability: number, Player: Player?, Permission: string?): any
+    local Entry = RuntimeState.Capabilities[Capability]
+    if Entry == nil or os.clock() >= Entry.ExpiresAt then
+        RuntimeState.Capabilities[Capability] = nil
+        return nil
+    end
+    if Entry.Owner ~= nil and Player ~= nil and Entry.Owner ~= Player then
+        return nil
+    end
+    if Permission and Entry.Permissions[Permission] ~= true then
+        return nil
+    end
+
+    return Entry.Object
+end
+
+local function RegisterPolicyPresets()
+    local function Alive(Context)
+        return Context.Source == "Server" or Context.Source ~= nil
+    end
+
+    local function RequireKnownPolicy(Context)
+        return Alive(Context)
+    end
+
+    for _, Name in {
+        "damage",
+        "currency",
+        "trade",
+        "inventory",
+        "teleport",
+        "admin",
+        "crafting",
+        "marketplace",
+        "moderation",
+    } do
+        RuntimeState.PolicyRules[Name] = RequireKnownPolicy
+    end
+end
+
+RegisterPolicyPresets()
+
+local function TransportKey(Target: any): any
+    return RuntimeSupport.PeerKey(Target)
+end
+
+local function GetTransportState(Target: any)
+    local Key = TransportKey(Target)
+    local State = RuntimeState.Transport[Key]
+    if State == nil then
+        State = {
+            QueuedBytes = 0,
+            QueuedEvents = 0,
+            SentBytes = 0,
+            SentPackets = 0,
+            DroppedLowPriority = 0,
+            LastFlush = 0,
+            LastQueueTime = 0,
+            Rtt = 0,
+            Jitter = 0,
+            ClockSkew = 0,
+            PacketLoss = 0,
+            Priority = {
+                Critical = { Bytes = 0, Events = 0 },
+                Gameplay = { Bytes = 0, Events = 0 },
+                Cosmetic = { Bytes = 0, Events = 0 },
+                Background = { Bytes = 0, Events = 0 },
+            }
+        }
+        RuntimeState.Transport[Key] = State
+    end
+
+    return State
+end
+
+local function PriorityValue(Priority: string?): number
+    return PriorityOrder[Priority or "Gameplay"] or PriorityOrder.Gameplay
+end
+
+function RuntimeSupport.RecordQueuedEvent(Target: any, Channel: string, Size: number, Priority: string?)
+    local State = GetTransportState(Target)
+    local Lane = Priority or "Gameplay"
+    State.QueuedBytes += Size
+    State.QueuedEvents += 1
+    State.LastQueueTime = os.clock()
+    State.Priority[Lane] = State.Priority[Lane] or { Bytes = 0, Events = 0 }
+    State.Priority[Lane].Bytes += Size
+    State.Priority[Lane].Events += 1
+
+    if RuntimeConfig.MaxQueuedBytes > 0 and State.QueuedBytes > RuntimeConfig.MaxQueuedBytes then
+        if RuntimeConfig.LowPriorityShedding and PriorityValue(Priority) >= PriorityOrder.Cosmetic then
+            State.DroppedLowPriority += 1
+            DropPacket(Target, Channel, TransportError.Backpressure, Size)
+            return false
+        end
+    end
+
+    return true
+end
+
+function RuntimeSupport.RecordFlush(Target: any, Channel: string, Size: number)
+    local State = GetTransportState(Target)
+    State.QueuedBytes = math.max(0, State.QueuedBytes - Size)
+    State.QueuedEvents = math.max(0, State.QueuedEvents - 1)
+    State.SentBytes += Size
+    State.SentPackets += 1
+    State.LastFlush = os.clock()
+    EmitTelemetry("transport.flush", {
+        Target = Target,
+        Channel = Channel,
+        Size = Size,
+        QueuedBytes = State.QueuedBytes,
+        QueuedEvents = State.QueuedEvents,
+    })
+end
+
+function RuntimeSupport.ShouldFlush(Target: any, Channel: string, Size: number, Priority: string?): boolean
+    if Size <= 0 then
+        return false
+    end
+
+    local State = GetTransportState(Target)
+    local Now = os.clock()
+    local Elapsed = Now - State.LastFlush
+    local Pressure = RuntimeConfig.MaxQueuedBytes > 0 and State.QueuedBytes / RuntimeConfig.MaxQueuedBytes or 0
+    local Budget = RuntimeConfig.MaxBurstBytes
+    if State.Rtt > 0.25 or State.Jitter > 0.1 then
+        Budget = math.max(1024, math.floor(Budget * 0.75))
+    end
+    if PriorityValue(Priority) == PriorityOrder.Critical then
+        return true
+    end
+    if Size >= Budget or Pressure >= 0.5 then
+        return true
+    end
+
+    return Elapsed >= 1 / 60
+end
+
+function RuntimeSupport.UpdateNetworkStats(Target: any, Rtt: number?, Jitter: number?, ClockSkew: number?, PacketLoss: number?)
+    local State = GetTransportState(Target)
+    if Rtt ~= nil then
+        State.Rtt = Rtt
+    end
+    if Jitter ~= nil then
+        State.Jitter = Jitter
+    end
+    if ClockSkew ~= nil then
+        State.ClockSkew = ClockSkew
+    end
+    if PacketLoss ~= nil then
+        State.PacketLoss = PacketLoss
+    end
+end
+
+function RuntimeSupport.TransportSnapshot(Target: any?)
+    if Target ~= nil then
+        return table.clone(GetTransportState(Target))
+    end
+
+    local Snapshot = {}
+    for Key, State in RuntimeState.Transport do
+        Snapshot[tostring(Key)] = table.clone(State)
+    end
+    return Snapshot
+end
+
+function RuntimeSupport.Coalesce(Target: any, Key: string, Priority: string, Payload: any)
+    local BucketKey = RuntimeSupport.PeerKey(Target)
+    local Bucket = RuntimeState.Coalesce[BucketKey]
+    if Bucket == nil then
+        Bucket = {}
+        RuntimeState.Coalesce[BucketKey] = Bucket
+    end
+
+    Bucket[Key] = {
+        Priority = Priority,
+        Payload = Payload,
+        Time = os.clock()
+    }
+end
+
+function RuntimeSupport.FlushCoalesced(Target: any): {[string]: any}
+    local BucketKey = RuntimeSupport.PeerKey(Target)
+    local Bucket = RuntimeState.Coalesce[BucketKey] or {}
+    RuntimeState.Coalesce[BucketKey] = {}
+    return Bucket
+end
+
+local function SetScopedMembership(Store: {[any]: {[Player]: true}}, ScopeName: any, Player: Player, Enabled: boolean?)
+    local Bucket = Store[ScopeName]
+    if Bucket == nil then
+        Bucket = {}
+        Store[ScopeName] = Bucket
+    end
+    if Enabled == false then
+        Bucket[Player] = nil
+    else
+        Bucket[Player] = true
+    end
+end
+
+local function GetScopedPlayers(Store: {[any]: {[Player]: true}}, ScopeName: any): {Player}
+    local Bucket = Store[ScopeName]
+    if Bucket == nil then
+        return {}
+    end
+
+    local Players = {}
+    for Player in Bucket do
+        if IsPlayerActive(Player) then
+            table.insert(Players, Player)
+        end
+    end
+    return Players
+end
+
+function RuntimeSupport.SetParty(PartyName: string, Player: Player, Enabled: boolean?)
+    SetScopedMembership(RuntimeState.Parties, PartyName, Player, Enabled)
+    RuntimeState.PlayerInterest.Party[Player] = if Enabled == false then nil else PartyName
+end
+
+function RuntimeSupport.SetMatch(MatchName: string, Player: Player, Enabled: boolean?)
+    SetScopedMembership(RuntimeState.Matches, MatchName, Player, Enabled)
+    RuntimeState.PlayerInterest.Match[Player] = if Enabled == false then nil else MatchName
+end
+
+function RuntimeSupport.SetTeam(TeamName: string, Player: Player, Enabled: boolean?)
+    SetScopedMembership(RuntimeState.Teams, TeamName, Player, Enabled)
+    RuntimeState.PlayerInterest.Team[Player] = if Enabled == false then nil else TeamName
+end
+
+function RuntimeSupport.SetStreamedCell(CellName: string, Player: Player, Enabled: boolean?)
+    SetScopedMembership(RuntimeState.StreamedCells, CellName, Player, Enabled)
+    RuntimeState.PlayerInterest.Cell[Player] = if Enabled == false then nil else CellName
+end
+
+function RuntimeSupport.SetObjectOwner(Object: any, Player: Player, Enabled: boolean?)
+    local Owners = RuntimeState.ObjectOwners[Object]
+    if Owners == nil then
+        Owners = {}
+        RuntimeState.ObjectOwners[Object] = Owners
+    end
+    if Enabled == false then
+        Owners[Player] = nil
+    else
+        Owners[Player] = true
+    end
+end
+
+function RuntimeSupport.GetInterestPlayers(Scope: string, Key: any): {Player}
+    if Scope == "Group" then
+        return GetGroupPlayers(Key)
+    elseif Scope == "Party" then
+        return GetScopedPlayers(RuntimeState.Parties, Key)
+    elseif Scope == "Match" then
+        return GetScopedPlayers(RuntimeState.Matches, Key)
+    elseif Scope == "Team" then
+        return GetScopedPlayers(RuntimeState.Teams, Key)
+    elseif Scope == "Cell" then
+        return GetScopedPlayers(RuntimeState.StreamedCells, Key)
+    elseif Scope == "Owner" then
+        return GetScopedPlayers(RuntimeState.ObjectOwners, Key)
+    elseif Scope == "Zone" then
+        return GetInterestZonePlayers("*", Key)
+    end
+
+    return {}
+end
+
+function RuntimeSupport.CreateReplicationGraph()
+    local Graph = {
+        Routes = {}
+    }
+
+    function Graph:Observe(Scope: string, Key: any, Player: Player)
+        self.Routes[Scope] = self.Routes[Scope] or {}
+        self.Routes[Scope][Key] = self.Routes[Scope][Key] or {}
+        self.Routes[Scope][Key][Player] = true
+    end
+
+    function Graph:Unobserve(Scope: string, Key: any, Player: Player)
+        if self.Routes[Scope] and self.Routes[Scope][Key] then
+            self.Routes[Scope][Key][Player] = nil
+        end
+    end
+
+    function Graph:Players(Scope: string, Key: any): {Player}
+        local Bucket = self.Routes[Scope] and self.Routes[Scope][Key]
+        if Bucket == nil then
+            return RuntimeSupport.GetInterestPlayers(Scope, Key)
+        end
+
+        local Players = {}
+        for Player in Bucket do
+            if IsPlayerActive(Player) then
+                table.insert(Players, Player)
+            end
+        end
+        return Players
+    end
+
+    function Graph:Route(Scope: string, Key: any, Sender: (Player) -> ())
+        for _, Player in self:Players(Scope, Key) do
+            Sender(Player)
+        end
+    end
+
+    return Graph
+end
+
+function RuntimeSupport.MakePatch(Previous: any, Next: any): any
+    if type(Previous) ~= "table" or type(Next) ~= "table" then
+        return {
+            op = "replace",
+            value = Next
+        }
+    end
+
+    local Patch = {}
+    for Key, Value in Next do
+        if type(Value) == "table" and type(Previous[Key]) == "table" then
+            Patch[Key] = RuntimeSupport.MakePatch(Previous[Key], Value)
+        elseif Previous[Key] ~= Value then
+            Patch[Key] = {
+                op = "set",
+                value = Value
+            }
+        end
+    end
+    for Key in Previous do
+        if Next[Key] == nil then
+            Patch[Key] = {
+                op = "delete",
+                tombstone = Tombstone
+            }
+        end
+    end
+    return Patch
+end
+
+function RuntimeSupport.ApplyPatch(Base: any, Patch: any): any
+    if type(Patch) ~= "table" then
+        return Base
+    end
+    if Patch.op == "replace" then
+        return Patch.value
+    end
+
+    local Result = if type(Base) == "table" then table.clone(Base) else {}
+    for Key, Operation in Patch do
+        if type(Operation) == "table" and Operation.op == "delete" then
+            Result[Key] = nil
+        elseif type(Operation) == "table" and Operation.op == "set" then
+            Result[Key] = Operation.value
+        else
+            Result[Key] = RuntimeSupport.ApplyPatch(Result[Key], Operation)
+        end
+    end
+    return Result
+end
+
+function RuntimeSupport.Interpolator(Initial: any)
+    local Interpolator = {
+        Current = Initial,
+        Target = Initial,
+        Alpha = 0
+    }
+
+    function Interpolator:SetTarget(Target: any)
+        self.Target = Target
+        self.Alpha = 0
+    end
+
+    function Interpolator:Step(DeltaTime: number, Speed: number?)
+        self.Alpha = math.min(1, self.Alpha + DeltaTime * (Speed or 12))
+        if typeof(self.Current) == "Vector3" and typeof(self.Target) == "Vector3" then
+            self.Current = self.Current:Lerp(self.Target, self.Alpha)
+        else
+            self.Current = self.Target
+        end
+        return self.Current
+    end
+
+    return Interpolator
+end
+
+function RuntimeSupport.QuantizeNumber(Value: number, Scale: number, Min: number?, Max: number?): number
+    local Clamped = math.clamp(Value, Min or -math.huge, Max or math.huge)
+    return math.floor((Clamped * Scale) + 0.5)
+end
+
+function RuntimeSupport.DequantizeNumber(Value: number, Scale: number): number
+    return Value / Scale
+end
+
+function RuntimeSupport.QuantizeVector3(Value: Vector3, Scale: number): {number}
+    return {
+        RuntimeSupport.QuantizeNumber(Value.X, Scale),
+        RuntimeSupport.QuantizeNumber(Value.Y, Scale),
+        RuntimeSupport.QuantizeNumber(Value.Z, Scale),
+    }
+end
+
+function RuntimeSupport.DequantizeVector3(Value: {number}, Scale: number): Vector3
+    return Vector3.new(Value[1] / Scale, Value[2] / Scale, Value[3] / Scale)
+end
+
+function RuntimeSupport.QuantizeAngle(Radians: number, Steps: number?): number
+    local StepCount = Steps or 65535
+    local Wrapped = (Radians % (math.pi * 2)) / (math.pi * 2)
+    return math.floor(Wrapped * StepCount + 0.5)
+end
+
+function RuntimeSupport.DequantizeAngle(Value: number, Steps: number?): number
+    return (Value / (Steps or 65535)) * math.pi * 2
+end
+
+function RuntimeSupport.SetKillSwitch(Name: string, Reason: string?)
+    RuntimeState.KilledRemotes[Name] = Reason or "manual"
+end
+
+function RuntimeSupport.ClearKillSwitch(Name: string)
+    RuntimeState.KilledRemotes[Name] = nil
+end
+
+function RuntimeSupport.SetPolicyGroupKillSwitch(Name: string, Reason: string?)
+    RuntimeState.KilledPolicyGroups[Name] = Reason or "manual"
+end
+
+function RuntimeSupport.ClearPolicyGroupKillSwitch(Name: string)
+    RuntimeState.KilledPolicyGroups[Name] = nil
+end
+
+function RuntimeSupport.AbuseScores(Source: any?)
+    if Source ~= nil then
+        return table.clone(RuntimeState.Abuse[RuntimeSupport.PeerKey(Source)] or {})
+    end
+
+    local Copy = {}
+    for Key, Value in RuntimeState.Abuse do
+        Copy[tostring(Key)] = table.clone(Value)
+    end
+    return Copy
+end
+
+function RuntimeSupport.RegisterListener(Name: string, Listener: any): () -> ()
+    local List = RuntimeState.Listeners[Name]
+    if List == nil then
+        List = {}
+        RuntimeState.Listeners[Name] = List
+    end
+
+    local Duplicate = List[Listener] == true
+    List[Listener] = true
+    local Count = 0
+    for _ in List do
+        Count += 1
+    end
+
+    RunHooks("Listener", {
+        Name = Name,
+        Listener = Listener,
+        Count = Count,
+        Duplicate = Duplicate,
+        Action = "connect"
+    })
+
+    return function()
+        if List[Listener] then
+            List[Listener] = nil
+            RunHooks("Listener", {
+                Name = Name,
+                Listener = Listener,
+                Count = math.max(0, Count - 1),
+                Duplicate = false,
+                Action = "disconnect"
+            })
+        end
+    end
+end
+
+function RuntimeSupport.ListenerSnapshot()
+    local Snapshot = {}
+    for Name, List in RuntimeState.Listeners do
+        local Count = 0
+        for _ in List do
+            Count += 1
+        end
+        Snapshot[Name] = Count
+    end
+    return Snapshot
+end
+
 local function Configure(Options: {[string]: any})
-    local ResetProtocolState = false
     for Key, Value in Options do
         if RuntimeConfig[Key] == nil then
             error(`[Blink]: Unknown runtime option "{Key}".`)
         end
 
-        RuntimeConfig[Key] = Value
-        if Key == "ProtocolVersion" or Key == "ProtocolMode" or Key == "AcceptProtocolVersion1" or Key == "EnableProtocolHandshake" or Key == "SchemaVersion" or Key == "MinimumSchemaVersion" then
-            ResetProtocolState = true
+        if Key == "ProtocolVersion" and Value ~= PROTOCOL_VERSION then
+            error("[Blink]: This fork is v2-only; RuntimeConfig.ProtocolVersion must be 2.")
+        elseif Key == "ProtocolMode" then
+            error("[Blink]: ProtocolMode is retired in this v2-only fork.")
+        elseif Key == "AcceptProtocolVersion1" then
+            error("[Blink]: AcceptProtocolVersion1 is retired in this v2-only fork.")
         end
+
+        RuntimeConfig[Key] = Value
     end
 
-    CaptureState.Limit = RuntimeConfig.CaptureLimit
+    RuntimeState.Capture.Limit = RuntimeConfig.CaptureLimit
     RuntimeSupport.SetCaptureRedactions(RuntimeConfig.CaptureRedactions)
-    if ResetProtocolState then
-        table.clear(PeerCapabilities)
-        table.clear(PeerHandshakesSent)
-    end
 end
 
 local function GetMetrics()
@@ -505,7 +1463,7 @@ local function GetMetrics()
 
     Copy.PendingInvokes = PendingInvokes
     Copy.PendingInvokesByName = table.clone(PendingInvokesByName)
-    Copy.CapturedPackets = #CaptureState.Entries
+    Copy.CapturedPackets = #RuntimeState.Capture.Entries
     return Copy
 end
 
@@ -563,44 +1521,29 @@ local function InstancePayload(Instances: {Instance})
 end
 
 function RuntimeSupport.CurrentProtocolVersion(): number
-    return SendProtocolVersion or ActiveProtocolVersion or RuntimeConfig.ProtocolVersion
-end
-
-local function UseProtocolV2(): boolean
-    return RuntimeSupport.CurrentProtocolVersion() >= 2
+    return PROTOCOL_VERSION
 end
 
 function RuntimeSupport.ResolveReceiveProtocolVersion(Source: any): number
-    if RuntimeConfig.ProtocolMode == "Legacy" then
-        return 1
-    elseif RuntimeConfig.ProtocolMode == "Strict" then
-        return RuntimeConfig.ProtocolVersion
-    end
-
-    local Capability = PeerCapabilities[RuntimeSupport.PeerKey(Source)]
-    if Capability then
-        return math.min(RuntimeConfig.ProtocolVersion, Capability.ProtocolVersion or 1)
-    end
-
-    return if RuntimeConfig.AcceptProtocolVersion1 then 1 else RuntimeConfig.ProtocolVersion
+    return PROTOCOL_VERSION
 end
 
-function RuntimeSupport.IsPeerCompatible(ProtocolVersion: number, SchemaVersion: number): boolean
-    return ProtocolVersion <= RuntimeConfig.ProtocolVersion and SchemaVersion >= RuntimeConfig.MinimumSchemaVersion
+function RuntimeSupport.IsPeerCompatible(ProtocolVersion: number, SchemaVersion: number, SchemaHash: string?): boolean
+    return ProtocolVersion == PROTOCOL_VERSION
+        and SchemaVersion >= RuntimeConfig.MinimumSchemaVersion
+        and SchemaHash == RuntimeConfig.SchemaHash
 end
 
 function RuntimeSupport.WriteCapabilityHandshake()
-    if not RuntimeConfig.EnableProtocolHandshake or RuntimeConfig.ProtocolVersion < 2 or RuntimeConfig.ProtocolMode == "Legacy" then
+    if not RuntimeConfig.EnableProtocolHandshake then
         return
     end
 
-    local PreviousProtocolVersion = SendProtocolVersion
-    SendProtocolVersion = 1
-
+    local Frame = BeginMessage(CAPABILITY_HANDSHAKE_INDEX)
     local IndexOffset = Allocate(1)
-    buffer.writeu8(SendBuffer, IndexOffset, CAPABILITY_HANDSHAKE_INDEX)
+    buffer.writeu8(SendBuffer, IndexOffset, PROTOCOL_VERSION)
     local ProtocolOffset = Allocate(1)
-    buffer.writeu8(SendBuffer, ProtocolOffset, RuntimeConfig.ProtocolVersion)
+    buffer.writeu8(SendBuffer, ProtocolOffset, PROTOCOL_VERSION)
     local SchemaOffset = Allocate(2)
     buffer.writeu16(SendBuffer, SchemaOffset, RuntimeConfig.SchemaVersion)
     local MinimumSchemaOffset = Allocate(2)
@@ -611,26 +1554,29 @@ function RuntimeSupport.WriteCapabilityHandshake()
     buffer.writeu8(SendBuffer, HashLengthOffset, HashLength)
     local HashOffset = Allocate(HashLength)
     buffer.writestring(SendBuffer, HashOffset, Hash, HashLength)
-
-    SendProtocolVersion = PreviousProtocolVersion
+    EndMessage(Frame)
 end
 
 function RuntimeSupport.QueueCapabilityHandshake(Target: any?)
-    if not RuntimeConfig.EnableProtocolHandshake or RuntimeConfig.ProtocolVersion < 2 or RuntimeConfig.ProtocolMode == "Legacy" then
+    if not RuntimeConfig.EnableProtocolHandshake then
         return
     end
 
     local Key = RuntimeSupport.PeerKey(Target)
-    if PeerHandshakesSent[Key] then
+    if RuntimeState.PeerHandshakesSent[Key] then
         return
     end
 
     RuntimeSupport.WriteCapabilityHandshake()
-    PeerHandshakesSent[Key] = true
+    RuntimeState.PeerHandshakesSent[Key] = true
 end
 
 function RuntimeSupport.ReadCapabilityHandshake(Source: any, Channel: string, PacketSize: number): boolean
     local Success, ProtocolVersion, SchemaVersion, MinimumSchemaVersion, SchemaHash = pcall(function()
+        local Marker = buffer.readu8(RecieveBuffer, Read(1))
+        if Marker ~= PROTOCOL_VERSION then
+            error("[Blink]: Invalid v2 handshake marker.")
+        end
         local ProtocolVersion = buffer.readu8(RecieveBuffer, Read(1))
         local SchemaVersion = buffer.readu16(RecieveBuffer, Read(2))
         local MinimumSchemaVersion = buffer.readu16(RecieveBuffer, Read(2))
@@ -644,8 +1590,8 @@ function RuntimeSupport.ReadCapabilityHandshake(Source: any, Channel: string, Pa
         return false
     end
 
-    local Compatible = RuntimeSupport.IsPeerCompatible(ProtocolVersion, SchemaVersion)
-    PeerCapabilities[RuntimeSupport.PeerKey(Source)] = {
+    local Compatible = RuntimeSupport.IsPeerCompatible(ProtocolVersion, SchemaVersion, SchemaHash)
+    RuntimeState.PeerCapabilities[RuntimeSupport.PeerKey(Source)] = {
         ProtocolVersion = ProtocolVersion,
         SchemaVersion = SchemaVersion,
         MinimumSchemaVersion = MinimumSchemaVersion,
@@ -679,22 +1625,22 @@ function RuntimeSupport.ReadCapabilityHandshake(Source: any, Channel: string, Pa
 end
 
 function RuntimeSupport.ProtocolInfo(Source: any?)
-    local Capability = PeerCapabilities[RuntimeSupport.PeerKey(Source)]
+    local Capability = RuntimeState.PeerCapabilities[RuntimeSupport.PeerKey(Source)]
     return {
-        LocalProtocolVersion = RuntimeConfig.ProtocolVersion,
+        LocalProtocolVersion = PROTOCOL_VERSION,
         LocalSchemaVersion = RuntimeConfig.SchemaVersion,
         MinimumSchemaVersion = RuntimeConfig.MinimumSchemaVersion,
-        ProtocolMode = RuntimeConfig.ProtocolMode,
+        ProtocolMode = "StrictV2Only",
         Peer = Capability
     }
 end
 
 local function UseVarints(): boolean
-    return UseProtocolV2() and RuntimeConfig.UseVarints
+    return RuntimeConfig.UseVarints
 end
 
 local function UseBitPacking(): boolean
-    return UseProtocolV2() and RuntimeConfig.UseBitPacking
+    return RuntimeConfig.UseBitPacking
 end
 
 local function PoolSize(Size: number): number
@@ -898,10 +1844,10 @@ local function CheckRateLimit(Source: any, Key: string, Rate: number?, Burst: nu
         Burst = Rate
     end
 
-    local SourceState = RateLimitState[Source]
+    local SourceState = RuntimeState.RateLimit[Source]
     if SourceState == nil then
         SourceState = {}
-        RateLimitState[Source] = SourceState
+        RuntimeState.RateLimit[Source] = SourceState
     end
 
     local Now = os.clock()
@@ -1078,13 +2024,227 @@ local function WriteEncodedVarint(Offset: number, Bytes: {number})
     end
 end
 
-local function BeginMessage(Index: number)
-    if not UseProtocolV2() then
-        local Offset = Allocate(1)
-        buffer.writeu8(SendBuffer, Offset, Index)
-        return nil
+local function ReadVarintFrom(Buffer: buffer, Cursor: number, Limit: number): (number?, number)
+    local Result = 0
+    local Shift = 0
+    for _ = 1, 5 do
+        if Cursor >= Limit then
+            return nil, Cursor
+        end
+
+        local Byte = buffer.readu8(Buffer, Cursor)
+        Cursor += 1
+        Result += bit32.lshift(bit32.band(Byte, 0x7F), Shift)
+        if bit32.band(Byte, 0x80) == 0 then
+            return Result, Cursor
+        end
+        Shift += 7
     end
 
+    return nil, Cursor
+end
+
+local function WriteVarintTo(Bytes: {number}, Value: number)
+    for _, Byte in EncodeVarint(Value) do
+        table.insert(Bytes, Byte)
+    end
+end
+
+local function BuildControlFrame(Index: number, Payload: {number}, Source: buffer?, SourceStart: number?, SourceLength: number?): buffer
+    local Header = { Index, 0 }
+    WriteVarintTo(Header, #Payload + (SourceLength or 0))
+    WriteVarintTo(Header, 0)
+
+    local Packet = buffer.create(#Header + #Payload + (SourceLength or 0))
+    for Offset, Byte in Header do
+        buffer.writeu8(Packet, Offset - 1, Byte)
+    end
+    for Offset, Byte in Payload do
+        buffer.writeu8(Packet, #Header + Offset - 1, Byte)
+    end
+    if Source and SourceLength and SourceLength > 0 then
+        buffer.copy(Packet, #Header + #Payload, Source, SourceStart or 0, SourceLength)
+    end
+
+    return Packet
+end
+
+function RuntimeSupport.FragmentReliablePacket(Target: any, Packet: buffer, Instances: {Instance}?): {any}
+    local Size = buffer.len(Packet)
+    local FragmentBytes = RuntimeConfig.ReliableFragmentBytes
+    if FragmentBytes <= 0 or Size <= FragmentBytes then
+        return {
+            {
+                Buffer = Packet,
+                Instances = Instances
+            }
+        }
+    end
+
+    RuntimeState.NextFragmentId = (RuntimeState.NextFragmentId + 1) % 2147483647
+    local FragmentId = RuntimeState.NextFragmentId
+    local Count = math.ceil(Size / FragmentBytes)
+    local Fragments = table.create(Count)
+
+    for Index = 1, Count do
+        local Start = (Index - 1) * FragmentBytes
+        local Length = math.min(FragmentBytes, Size - Start)
+        local Payload = {}
+        WriteVarintTo(Payload, FragmentId)
+        WriteVarintTo(Payload, Index)
+        WriteVarintTo(Payload, Count)
+        WriteVarintTo(Payload, Size)
+        Fragments[Index] = {
+            Buffer = BuildControlFrame(FRAGMENT_INDEX, Payload, Packet, Start, Length),
+            Instances = Instances
+        }
+    end
+
+    EmitTelemetry("transport.fragment", {
+        Target = Target,
+        FragmentId = FragmentId,
+        Count = Count,
+        Size = Size
+    })
+    return Fragments
+end
+
+local function CleanupFragments(Source: any)
+    local Key = RuntimeSupport.PeerKey(Source)
+    local ById = RuntimeState.Fragments[Key]
+    if ById == nil then
+        return
+    end
+
+    local Now = os.clock()
+    for FragmentId, Assembly in ById do
+        if Now - Assembly.Started >= RuntimeConfig.FragmentTimeoutSeconds then
+            ById[FragmentId] = nil
+            DropPacket(Source, "Reliable", TransportError.FragmentTimeout, Assembly.ReceivedBytes or 0)
+        end
+    end
+end
+
+function RuntimeSupport.TryReassembleReliableFragment(Source: any, Packet: buffer, Instances: {Instance}?): (buffer?, {Instance}?, boolean)
+    local Size = buffer.len(Packet)
+    if Size <= 0 or buffer.readu8(Packet, 0) ~= FRAGMENT_INDEX then
+        return Packet, Instances, true
+    end
+
+    local Cursor = 2
+    local PayloadLength
+    PayloadLength, Cursor = ReadVarintFrom(Packet, Cursor, Size)
+    local InstanceCount
+    InstanceCount, Cursor = ReadVarintFrom(Packet, Cursor, Size)
+    if PayloadLength == nil or InstanceCount == nil or Cursor + PayloadLength > Size then
+        DropPacket(Source, "Reliable", TransportError.MalformedPacket, Size)
+        return nil, nil, false
+    end
+
+    local PayloadEnd = Cursor + PayloadLength
+    local FragmentId
+    FragmentId, Cursor = ReadVarintFrom(Packet, Cursor, PayloadEnd)
+    local FragmentIndex
+    FragmentIndex, Cursor = ReadVarintFrom(Packet, Cursor, PayloadEnd)
+    local FragmentCount
+    FragmentCount, Cursor = ReadVarintFrom(Packet, Cursor, PayloadEnd)
+    local OriginalSize
+    OriginalSize, Cursor = ReadVarintFrom(Packet, Cursor, PayloadEnd)
+
+    if FragmentId == nil
+        or FragmentIndex == nil
+        or FragmentCount == nil
+        or OriginalSize == nil
+        or FragmentIndex < 1
+        or FragmentIndex > FragmentCount
+        or FragmentCount <= 1
+        or OriginalSize <= 0
+    then
+        DropPacket(Source, "Reliable", TransportError.MalformedPacket, Size)
+        return nil, nil, false
+    end
+
+    CleanupFragments(Source)
+    local Key = RuntimeSupport.PeerKey(Source)
+    local ById = RuntimeState.Fragments[Key]
+    if ById == nil then
+        ById = {}
+        RuntimeState.Fragments[Key] = ById
+    end
+
+    local InFlight = 0
+    for _ in ById do
+        InFlight += 1
+    end
+    if ById[FragmentId] == nil and RuntimeConfig.MaxInFlightFragments > 0 and InFlight >= RuntimeConfig.MaxInFlightFragments then
+        DropPacket(Source, "Reliable", TransportError.FragmentOverflow, Size)
+        return nil, nil, false
+    end
+
+    local Assembly = ById[FragmentId]
+    if Assembly == nil then
+        Assembly = {
+            Started = os.clock(),
+            Count = FragmentCount,
+            OriginalSize = OriginalSize,
+            Parts = {},
+            Instances = Instances,
+            Received = 0,
+            ReceivedBytes = 0
+        }
+        ById[FragmentId] = Assembly
+    end
+
+    if Assembly.Count ~= FragmentCount or Assembly.OriginalSize ~= OriginalSize then
+        ById[FragmentId] = nil
+        DropPacket(Source, "Reliable", TransportError.MalformedPacket, Size)
+        return nil, nil, false
+    end
+
+    if Assembly.Parts[FragmentIndex] == nil then
+        local ChunkLength = PayloadEnd - Cursor
+        local Chunk = buffer.create(ChunkLength)
+        buffer.copy(Chunk, 0, Packet, Cursor, ChunkLength)
+        Assembly.Parts[FragmentIndex] = Chunk
+        Assembly.Received += 1
+        Assembly.ReceivedBytes += ChunkLength
+        if Instances ~= nil then
+            Assembly.Instances = Instances
+        end
+    end
+
+    if Assembly.Received < Assembly.Count then
+        return nil, nil, false
+    end
+
+    local Reassembled = buffer.create(Assembly.OriginalSize)
+    local Offset = 0
+    for Index = 1, Assembly.Count do
+        local Chunk = Assembly.Parts[Index]
+        if Chunk == nil then
+            return nil, nil, false
+        end
+        local ChunkLength = buffer.len(Chunk)
+        if Offset + ChunkLength > Assembly.OriginalSize then
+            ById[FragmentId] = nil
+            DropPacket(Source, "Reliable", TransportError.MalformedPacket, Size)
+            return nil, nil, false
+        end
+        buffer.copy(Reassembled, Offset, Chunk, 0, ChunkLength)
+        Offset += ChunkLength
+    end
+
+    ById[FragmentId] = nil
+    EmitTelemetry("transport.reassembled", {
+        Source = Source,
+        FragmentId = FragmentId,
+        Count = Assembly.Count,
+        Size = Assembly.OriginalSize
+    })
+    return Reassembled, Assembly.Instances, true
+end
+
+function BeginMessage(Index: number)
     FlushBits()
     local Flags = if SendPredictionId ~= nil then 1 else 0
     local IndexOffset = RawAllocate(1)
@@ -1108,7 +2268,7 @@ local function BeginMessage(Index: number)
     }
 end
 
-local function EndMessage(Frame: any?)
+function EndMessage(Frame: any?)
     if Frame == nil then
         return
     end
@@ -1140,11 +2300,6 @@ local function BeginReadMessage(PacketSize: number): number?
     RecieveFrameEnd = 0
     RecieveFrameInstanceEnd = RecieveInstanceCursor
     RecievePredictionId = nil
-    ActiveProtocolVersion = RuntimeSupport.ResolveReceiveProtocolVersion(RecieveSource)
-
-    if not UseProtocolV2() then
-        return buffer.readu8(RecieveBuffer, Read(1))
-    end
 
     local Index = buffer.readu8(RecieveBuffer, Read(1))
     local Flags = buffer.readu8(RecieveBuffer, Read(1))
@@ -1167,8 +2322,7 @@ local function BeginReadMessage(PacketSize: number): number?
 end
 
 local function EndReadMessage()
-    if not UseProtocolV2() or RecieveFrameEnd <= 0 then
-        ActiveProtocolVersion = nil
+    if RecieveFrameEnd <= 0 then
         RecieveMessageStart = 0
         return
     end
@@ -1179,12 +2333,11 @@ local function EndReadMessage()
     RecieveFrameEnd = 0
     RecieveFrameInstanceEnd = RecieveInstanceCursor
     RecievePredictionId = nil
-    ActiveProtocolVersion = nil
     RecieveMessageStart = 0
 end
 
 local function RecoverMessage()
-    if UseProtocolV2() and RecieveFrameEnd > 0 then
+    if RecieveFrameEnd > 0 then
         EndReadMessage()
         return
     end
@@ -1194,12 +2347,11 @@ local function RecoverMessage()
     RecieveFrameEnd = 0
     RecieveFrameInstanceEnd = RecieveInstanceCursor
     RecievePredictionId = nil
-    ActiveProtocolVersion = nil
     RecieveMessageStart = 0
 end
 
 local function WriteStringValue(Value: string, LengthBytes: number)
-    if UseProtocolV2() and RuntimeConfig.UseStringDictionaries then
+    if RuntimeConfig.UseStringDictionaries then
         local Existing = SendStringIds[Value]
         if Existing then
             WriteVarint(Existing)
@@ -1218,7 +2370,7 @@ local function WriteStringValue(Value: string, LengthBytes: number)
 end
 
 local function ReadStringValue(LengthBytes: number): string
-    if UseProtocolV2() and RuntimeConfig.UseStringDictionaries then
+    if RuntimeConfig.UseStringDictionaries then
         local Identifier = ReadVarint()
         if Identifier > 0 then
             local Value = RecieveStrings[Identifier]
@@ -1232,7 +2384,7 @@ local function ReadStringValue(LengthBytes: number): string
 
     local Length = ReadLength(LengthBytes)
     local Value = buffer.readstring(RecieveBuffer, Read(Length), Length)
-    if UseProtocolV2() and RuntimeConfig.UseStringDictionaries then
+    if RuntimeConfig.UseStringDictionaries then
         RecieveStrings[NextRecieveStringId] = Value
         NextRecieveStringId += 1
     end
@@ -1411,28 +2563,28 @@ local function SetGroup(Name: string, Players: {Player})
         Group[Player] = true
     end
 
-    Groups[Name] = Group
+    RuntimeState.Groups[Name] = Group
 end
 
 local function AddToGroup(Name: string, Player: Player)
-    local Group = Groups[Name]
+    local Group = RuntimeState.Groups[Name]
     if Group == nil then
         Group = {}
-        Groups[Name] = Group
+        RuntimeState.Groups[Name] = Group
     end
 
     Group[Player] = true
 end
 
 local function RemoveFromGroup(Name: string, Player: Player)
-    local Group = Groups[Name]
+    local Group = RuntimeState.Groups[Name]
     if Group then
         Group[Player] = nil
     end
 end
 
-local function GetGroupPlayers(Name: string): {Player}
-    local Group = Groups[Name]
+function GetGroupPlayers(Name: string): {Player}
+    local Group = RuntimeState.Groups[Name]
     if Group == nil then
         return {}
     end
@@ -1446,17 +2598,17 @@ local function GetGroupPlayers(Name: string): {Player}
 end
 
 local function SetInterestZone(ChannelName: string, Player: Player, ZoneName: string?)
-    local ChannelZones = InterestZones[ChannelName]
+    local ChannelZones = RuntimeState.InterestZones[ChannelName]
     if ChannelZones == nil then
         ChannelZones = {}
-        InterestZones[ChannelName] = ChannelZones
+        RuntimeState.InterestZones[ChannelName] = ChannelZones
     end
 
     ChannelZones[Player] = ZoneName
 end
 
-local function GetInterestZonePlayers(ChannelName: string, ZoneName: string): {Player}
-    local ChannelZones = InterestZones[ChannelName]
+function GetInterestZonePlayers(ChannelName: string, ZoneName: string): {Player}
+    local ChannelZones = RuntimeState.InterestZones[ChannelName]
     if ChannelZones == nil then
         return {}
     end
@@ -1472,17 +2624,17 @@ local function GetInterestZonePlayers(ChannelName: string, ZoneName: string): {P
 end
 
 local function SetInterestPosition(ChannelName: string, Player: Player, Position: Vector3?)
-    local ChannelPositions = InterestPositions[ChannelName]
+    local ChannelPositions = RuntimeState.InterestPositions[ChannelName]
     if ChannelPositions == nil then
         ChannelPositions = {}
-        InterestPositions[ChannelName] = ChannelPositions
+        RuntimeState.InterestPositions[ChannelName] = ChannelPositions
     end
 
     ChannelPositions[Player] = Position
 end
 
 local function GetInterestDistancePlayers(ChannelName: string, Origin: Vector3, Radius: number): {Player}
-    local ChannelPositions = InterestPositions[ChannelName]
+    local ChannelPositions = RuntimeState.InterestPositions[ChannelName]
     if ChannelPositions == nil then
         return {}
     end
@@ -1499,15 +2651,38 @@ local function GetInterestDistancePlayers(ChannelName: string, Origin: Vector3, 
 end
 
 local function ClearPlayerRuntimeState(Player: Player)
-    RateLimitState[Player] = nil
-    for _, Group in Groups do
+    RuntimeState.RateLimit[Player] = nil
+    RuntimeState.Transport[Player] = nil
+    RuntimeState.Replay[Player] = nil
+    RuntimeState.InvokeNonces[Player] = nil
+    RuntimeState.Abuse[Player] = nil
+    RuntimeState.Idempotency[Player] = nil
+    for _, Group in RuntimeState.Groups do
         Group[Player] = nil
     end
-    for _, ChannelZones in InterestZones do
+    for _, Party in RuntimeState.Parties do
+        Party[Player] = nil
+    end
+    for _, Match in RuntimeState.Matches do
+        Match[Player] = nil
+    end
+    for _, Team in RuntimeState.Teams do
+        Team[Player] = nil
+    end
+    for _, Cell in RuntimeState.StreamedCells do
+        Cell[Player] = nil
+    end
+    for _, Owners in RuntimeState.ObjectOwners do
+        Owners[Player] = nil
+    end
+    for _, ChannelZones in RuntimeState.InterestZones do
         ChannelZones[Player] = nil
     end
-    for _, ChannelPositions in InterestPositions do
+    for _, ChannelPositions in RuntimeState.InterestPositions do
         ChannelPositions[Player] = nil
+    end
+    for _, Map in RuntimeState.PlayerInterest do
+        Map[Player] = nil
     end
 end
 
@@ -1516,9 +2691,9 @@ local function BeginPrediction(Name: string, Payload: any): number
         error("[Blink]: Prediction helpers are disabled by RuntimeConfig.EnablePrediction.")
     end
 
-    PredictionState.NextId = (PredictionState.NextId + 1) % 65536
-    local Identifier = PredictionState.NextId
-    PredictionState.Pending[Identifier] = {
+    RuntimeState.Prediction.NextId = (RuntimeState.Prediction.NextId + 1) % 65536
+    local Identifier = RuntimeState.Prediction.NextId
+    RuntimeState.Prediction.Pending[Identifier] = {
         Name = Name,
         Payload = Payload,
         Started = os.clock()
@@ -1534,12 +2709,12 @@ local function BeginPrediction(Name: string, Payload: any): number
 end
 
 local function AckPrediction(Identifier: number)
-    local Prediction = PredictionState.Pending[Identifier]
+    local Prediction = RuntimeState.Prediction.Pending[Identifier]
     if Prediction == nil then
         return nil
     end
 
-    PredictionState.Pending[Identifier] = nil
+    RuntimeState.Prediction.Pending[Identifier] = nil
     RunHooks("Ack", {
         Id = Identifier,
         Prediction = Prediction
@@ -1549,12 +2724,12 @@ local function AckPrediction(Identifier: number)
 end
 
 local function RollbackPrediction(Identifier: number, Reason: string?)
-    local Prediction = PredictionState.Pending[Identifier]
+    local Prediction = RuntimeState.Prediction.Pending[Identifier]
     if Prediction == nil then
         return nil
     end
 
-    PredictionState.Pending[Identifier] = nil
+    RuntimeState.Prediction.Pending[Identifier] = nil
     RunHooks("Rollback", {
         Id = Identifier,
         Prediction = Prediction,
@@ -1624,16 +2799,16 @@ local function DefineStateChannel(Name: string, Options: {[string]: any}?)
         return Dirty, self.Version
     end
 
-    StateChannels[Name] = Channel
+    RuntimeState.StateChannels[Name] = Channel
     return Channel
 end
 
 local function RegisterStateFlusher(Callback: () -> ())
-    table.insert(StateFlushers, Callback)
+    table.insert(RuntimeState.StateFlushers, Callback)
 end
 
 local function RunStateFlushers()
-    for _, Callback in StateFlushers do
+    for _, Callback in RuntimeState.StateFlushers do
         local Success, Error = pcall(Callback)
         if not Success then
             MetricAdd("HookErrors", "StateFlusher")
@@ -1643,19 +2818,19 @@ local function RunStateFlushers()
 end
 
 function RuntimeSupport.RegisterMigration(FromVersion: number, Callback: (any) -> any)
-    SchemaMigrations[FromVersion] = Callback
+    RuntimeState.SchemaMigrations[FromVersion] = Callback
 end
 
 function RuntimeSupport.SetSchemaDefault(Field: string, Value: any)
-    SchemaDefaults[Field] = Value
+    RuntimeState.SchemaDefaults[Field] = Value
 end
 
 function RuntimeSupport.RenameSchemaField(From: string, To: string)
-    SchemaRenames[From] = To
+    RuntimeState.SchemaRenames[From] = To
 end
 
 function RuntimeSupport.DeprecateSchemaField(Field: string)
-    SchemaDeprecated[Field] = true
+    RuntimeState.SchemaDeprecated[Field] = true
 end
 
 function RuntimeSupport.ApplySchemaTransforms(Payload: any)
@@ -1664,20 +2839,20 @@ function RuntimeSupport.ApplySchemaTransforms(Payload: any)
     end
 
     local Result = table.clone(Payload)
-    for From, To in SchemaRenames do
+    for From, To in RuntimeState.SchemaRenames do
         if Result[From] ~= nil and Result[To] == nil then
             Result[To] = Result[From]
             Result[From] = nil
         end
     end
 
-    for Field, Value in SchemaDefaults do
+    for Field, Value in RuntimeState.SchemaDefaults do
         if Result[Field] == nil then
             Result[Field] = Value
         end
     end
 
-    for Field in SchemaDeprecated do
+    for Field in RuntimeState.SchemaDeprecated do
         Result[Field] = nil
     end
 
@@ -1688,7 +2863,7 @@ function RuntimeSupport.MigratePayload(Payload: any, FromVersion: number?)
     local Version = FromVersion or RuntimeConfig.SchemaVersion
     local Result = RuntimeSupport.ApplySchemaTransforms(Payload)
     while Version < RuntimeConfig.SchemaVersion do
-        local Migration = SchemaMigrations[Version]
+        local Migration = RuntimeState.SchemaMigrations[Version]
         if Migration then
             Result = Migration(Result)
         end
@@ -1703,29 +2878,29 @@ function RuntimeSupport.SchemaInfo()
         Version = RuntimeConfig.SchemaVersion,
         MinimumVersion = RuntimeConfig.MinimumSchemaVersion,
         Hash = RuntimeConfig.SchemaHash,
-        Defaults = table.clone(SchemaDefaults),
-        Renames = table.clone(SchemaRenames),
-        Deprecated = table.clone(SchemaDeprecated)
+        Defaults = table.clone(RuntimeState.SchemaDefaults),
+        Renames = table.clone(RuntimeState.SchemaRenames),
+        Deprecated = table.clone(RuntimeState.SchemaDeprecated)
     }
 end
 
 function RuntimeSupport.SetInspectorEnabled(Enabled: boolean)
-    InspectorState.Enabled = Enabled
+    RuntimeState.Inspector.Enabled = Enabled
 end
 
 function RuntimeSupport.InspectorSnapshot()
-    if not InspectorState.Enabled and not RuntimeConfig.EnableInspector then
+    if not RuntimeState.Inspector.Enabled and not RuntimeConfig.EnableInspector then
         error("[Blink]: Inspector is disabled. Set RuntimeConfig.EnableInspector or call Inspector.Enable(true).")
     end
 
     return {
         Metrics = GetMetrics(),
         Protocol = RuntimeSupport.ProtocolInfo(nil),
-        Peers = table.clone(PeerCapabilities),
+        Peers = table.clone(RuntimeState.PeerCapabilities),
         Capture = RuntimeSupport.CaptureEntries(),
         Runtime = {
             ProtocolVersion = RuntimeConfig.ProtocolVersion,
-            ProtocolMode = RuntimeConfig.ProtocolMode,
+            ProtocolMode = "StrictV2Only",
             SchemaVersion = RuntimeConfig.SchemaVersion,
             SecurityProfile = RuntimeConfig.SecurityProfile
         }
