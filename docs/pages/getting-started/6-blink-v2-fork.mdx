@@ -1,0 +1,443 @@
+# Blink V2 Fork Guide
+
+This fork is a strict v2-only networking engine. It does not preserve v1 compatibility, does not negotiate down to legacy framing, and does not emit generated v1 reader or writer branches. Treat schemas compiled with this fork as a new protocol surface.
+
+Use this page as the handoff document for future integrations. It describes the required schema posture, the runtime APIs added by this fork, the security model, and the practical steps for putting the generated modules into a Roblox game such as Server Admin.
+
+## Hard rules
+
+- `ProtocolVersion` must be `2` when it is provided.
+- `ProtocolMode` is retired. Legacy and negotiated modes fail.
+- `AcceptProtocolVersion1` is retired and fails.
+- Generated modules only send and receive v2 frames.
+- Compatibility is schema-hash and schema-version based, not mixed protocol based.
+- Production client-origin remotes must have `Auth`, `Policy`, or `PolicyGroup`.
+- High-risk production payloads must have bounded packet sizes, rate limits, policies, and server authority.
+- Remote spying cannot be fully prevented. This fork makes spying less useful by avoiding secrets in remotes, validating every client request on the server, rejecting replay, using compact server-issued handles, and scoring abuse.
+
+## Minimal production schema
+
+```blink
+option Casing = Pascal
+option ClientOutput = "Network/Client.luau"
+option ServerOutput = "Network/Server.luau"
+option TypesOutput = "Network/Types.luau"
+
+option ProtocolVersion = 2
+option EnableProtocolHandshake = true
+option Version = 7
+option MinimumSchemaVersion = 7
+
+option SecurityProfile = Production
+option RequirePolicies = true
+option MaxPacketBytes = 65536
+option MaxUnreliablePacketBytes = 900
+option RateLimitPerSecond = 60
+option RateLimitBurst = 120
+option InvokeTimeoutSeconds = 10
+
+option ReliableFragmentBytes = 32768
+option MaxInFlightFragments = 128
+option FragmentTimeoutSeconds = 10
+option MaxQueuedBytes = 1048576
+option MaxQueuedEvents = 256
+option MaxBurstBytes = 262144
+option LowPriorityShedding = true
+
+event AdminCommand {
+    WireId: 10,
+    From: Client,
+    Type: Reliable,
+    Call: SingleAsync,
+    Policy: "admin",
+    Risk: Admin,
+    Priority: Critical,
+    Idempotency: true,
+    MaxPacketBytes: 512,
+    Data: string
+}
+
+event CosmeticState {
+    WireId: 20,
+    From: Server,
+    Type: Unreliable,
+    Call: SingleAsync,
+    Priority: Cosmetic,
+    ReliabilityMode: Latest,
+    CoalesceKey: "cosmetic-state",
+    Data: Vector3
+}
+```
+
+## Wire identity and lockfiles
+
+Every event, function, type, and channel can carry an explicit `WireId`. Use explicit IDs for production schemas. When an item is removed, reserve or deprecate its old ID instead of letting later items shift.
+
+```blink
+event CurrencySpend {
+    WireId: 30,
+    From: Client,
+    Type: Reliable,
+    Call: SingleAsync,
+    Policy: "currency",
+    Risk: Currency,
+    Idempotency: true,
+    MaxPacketBytes: 128,
+    Data: u32
+}
+```
+
+Write and commit the lockfile:
+
+```sh copy
+blink path/to/schema --write-lock --yes
+blink path/to/schema --check-lock --yes
+```
+
+`blink.lock` records protocol version, schema version, schema hash, type hashes, explicit wire IDs, reserved IDs, deprecated IDs, options, and compatibility metadata. CI should fail when a schema change alters the wire layout without an intentional lockfile update.
+
+## Transport model
+
+Reliable packets use v2 frame headers and can be fragmented when they exceed `ReliableFragmentBytes`. Each fragment carries an id, index, count, and original byte count. Reassembly is bounded by `MaxInFlightFragments` and `FragmentTimeoutSeconds`, so partial fragment streams cannot grow memory forever.
+
+Priority lanes are:
+
+- `Critical`: security-sensitive or gameplay-blocking traffic.
+- `Gameplay`: normal gameplay state and commands.
+- `Cosmetic`: effects, animation, aim, visual state, and short-lived presentation data.
+- `Background`: low urgency sync, diagnostics, and bulk state.
+
+Flush scheduling considers elapsed time, queued bytes, queued event count, byte budget, burst budget, queue pressure, RTT, jitter, and priority. When `LowPriorityShedding` is enabled, cosmetic and background unreliable traffic can be dropped before critical or gameplay traffic.
+
+Use latest-only unreliable traffic for stale updates:
+
+```blink
+event AimPose {
+    From: Client,
+    Type: Unreliable,
+    Call: SingleAsync,
+    Priority: Cosmetic,
+    ReliabilityMode: Latest,
+    CoalesceKey: "aim-pose",
+    Policy: "damage",
+    Risk: Damage,
+    Data: Vector3
+}
+```
+
+Runtime APIs:
+
+```lua
+Network.Transport.Snapshot(player)
+Network.Transport.UpdateStats(player, rttSeconds, jitterSeconds, packetLoss)
+Network.Transport.ShouldFlush(player, "Reliable", "Gameplay")
+Network.Transport.Errors
+```
+
+## Typed drops and recovery
+
+Malformed packets never throw through RemoteEvent handlers. The runtime drops, recovers, and reports typed reasons through `Security.OnViolation`.
+
+Common reasons include:
+
+- `MalformedPacket`
+- `MalformedPayload`
+- `FragmentTimeout`
+- `FragmentLimit`
+- `ReplayDuplicate`
+- `ReplayStale`
+- `PolicyDenied`
+- `Cooldown`
+- `InvalidHandle`
+- `DecodeBudget`
+- `Killed`
+- `QueueOverflow`
+
+Install a structured hook on the server:
+
+```lua
+Network.Security.OnViolation(function(report)
+    print(report.reason, report.player, report.event, report.channel, report.score, report.action, report.payloadSize)
+end)
+```
+
+The report includes reason, player, event, channel, score, action, payload size, protocol, schema version, and policy metadata when available.
+
+## Policies and presets
+
+Schema policies describe the server-side checks that must succeed before a client-origin remote is dispatched. Built-in presets are available for `damage`, `currency`, `trade`, `inventory`, `teleport`, `admin`, `crafting`, `marketplace`, and `moderation`.
+
+```blink
+event TeleportRequest {
+    WireId: 40,
+    From: Client,
+    Type: Reliable,
+    Call: SingleAsync,
+    Policy: "teleport",
+    Risk: Teleport,
+    RequireZone: true,
+    RequireMatch: true,
+    CooldownSeconds: 5,
+    Idempotency: true,
+    MaxPacketBytes: 256,
+    Data: u16
+}
+```
+
+Register custom policies at runtime:
+
+```lua
+Network.Security.RegisterPolicy("server-admin-command", function(player, context)
+    if not player then
+        return false, "missing-player"
+    end
+
+    local adminLevel = player:GetAttribute("AdminLevel")
+    if type(adminLevel) ~= "number" or adminLevel < 100 then
+        return false, "not-admin"
+    end
+
+    return true
+end)
+```
+
+Policy checks can cover ownership, distance, team, zone, match id, cooldown, inventory ownership, character state, object handle validity, server-known ids, idempotency keys, and custom game state.
+
+## Payload canonicalization
+
+Decoded payloads are canonicalized before handlers run. The runtime rejects NaN, infinities, impossible vectors, impossible CFrames, excessive table depth, sparse arrays, oversized strings, invalid enums, duplicate map keys when detectable, invalid handles, and decode-operation budget overruns.
+
+Use bounded schema types and fixed-size structs for sensitive traffic. Avoid `unknown` for production client-origin data unless a policy rejects untrusted shapes and `MaxPayloadDepth`, `MaxPayloadStringBytes`, `MaxTableKeys`, and `MaxDecodeOperations` are strict enough for the use case.
+
+## Handles and capabilities
+
+Clients should not send arbitrary `Instance` references for sensitive objects. Register server-issued handles and resolve them on the server.
+
+```lua
+local handle = Network.Handles.RegisterHandle(part, ownerPlayer, {
+    kind = "BuildPiece",
+    ttl = 30,
+})
+
+local object = Network.Handles.ResolveHandle(player, handle, "BuildPiece")
+```
+
+Capabilities are expiring object grants:
+
+```lua
+local token = Network.Handles.IssueCapability(player, objectId, {
+    action = "Edit",
+    ttl = 15,
+})
+
+local allowed = Network.Handles.ValidateCapability(player, token, "Edit", objectId)
+```
+
+Use handles for admin targets, build objects, private-server entities, inventory items, trade sessions, teleport anchors, and any other object the server owns.
+
+## Replay and idempotency
+
+The runtime tracks per-player sequence windows and invoke nonces. Duplicate packets are rejected, stale packets expire, and sensitive retries can be idempotent instead of duplicating effects.
+
+Use `Idempotency: true` on client requests that can spend currency, move inventory, grant rewards, mutate moderation state, execute admin actions, trade items, craft items, teleport players, or call marketplace flows.
+
+## Interest and replication graph
+
+The replication engine routes events and state to observable players only. Supported scopes are player, group, zone, party, match, team, streamed cell, and object owner.
+
+```lua
+Network.Replication.SetGroup(player, "Admins")
+Network.Replication.SetZone(player, "Lobby")
+Network.Replication.SetParty(player, partyId)
+Network.Replication.SetMatch(player, matchId)
+Network.Replication.SetTeam(player, teamId)
+Network.Replication.SetStreamedCell(player, cellId)
+Network.Replication.SetObjectOwner(objectId, player)
+```
+
+Create a graph for routing server state:
+
+```lua
+local graph = Network.Replication.CreateGraph()
+graph:Route("AdminAudit", {
+    group = "Admins",
+    zone = "Lobby",
+})
+
+local recipients = graph:GetPlayers("AdminAudit")
+```
+
+Clean subscriptions on player leave, zone exit, team swap, party leave, match leave, streamed-cell unload, and object destroy. The runtime clears known per-player state on `Players.PlayerRemoving`; game-specific ownership maps should still call the matching clear/remove APIs when gameplay state changes.
+
+## State deltas and interpolation
+
+State helpers produce full snapshots or compact patch operations with nested masks, array operations, map operations, tombstones, and full snapshot fallback.
+
+```lua
+local patch = Network.State.MakePatch(previousState, nextState)
+local applied = Network.State.ApplyPatch(previousState, patch)
+```
+
+For client smoothing, create interpolation helpers:
+
+```lua
+local interpolator = Network.State.Interpolator(0.12)
+interpolator:Push(os.clock(), serverSnapshot)
+local visibleState = interpolator:Sample(os.clock())
+```
+
+Use this for replicated positions, cooldown displays, cosmetic state, team indicators, zone metadata, match UI, and any state that should tolerate jitter without exposing authority to the client.
+
+## Quantized codecs
+
+Use quantized codecs when exact IEEE values are not needed:
+
+```lua
+local encoded = Network.Codecs.QuantizeVector3(position, 0.01, -4096, 4096)
+local position = Network.Codecs.DequantizeVector3(encoded, 0.01, -4096)
+
+local angle = Network.Codecs.QuantizeAngle(radians, 16)
+local radians = Network.Codecs.DequantizeAngle(angle, 16)
+```
+
+Available helpers cover fixed-point numbers, Vector2/Vector3-style structs, angles, unit direction values, quaternions, and CFrame-friendly pieces. Pair these helpers with fixed numeric schema types for predictable packet size.
+
+## Capture, replay, and diagnostics
+
+Capture export includes schema hash, schema version, protocol, redaction metadata, raw buffers when allowed, decoded summaries, and timestamps. Production can disable raw buffer export with `NoRawCaptureInProduction`.
+
+Replay modes are:
+
+- Decode-only replay.
+- Handler replay.
+- Raw receive replay.
+- Drop and recovery replay.
+
+The corpus should contain malformed frames, malformed payloads, fragmented packets, replay attempts, duplicate packets, stale packets, corrupted packets, reordered packets, delayed packets, prediction acks, and minimized fuzz repros.
+
+Runtime diagnostics:
+
+```lua
+Network.Diagnostics.ListenerSnapshot()
+Network.Security.AbuseScores()
+Network.Protocol.Info(player)
+Network.Protocol.Peers
+```
+
+Listener diagnostics report no listeners, duplicate handlers, leaking listener counts, and growing queues. Optional Roblox micro-profiler markers wrap encode, flush, decode, dispatch, and state replication when `EnableMicroProfiler` is enabled.
+
+## Production gates
+
+Run every gate before publishing a production schema:
+
+```sh copy
+blink path/to/schema --doctor --yes
+blink path/to/schema --benchmark --yes
+blink path/to/schema --load-sim --yes
+blink path/to/schema --capture-replay --yes
+blink path/to/schema --golden-snapshots --yes
+blink path/to/schema --compatibility --yes
+blink path/to/schema --schema-docs --yes
+blink path/to/schema --check-lock --yes
+blink path/to/schema --hardening-checklist --yes
+```
+
+CI should also run `stylua --check`, `selene`, the test suite, benchmark thresholds, lockfile checks, generated docs checks, capture replay checks, and `git diff --check`.
+
+## Server Admin integration pattern
+
+For Server Admin or another existing game, install the generated modules in a shared service location and keep server authority in ServerScriptService.
+
+Recommended layout:
+
+```text
+ReplicatedStorage
+  BlinkV2
+    Client
+    Types
+ServerScriptService
+  BlinkV2
+    Server
+    ServerAdminIntegration
+```
+
+Server bootstrap:
+
+```lua
+local ServerScriptService = game:GetService("ServerScriptService")
+local BlinkServer = require(ServerScriptService.BlinkV2.Server)
+
+BlinkServer.Security.RegisterPolicy("admin", function(player, context)
+    local adminLevel = player and player:GetAttribute("AdminLevel")
+    if type(adminLevel) ~= "number" or adminLevel < 100 then
+        return false, "not-admin"
+    end
+
+    return true
+end)
+
+BlinkServer.Security.OnViolation(function(report)
+    warn("[BlinkV2]", report.reason, report.player, report.event, report.action, report.score)
+end)
+
+BlinkServer.Transport.UpdateStats(nil, 0, 0, 0)
+```
+
+Client bootstrap:
+
+```lua
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local BlinkClient = require(ReplicatedStorage.BlinkV2.Client)
+
+BlinkClient.Protocol.QueueHandshake()
+```
+
+When migrating existing Server Admin remotes:
+
+- Replace arbitrary `RemoteEvent` and `RemoteFunction` calls with generated Blink events/functions.
+- Assign explicit `WireId` values before the first production release.
+- Put admin, moderation, marketplace, inventory, teleport, trade, currency, crafting, and damage requests behind policies.
+- Convert instance arguments to server-issued handles or capabilities.
+- Add idempotency to admin actions that can be retried.
+- Use latest-only unreliable events for cosmetic UI or cursor-like state.
+- Use replication graph routing for admin panels that should only observe players, matches, zones, or objects they are allowed to inspect.
+- Hook `Security.OnViolation` into Server Admin's audit log, moderation log, and abuse scoring.
+- Use kill switches for remote names and policy groups so an exploited surface can be disabled without shutting down the whole game.
+
+## Compatibility risks
+
+This fork intentionally breaks clients and servers generated by legacy Blink schemas. Mixed v1/v2 clients are not supported. A client must match protocol v2, compatible schema version bounds, and schema hash.
+
+Breaking changes to communicate before release:
+
+- v1 clients cannot connect.
+- Schemas using `ProtocolMode` or `AcceptProtocolVersion1` no longer compile.
+- Generated modules expose stricter runtime errors for invalid config.
+- Malformed packets are dropped earlier, so old tests that expected handler invocation after bad data must change.
+- Client-origin remotes without policies fail production hardening.
+- Raw capture can be disabled in production, so tooling must read redacted summaries when raw buffers are not available.
+
+## Future handoff checklist
+
+When another Codex or Claude chat continues this fork, start with these files:
+
+- `src/Templates/Base.luau`
+- `src/Generator/init.luau`
+- `src/CLI/Utility/Compile.luau`
+- `src/Parser.luau`
+- `test/Test.luau`
+- `test/Sources/Test.blink`
+- `test/Sources/HardeningGood.blink`
+- `test/Sources/blink.lock`
+- `docs/pages/getting-started/6-blink-v2-fork.mdx`
+
+Then run:
+
+```sh copy
+lune run Test -- --ci
+lune run src/CLI/init.luau test/Sources/Test -- --check-lock --yes
+lune run src/CLI/init.luau test/Sources/HardeningGood -- --hardening-checklist --yes
+stylua --check src test benchmark plugin
+selene src test benchmark plugin
+git diff --check
+```

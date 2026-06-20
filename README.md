@@ -15,12 +15,10 @@ It means lower bandwidth usage directly resulting in **lower ping\*** experience
 *\* In comparison to standard ROBLOX networking, this may not always be the case but should never result in increased ping times.*
 
 Benchmarks are available here [here](./benchmark/Benchmarks.md).
-Production rollout helpers, capture/replay, strict build checks, schema migrations, load simulation, and replication adapters are documented in [Production Upgrades](./docs/pages/getting-started/5-production-upgrades.mdx).
+This fork is a v2-only hardened networking engine. Production rollout helpers, capture/replay, strict build checks, schema migrations, load simulation, and replication adapters are documented in [Production Upgrades](./docs/pages/getting-started/5-production-upgrades.mdx). The full fork integration guide is in [Blink V2 Fork Guide](./docs/pages/getting-started/6-blink-v2-fork.mdx).
 
 # Security
-Blink does two things to combat bad actors:
-1. Data sent by clients will be **validated** on the receiving side before  reaching any critical game code.
-2. As a result of the compression done by Blink it becomes **significantly harder** to snoop on your game's network traffic. Long gone are the days of skids using RemoteSpy to snoop on your game's traffic.
+Blink does not claim remote spying can be fully prevented. A client can always observe traffic that reaches that client. This fork makes spying and replaying traffic less useful by keeping authority on the server, never putting secrets in remotes, enforcing v2 schema/hash compatibility, rejecting stale or duplicate packets, validating schema policies before handlers run, scoring abuse, and surfacing structured security violations.
 
 # Get Started
 Head over to the [installation](https://1axen.github.io/blink/getting-started/1-installation) page to get started with Blink.

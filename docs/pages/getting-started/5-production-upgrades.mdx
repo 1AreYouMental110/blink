@@ -1,19 +1,19 @@
 # Production Upgrades
 
-Blink can now generate rollout and operations helpers alongside the normal client, server, and type files.
+Blink can now generate hardened v2 networking and operations helpers alongside the normal client, server, and type files.
 
-## Protocol rollout
+## Strict v2 protocol
 
-Use protocol v2 with negotiated rollout when a live server must accept older generated clients during deploys.
+This fork is v2-only. It does not generate v1 readers, v1 writers, legacy protocol negotiation, or `AcceptProtocolVersion1` fallback. Schemas that request `ProtocolVersion < 2`, `ProtocolMode`, or `AcceptProtocolVersion1` fail compilation.
 
 ```blink
 option ProtocolVersion = 2
-option ProtocolMode = Negotiated
-option AcceptProtocolVersion1 = true
 option EnableProtocolHandshake = true
+option Version = 3
+option MinimumSchemaVersion = 3
 ```
 
-Generated modules send a capability handshake before their first packet. The receiver records the peer protocol and schema version, accepts v1 packets while no compatible v2 handshake is present, and rejects future or too-old schemas through safe drops instead of decoding with the wrong wire format.
+Generated modules send a v2 capability handshake before their first packet. The receiver checks peer protocol, schema version, minimum schema version, and schema hash. Legacy protocol traffic, stale schema versions, and mismatched hashes are dropped safely without invoking handlers.
 
 Runtime helpers:
 
@@ -23,7 +23,92 @@ Network.Protocol.QueueHandshake(player)
 Network.Protocol.Peers
 ```
 
-Use `ProtocolMode = Strict` after all clients are upgraded, or `ProtocolMode = Legacy` when intentionally emitting v1 packets.
+Use wire IDs and `blink.lock` when changing schemas. Explicit IDs and reserved/deprecated IDs keep removals from shifting unrelated wire IDs.
+
+```blink
+event DamageRequest {
+    WireId: 10,
+    From: Client,
+    Type: Reliable,
+    Call: SingleAsync,
+    Policy: "damage",
+    Risk: Damage,
+    Data: u16
+}
+```
+
+## Transport hardening
+
+Reliable packets can be fragmented and reassembled with bounded per-player state. Fragments carry an id, index, count, and source packet size. Timeout cleanup and `MaxInFlightFragments` prevent memory growth when clients send partial or corrupted fragment streams.
+
+Priority lanes are `Critical`, `Gameplay`, `Cosmetic`, and `Background`. Flush scheduling considers elapsed time, queued bytes, queued event count, byte budget, burst budget, queue pressure, and priority. Low-priority unreliable traffic can be shed when a player is under backpressure.
+
+```blink
+option ReliableFragmentBytes = 32768
+option MaxInFlightFragments = 128
+option FragmentTimeoutSeconds = 10
+option MaxQueuedBytes = 1048576
+option MaxQueuedEvents = 256
+option MaxBurstBytes = 262144
+option LowPriorityShedding = true
+```
+
+Events can select a priority and latest-only behavior:
+
+```blink
+event AimUpdate {
+    From: Client,
+    Type: Unreliable,
+    Call: SingleAsync,
+    Priority: Cosmetic,
+    ReliabilityMode: Latest,
+    CoalesceKey: "aim",
+    Policy: "combat",
+    Data: Vector3
+}
+```
+
+Malformed packets, malformed payloads, replay attempts, stale packets, policy failures, decode-budget failures, and kill-switch drops are reported with typed transport error reasons. RemoteEvent handlers recover after bad packets instead of throwing through Roblox event dispatch.
+
+## Security policies
+
+Client-origin remotes can declare `Policy`, `PolicyGroup`, risk level, cooldown, idempotency, and server-side constraints:
+
+```blink
+event TradeAccept {
+    From: Client,
+    Type: Reliable,
+    Call: SingleAsync,
+    Policy: "trade",
+    PolicyGroup: "economy",
+    Risk: Trade,
+    Priority: Critical,
+    CooldownSeconds: 0.5,
+    RequireObjectHandle: true,
+    RequireServerKnownId: true,
+    Idempotency: true,
+    MaxPacketBytes: 128,
+    Data: u32
+}
+```
+
+Policy checks include ownership, distance, team, zone, match id, cooldown, inventory ownership, character state, object handle validity, and server-known ids. Built-in presets cover damage, currency, trade, inventory, teleport, admin, crafting, marketplace, and moderation. Runtime code can replace or extend presets:
+
+```lua
+Network.Security.RegisterPolicy("trade", function(context)
+    return context.Source ~= nil and context.Payload ~= nil, "trade-rejected"
+end)
+```
+
+Security violations flow through a structured hook:
+
+```lua
+Network.Security.OnViolation(function(entry)
+    warn(entry.Reason, entry.Player, entry.Event, entry.Channel, entry.Score, entry.Action, entry.PayloadSize)
+end)
+```
+
+Remote spying cannot be fully prevented because clients can observe traffic addressed to them. The hardening model is server authority, no secrets in remotes, strict schema/hash checks, replay protection, policy validation, object capability handles, and abuse scoring.
 
 ## Packet capture and replay
 
@@ -45,10 +130,10 @@ local rawReplay = Network.Capture.ReplayRaw(entries)
 Network.Capture.Stop()
 ```
 
-Entries include event name, direction, source or target, user id when available, payload size, accepted or dropped status, drop reason, timing, protocol version, schema version, and a redacted payload summary.
-Accepted and dropped entries also keep a cloned raw packet buffer so `ReplayRaw` can inject recorded bytes through the generated receive path. That mode exercises framing recovery, malformed packet drops, and decode behavior closer to wire replay than handler-only replay.
+Entries include event name, direction, source or target, user id when available, payload size, accepted or dropped status, drop reason, timing, protocol version, schema version, schema hash, redaction metadata, and a redacted payload summary.
+Accepted and dropped entries can keep a cloned raw packet buffer so `ReplayRaw` can inject recorded bytes through the generated receive path. That mode exercises framing recovery, malformed packet drops, fragment reassembly, replay attempts, duplicate packets, stale packets, and decode behavior closer to wire replay than handler-only replay.
 
-Use `option CaptureRedactions = "Password,Token"` for schema-level defaults, `Capture.Start({ Redactions = ... })` for a capture-local override, or `Network.Capture.Redact(...)` at runtime. Redactions match field names inside payload summaries; raw buffers are retained for replay and should be stored with the same access controls as production packet captures.
+Use `option CaptureRedactions = "Password,Token"` for schema-level defaults, `Capture.Start({ Redactions = ... })` for a capture-local override, or `Network.Capture.Redact(...)` at runtime. Redactions match field names inside payload summaries. In production, set `option NoRawCaptureInProduction = true` so captures omit raw buffers unless an operator deliberately enables raw replay in a controlled environment.
 
 ## Inspector
 
@@ -59,7 +144,7 @@ Network.Inspector.Enable(true)
 local snapshot = Network.Inspector.Snapshot()
 ```
 
-Snapshots include metrics, captured packets, invoke state, peer protocol state, packet drops, validation failures, rate-limit decisions, and runtime configuration.
+Snapshots include metrics, captured packets, invoke state, peer protocol state, packet drops, validation failures, rate-limit decisions, listener lifecycle diagnostics, transport queues, replay state, abuse scores, and runtime configuration.
 
 ## Schema versioning
 
@@ -86,7 +171,26 @@ Network.Schema.DeprecateField("LegacyField")
 local migrated, version = Network.Schema.Migrate(payload, 2)
 ```
 
-State channels and packet captures carry schema version metadata so old captures and rollout clients can be checked before replaying or decoding.
+State channels and packet captures carry schema version metadata so old captures can be checked before replaying or decoding.
+
+## Interest and replication graph
+
+Generated runtime exposes routing helpers for player, group, zone, party, match, team, streamed cell, and object ownership interest. Use these before broadcasting expensive state:
+
+```lua
+Network.Replication.SetParty(player, partyId)
+Network.Replication.SetMatch(player, matchId)
+Network.Replication.SetTeam(player, teamName)
+Network.Replication.SetStreamedCell(player, cellId)
+Network.Replication.SetObjectOwner(object, player)
+
+local graph = Network.Replication.Graph()
+for _, observer in graph.Route("Party", partyId) do
+    Network.WorldState.SetPlayer(observer, snapshot)
+end
+```
+
+State deltas support nested patch masks, array/map operations, tombstones, and full snapshot fallback. Clients can use `Network.State.Interpolator()` for snapshot smoothing.
 
 ## Cross-server adapters
 
@@ -119,7 +223,7 @@ option StrictProduction = true
 option SecurityProfile = Production
 ```
 
-Strict mode fails on missing auth for client-to-server events, unlimited packet sizes, missing invoke timeout, missing rate limits, debug validation in production, unsafe output paths, and incompatible protocol settings.
+Strict mode fails on missing auth or policy for client-to-server events/functions, unlimited packet sizes, missing invoke timeout, missing rate limits, debug validation in production, unsafe output paths, raw production capture, missing hardening policies, and incompatible protocol settings.
 Diagnostics include the source file, line, and column when the option or declaration can be located.
 
 ## CI reports
@@ -134,10 +238,13 @@ blink config --capture-replay --yes
 blink config --golden-snapshots --yes
 blink config --compatibility --yes
 blink config --schema-docs --yes
+blink config --write-lock --yes
+blink config --check-lock --yes
+blink config --hardening-checklist --yes
 blink config --ci --yes
 ```
 
-`--ci` runs doctor, benchmark, load-sim, capture-replay, golden-snapshots, compatibility, and schema-docs in one noninteractive pass. `--load-sim` reports generated traffic estimates for 10, 50, 100, and 200 clients. `--golden-snapshots` prints schema and wire-hash metadata for snapshot review. Runtime tests should still lock exact bytes for representative exported serializers and wire features such as nested structs, maps and sets, optionals, dictionaries, invokes, prediction acks, and state deltas.
+`--ci` runs doctor, benchmark, load-sim, capture-replay, golden-snapshots, compatibility, schema-docs, and lockfile verification in one noninteractive pass. `--load-sim` reports generated traffic estimates for 10, 50, 100, and 200 clients. `--golden-snapshots` prints schema and wire-hash metadata for snapshot review. Runtime tests should still lock exact bytes for representative exported serializers and wire features such as nested structs, maps and sets, optionals, dictionaries, invokes, prediction acks, fragmentation, stale packet rejection, and state deltas.
 
 In this repository, the full noninteractive validation command is:
 

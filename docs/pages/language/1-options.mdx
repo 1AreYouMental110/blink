@@ -82,6 +82,18 @@ option MaxUnreliablePacketBytes = 1000
 option RateLimitPerSecond = 0
 option RateLimitBurst = 0
 option MaxQueuedEvents = 256
+option MaxQueuedBytes = 1048576
+option MaxBurstBytes = 262144
+option ReliableFragmentBytes = 32768
+option MaxInFlightFragments = 128
+option FragmentTimeoutSeconds = 10
+option LowPriorityShedding = true
+option ReplayWindowSize = 128
+option ReplayStaleSeconds = 30
+option MaxDecodeOperations = 4096
+option MaxPayloadDepth = 32
+option MaxPayloadStringBytes = 65536
+option MaxTableKeys = 4096
 option MaxPendingInvokes = 256
 option InvokeTimeoutSeconds = 0
 option SecurityProfile = Development
@@ -89,7 +101,7 @@ option SecurityProfile = Development
 
 `SecurityProfile` can be `Development`, `Production`, or `Competitive`. The profile supplies defaults for packet limits, rate limits, queue limits, pending invoke limits, and invoke timeouts. Explicit options override profile defaults.
 
-`MaxPacketBytes` is the fallback packet size limit. `MaxReliablePacketBytes` and `MaxUnreliablePacketBytes` override it per transport. Rate limiting is disabled when `RateLimitPerSecond` is `0`. `InvokeTimeoutSeconds` is disabled when set to `0`.
+`MaxPacketBytes` is the fallback packet size limit. `MaxReliablePacketBytes` and `MaxUnreliablePacketBytes` override it per transport. `ReliableFragmentBytes` controls reliable packet fragmentation; `MaxInFlightFragments` and `FragmentTimeoutSeconds` bound reassembly state per player. `MaxQueuedBytes`, `MaxQueuedEvents`, `MaxBurstBytes`, and `LowPriorityShedding` control backpressure and adaptive flush behavior. `ReplayWindowSize` and `ReplayStaleSeconds` reject stale or duplicate client packets. `MaxDecodeOperations`, `MaxPayloadDepth`, `MaxPayloadStringBytes`, and `MaxTableKeys` bound decode work before user handlers run. Rate limiting is disabled when `RateLimitPerSecond` is `0`. `InvokeTimeoutSeconds` is disabled when set to `0`.
 
 Events and functions can override the packet, queue, and rate settings:
 ```blink copy
@@ -97,6 +109,9 @@ event Attack {
     From: Client,
     Type: Reliable,
     Call: SingleAsync,
+    Policy: "damage",
+    Risk: Damage,
+    Priority: Critical,
     RateLimitPerSecond: 20,
     RateLimitBurst: 40,
     MaxQueuedEvents: 64,
@@ -117,9 +132,11 @@ option UseEmptyInstanceOptimization = true
 option Version = 2
 option MinimumSchemaVersion = 1
 option ProtocolVersion = 2
-option ProtocolMode = Negotiated
-option AcceptProtocolVersion1 = true
 option EnableProtocolHandshake = true
+option NoRawCaptureInProduction = true
+option RequirePolicies = true
+option EnableMicroProfiler = true
+option EnableHoneypots = true
 option UseVarints = true
 option UseBitPacking = true
 option UseStringDictionaries = false
@@ -136,13 +153,15 @@ Generated client and server modules expose:
 - `Prediction.Begin`, `Prediction.Ack`, and `Prediction.Rollback`.
 - `State.DefineChannel` for local dirty-state channels.
 - `Capture.Start`, `Capture.Entries`, `Capture.Replay`, `Capture.ReplayRaw`, and `Capture.Redact`.
+- `Transport`, `Security`, `Diagnostics`, `Handles`, `Replication`, `State`, and `Codecs` runtime APIs for hardened v2 operation.
 
 Server-origin events also expose `FireGroup(groupName, ...)`. Client-origin events expose `Predict(...)`, which sends the event and returns a local prediction id.
 
-`ProtocolVersion = 2` enables length-prefixed event frames, per-event recovery inside a packed reliable packet, prediction sequence ids and acks, optional integer varints, bit-packed booleans/optional presence, optional string dictionaries, and buffer pooling. Set individual `Use...` flags to disable a v2 wire optimization during rollout.
-`ProtocolMode = Negotiated` accepts compatible v1 peers while capability handshakes roll out; switch to `Strict` once every peer is on the new protocol or `Legacy` when intentionally emitting v1 packets.
+This fork only emits and accepts protocol v2. `ProtocolVersion` must be `2`; `ProtocolMode`, `AcceptProtocolVersion1`, and protocol v1 schemas fail compilation. V2 framing includes length-prefixed event frames, per-event recovery inside a packed reliable packet, prediction sequence ids and acks, reliable fragmentation and reassembly, optional integer varints, bit-packed booleans/optional presence, optional string dictionaries, and buffer pooling. Set individual `Use...` flags to disable a v2 wire optimization only when you deliberately want the simpler v2 encoding.
 
-`CaptureRedactions` is a comma-separated default list of payload field names to hide in capture summaries. Raw buffers are still retained for `Capture.ReplayRaw`, so store capture exports as sensitive data when they come from production traffic.
+`CaptureRedactions` is a comma-separated default list of payload field names to hide in capture summaries. `NoRawCaptureInProduction` removes raw packet buffers from production captures so exports can be shared for diagnostics without enabling raw replay.
+
+Client-origin events and functions should declare `Policy`, `PolicyGroup`, or `Auth`. Production hardening with `RequirePolicies = true` fails risky client-origin remotes without a policy surface. Built-in policy presets cover damage, currency, trade, inventory, teleport, admin, crafting, marketplace, and moderation; games can replace or extend them at runtime with `Network.Security.RegisterPolicy`.
 
 State channels can also be declared in schema:
 ```blink copy
