@@ -1,0 +1,29 @@
+{
+	"protocol": 2,
+	"schemaVersion": 1,
+	"minimumSchemaVersion": 1,
+	"schemaHash": "schema-1",
+	"compatibility": "strict-v2-schema-hash",
+	"options": {
+		"securityProfile": "Production",
+		"requirePolicies": true,
+		"maxReliablePacketBytes": 65536,
+		"maxUnreliablePacketBytes": 900
+	},
+	"wireIds": {
+		"LegacyFn_RemoteFunctions_Revert": { "id": 2120, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyFn_RemoteFunctions_SkinsAction": { "id": 2130, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyFn_SignPreview_Part_SurfaceGui_TextBox_ChangeText": { "id": 2150, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyFn_Skins_Sign_Cute_Part_SurfaceGui_TextBox_ChangeText": { "id": 2160, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyFn_Skins_Sign_Demon_Part_SurfaceGui_TextBox_ChangeText": { "id": 2170, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyFn_Skins_Sign_Evil_Part_SurfaceGui_TextBox_ChangeText": { "id": 2180, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyFn_Skins_Sign_Frozen_Part_SurfaceGui_TextBox_ChangeText": { "id": 2190, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyFn_Skins_Sign_Hacked_Part_SurfaceGui_TextBox_ChangeText": { "id": 2200, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyFn_Skins_Sign_Normal_Part_SurfaceGui_TextBox_ChangeText": { "id": 2210, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyFn_Skins_Sign_Overgrowth_Part_SurfaceGui_TextBox_ChangeText": { "id": 2220, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyFn_Skins_Sign_Potato_Part_SurfaceGui_TextBox_ChangeText": { "id": 2230, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyFn_Skins_Sign_Valentines_Part_SurfaceGui_TextBox_ChangeText": { "id": 2240, "kind": "Function", "deprecated": false, "reserved": false }
+	},
+	"typeHashes": {
+	}
+}

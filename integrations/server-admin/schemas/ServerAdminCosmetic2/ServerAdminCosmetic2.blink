@@ -1,0 +1,179 @@
+option Casing = Pascal
+option ClientOutput = "generated/Client.luau"
+option ServerOutput = "generated/Server.luau"
+option TypesOutput = "generated/Types.luau"
+option RemoteScope = "ServerAdminCosmetic2"
+option ProtocolVersion = 2
+option EnableProtocolHandshake = true
+option Version = 1
+option MinimumSchemaVersion = 1
+option SecurityProfile = Production
+option RequirePolicies = true
+option MaxPacketBytes = 65536
+option MaxReliablePacketBytes = 65536
+option MaxUnreliablePacketBytes = 900
+option RateLimitPerSecond = 60
+option RateLimitBurst = 120
+option InvokeTimeoutSeconds = 10
+option ReliableFragmentBytes = 32768
+option MaxInFlightFragments = 128
+option FragmentTimeoutSeconds = 10
+option MaxQueuedBytes = 1048576
+option MaxQueuedEvents = 256
+option MaxBurstBytes = 262144
+option LowPriorityShedding = true
+option ReplayWindowSize = 256
+option ReplayStaleSeconds = 15
+option MaxDecodeOperations = 20000
+option MaxPayloadDepth = 12
+option MaxPayloadStringBytes = 4096
+option MaxTableKeys = 256
+option SyncValidation = false
+option WriteValidations = false
+
+event LegacyS2C_RemoteEvents_DeafEvent {
+    WireId: 1780,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Data: unknown
+}
+
+event LegacyC2S_RemoteEvents_FIX_MY_CAMERA_NOW_YOU_NOOB {
+    WireId: 1800,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Policy: "server-admin-cosmetic",
+    PolicyGroup: "server-admin-cosmetic",
+    RateLimitPerSecond: 20,
+    RateLimitBurst: 40,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_FIX_MY_CAMERA_NOW_YOU_NOOB {
+    WireId: 1801,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Data: unknown
+}
+
+event LegacyC2S_RemoteEvents_FOV {
+    WireId: 1830,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Policy: "server-admin-cosmetic",
+    PolicyGroup: "server-admin-cosmetic",
+    RateLimitPerSecond: 20,
+    RateLimitBurst: 40,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_FOV {
+    WireId: 1831,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_HauntEvent {
+    WireId: 1860,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_OpenCommandsGui {
+    WireId: 1890,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_OpenSlots {
+    WireId: 1900,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_POV {
+    WireId: 1910,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Data: unknown
+}
+
+event LegacyC2S_RemoteEvents_TestAnimationReveal {
+    WireId: 2020,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Policy: "server-admin-cosmetic",
+    PolicyGroup: "server-admin-cosmetic",
+    RateLimitPerSecond: 20,
+    RateLimitBurst: 40,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_VoteKickUIUpdate {
+    WireId: 2040,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Data: unknown
+}
+
+function LegacyFn_RemoteFunctions_PaintCustomColors {
+    WireId: 2090,
+    Yield: Coroutine,
+    Policy: "server-admin-cosmetic",
+    PolicyGroup: "server-admin-cosmetic",
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    RateLimitPerSecond: 20,
+    RateLimitBurst: 40,
+    Data: unknown,
+    Return: unknown
+}

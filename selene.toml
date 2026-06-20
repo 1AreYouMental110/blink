@@ -1,8 +1,11 @@
 std = "roblox"
 exclude = [
 	"Network/**",
+	"generated/**",
 	"docs/**",
 	"benchmark/vendor/**",
+	"integrations/server-admin/generated/**",
+	"integrations/server-admin/schemas/**/generated/**",
 ]
 
 [lints]

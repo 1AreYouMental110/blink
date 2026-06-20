@@ -1,0 +1,2757 @@
+{
+  "generatedAt": "2026-06-20T23:08:18.890Z",
+  "protocolVersion": 2,
+  "schemaHash": "server-admin-blink-v2-legacy-full-1",
+  "remotes": [
+    {
+      "path": "ReplicatedStorage.Color",
+      "name": "Color",
+      "className": "RemoteEvent",
+      "wireId": 1000,
+      "risk": "Cosmetic",
+      "policy": "server-admin-cosmetic",
+      "maxPacketBytes": 900,
+      "clientOrigin": true,
+      "serverToClient": true,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyC2S_Color",
+          "direction": "ClientToServer",
+          "wireId": 1000,
+          "kind": "Event"
+        },
+        {
+          "name": "LegacyS2C_Color",
+          "direction": "ServerToClient",
+          "wireId": 1001,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.Activities.Announcement",
+      "name": "Announcement",
+      "className": "RemoteEvent",
+      "wireId": 1010,
+      "risk": "Moderation",
+      "policy": "moderation",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": true,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyC2S_EXE6_STORAGE_events_Activities_Announcement",
+          "direction": "ClientToServer",
+          "wireId": 1010,
+          "kind": "Event"
+        },
+        {
+          "name": "LegacyS2C_EXE6_STORAGE_events_Activities_Announcement",
+          "direction": "ServerToClient",
+          "wireId": 1011,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.Activities.Character",
+      "name": "Character",
+      "className": "RemoteEvent",
+      "wireId": 1020,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": true,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyC2S_EXE6_STORAGE_events_Activities_Character",
+          "direction": "ClientToServer",
+          "wireId": 1020,
+          "kind": "Event"
+        },
+        {
+          "name": "LegacyS2C_EXE6_STORAGE_events_Activities_Character",
+          "direction": "ServerToClient",
+          "wireId": 1021,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.Activities.FetchAnnouncementHistory",
+      "name": "FetchAnnouncementHistory",
+      "className": "RemoteFunction",
+      "wireId": 1030,
+      "risk": "Moderation",
+      "policy": "moderation",
+      "maxPacketBytes": 4096,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_Activities_FetchAnnouncementHistory",
+          "direction": "ClientToServer",
+          "wireId": 1030,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.Activities.GameTeam",
+      "name": "GameTeam",
+      "className": "RemoteEvent",
+      "wireId": 1040,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_EXE6_STORAGE_events_Activities_GameTeam",
+          "direction": "ServerToClient",
+          "wireId": 1040,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.Activities.History",
+      "name": "History",
+      "className": "RemoteEvent",
+      "wireId": 1050,
+      "risk": "Moderation",
+      "policy": "moderation",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyC2S_EXE6_STORAGE_events_Activities_History",
+          "direction": "ClientToServer",
+          "wireId": 1050,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid",
+      "name": "Humanoid",
+      "className": "RemoteEvent",
+      "wireId": 1060,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": true,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyC2S_EXE6_STORAGE_events_Activities_Humanoid",
+          "direction": "ClientToServer",
+          "wireId": 1060,
+          "kind": "Event"
+        },
+        {
+          "name": "LegacyS2C_EXE6_STORAGE_events_Activities_Humanoid",
+          "direction": "ServerToClient",
+          "wireId": 1061,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.Activities.LogTeamConnectChat",
+      "name": "LogTeamConnectChat",
+      "className": "RemoteEvent",
+      "wireId": 1070,
+      "risk": "Moderation",
+      "policy": "moderation",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyC2S_EXE6_STORAGE_events_Activities_LogTeamConnectChat",
+          "direction": "ClientToServer",
+          "wireId": 1070,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.Activities.Notify",
+      "name": "Notify",
+      "className": "RemoteEvent",
+      "wireId": 1080,
+      "risk": "Moderation",
+      "policy": "moderation",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyC2S_EXE6_STORAGE_events_Activities_Notify",
+          "direction": "ClientToServer",
+          "wireId": 1080,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.Activities.Primary",
+      "name": "Primary",
+      "className": "RemoteFunction",
+      "wireId": 1090,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": true,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_Activities_Primary",
+          "direction": "ClientToServer",
+          "wireId": 1090,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.Activities.PrivacyAction",
+      "name": "PrivacyAction",
+      "className": "RemoteFunction",
+      "wireId": 1100,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": true,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_Activities_PrivacyAction",
+          "direction": "ClientToServer",
+          "wireId": 1100,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.Activities.ServerTeleportation",
+      "name": "ServerTeleportation",
+      "className": "RemoteEvent",
+      "wireId": 1110,
+      "risk": "Teleport",
+      "policy": "teleport",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": true,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyC2S_EXE6_STORAGE_events_Activities_ServerTeleportation",
+          "direction": "ClientToServer",
+          "wireId": 1110,
+          "kind": "Event"
+        },
+        {
+          "name": "LegacyS2C_EXE6_STORAGE_events_Activities_ServerTeleportation",
+          "direction": "ServerToClient",
+          "wireId": 1111,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.Activities.Team",
+      "name": "Team",
+      "className": "RemoteEvent",
+      "wireId": 1120,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": true,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyC2S_EXE6_STORAGE_events_Activities_Team",
+          "direction": "ClientToServer",
+          "wireId": 1120,
+          "kind": "Event"
+        },
+        {
+          "name": "LegacyS2C_EXE6_STORAGE_events_Activities_Team",
+          "direction": "ServerToClient",
+          "wireId": 1121,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.ai.AIresponse",
+      "name": "AIresponse",
+      "className": "RemoteFunction",
+      "wireId": 1130,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_ai_AIresponse",
+          "direction": "ClientToServer",
+          "wireId": 1130,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.ai.DeleteChat",
+      "name": "DeleteChat",
+      "className": "RemoteFunction",
+      "wireId": 1140,
+      "risk": "Moderation",
+      "policy": "moderation",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_ai_DeleteChat",
+          "direction": "ClientToServer",
+          "wireId": 1140,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.ai.GetChatList",
+      "name": "GetChatList",
+      "className": "RemoteFunction",
+      "wireId": 1150,
+      "risk": "Moderation",
+      "policy": "moderation",
+      "maxPacketBytes": 4096,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_ai_GetChatList",
+          "direction": "ClientToServer",
+          "wireId": 1150,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.ai.GetData",
+      "name": "GetData",
+      "className": "RemoteFunction",
+      "wireId": 1160,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_ai_GetData",
+          "direction": "ClientToServer",
+          "wireId": 1160,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.ai.GetPastPolls",
+      "name": "GetPastPolls",
+      "className": "RemoteFunction",
+      "wireId": 1170,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_ai_GetPastPolls",
+          "direction": "ClientToServer",
+          "wireId": 1170,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.ai.LoadAISettings",
+      "name": "LoadAISettings",
+      "className": "RemoteFunction",
+      "wireId": 1180,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_ai_LoadAISettings",
+          "direction": "ClientToServer",
+          "wireId": 1180,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.ai.LoadChat",
+      "name": "LoadChat",
+      "className": "RemoteFunction",
+      "wireId": 1190,
+      "risk": "Moderation",
+      "policy": "moderation",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_ai_LoadChat",
+          "direction": "ClientToServer",
+          "wireId": 1190,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.ai.SaveAISettings",
+      "name": "SaveAISettings",
+      "className": "RemoteFunction",
+      "wireId": 1200,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_ai_SaveAISettings",
+          "direction": "ClientToServer",
+          "wireId": 1200,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.ai.SaveChat",
+      "name": "SaveChat",
+      "className": "RemoteFunction",
+      "wireId": 1210,
+      "risk": "Moderation",
+      "policy": "moderation",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_ai_SaveChat",
+          "direction": "ClientToServer",
+          "wireId": 1210,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.ai.Storedata",
+      "name": "Storedata",
+      "className": "RemoteEvent",
+      "wireId": 1220,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_EXE6_STORAGE_events_ai_Storedata",
+          "direction": "ServerToClient",
+          "wireId": 1220,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.ai.TextGeneratorRemote",
+      "name": "TextGeneratorRemote",
+      "className": "RemoteEvent",
+      "wireId": 1230,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_EXE6_STORAGE_events_ai_TextGeneratorRemote",
+          "direction": "ServerToClient",
+          "wireId": 1230,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.ai.web",
+      "name": "web",
+      "className": "RemoteFunction",
+      "wireId": 1240,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_ai_web",
+          "direction": "ClientToServer",
+          "wireId": 1240,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.auth.ActionPinning",
+      "name": "ActionPinning",
+      "className": "RemoteFunction",
+      "wireId": 1250,
+      "risk": "Admin",
+      "policy": "admin",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_auth_ActionPinning",
+          "direction": "ClientToServer",
+          "wireId": 1250,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.auth.Auth",
+      "name": "Auth",
+      "className": "RemoteFunction",
+      "wireId": 1260,
+      "risk": "Admin",
+      "policy": "admin",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": true,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_auth_Auth",
+          "direction": "ClientToServer",
+          "wireId": 1260,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.auth.FetchPins",
+      "name": "FetchPins",
+      "className": "RemoteFunction",
+      "wireId": 1270,
+      "risk": "Admin",
+      "policy": "admin",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_auth_FetchPins",
+          "direction": "ClientToServer",
+          "wireId": 1270,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.auth.FetchRecordedIds",
+      "name": "FetchRecordedIds",
+      "className": "RemoteFunction",
+      "wireId": 1280,
+      "risk": "Admin",
+      "policy": "admin",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_auth_FetchRecordedIds",
+          "direction": "ClientToServer",
+          "wireId": 1280,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.auth.FetchRoles",
+      "name": "FetchRoles",
+      "className": "RemoteFunction",
+      "wireId": 1290,
+      "risk": "Admin",
+      "policy": "admin",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_auth_FetchRoles",
+          "direction": "ClientToServer",
+          "wireId": 1290,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.auth.FetchServerBans",
+      "name": "FetchServerBans",
+      "className": "RemoteFunction",
+      "wireId": 1300,
+      "risk": "Admin",
+      "policy": "admin",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_auth_FetchServerBans",
+          "direction": "ClientToServer",
+          "wireId": 1300,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.auth.FetchUnsavedChats",
+      "name": "FetchUnsavedChats",
+      "className": "RemoteFunction",
+      "wireId": 1310,
+      "risk": "Admin",
+      "policy": "admin",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_auth_FetchUnsavedChats",
+          "direction": "ClientToServer",
+          "wireId": 1310,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.auth.IdSaving",
+      "name": "IdSaving",
+      "className": "RemoteFunction",
+      "wireId": 1320,
+      "risk": "Admin",
+      "policy": "admin",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_auth_IdSaving",
+          "direction": "ClientToServer",
+          "wireId": 1320,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.auth.VariableEncode",
+      "name": "VariableEncode",
+      "className": "RemoteFunction",
+      "wireId": 1330,
+      "risk": "Admin",
+      "policy": "admin",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_auth_VariableEncode",
+          "direction": "ClientToServer",
+          "wireId": 1330,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.components.GetAuditActivities",
+      "name": "GetAuditActivities",
+      "className": "RemoteFunction",
+      "wireId": 1340,
+      "risk": "Admin",
+      "policy": "admin",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_components_GetAuditActivities",
+          "direction": "ClientToServer",
+          "wireId": 1340,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.components.GetBanHistory",
+      "name": "GetBanHistory",
+      "className": "RemoteFunction",
+      "wireId": 1350,
+      "risk": "Admin",
+      "policy": "admin",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_components_GetBanHistory",
+          "direction": "ClientToServer",
+          "wireId": 1350,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.components.GetChatHistory",
+      "name": "GetChatHistory",
+      "className": "RemoteFunction",
+      "wireId": 1360,
+      "risk": "Moderation",
+      "policy": "moderation",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_components_GetChatHistory",
+          "direction": "ClientToServer",
+          "wireId": 1360,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.components.GetWarningHistory",
+      "name": "GetWarningHistory",
+      "className": "RemoteFunction",
+      "wireId": 1370,
+      "risk": "Admin",
+      "policy": "admin",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_components_GetWarningHistory",
+          "direction": "ClientToServer",
+          "wireId": 1370,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.DeleteTheme",
+      "name": "DeleteTheme",
+      "className": "RemoteFunction",
+      "wireId": 1380,
+      "risk": "Inventory",
+      "policy": "inventory",
+      "maxPacketBytes": 16384,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_DeleteTheme",
+          "direction": "ClientToServer",
+          "wireId": 1380,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.GetAI",
+      "name": "GetAI",
+      "className": "RemoteFunction",
+      "wireId": 1390,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_GetAI",
+          "direction": "ClientToServer",
+          "wireId": 1390,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.GetAllThemes",
+      "name": "GetAllThemes",
+      "className": "RemoteFunction",
+      "wireId": 1400,
+      "risk": "Inventory",
+      "policy": "inventory",
+      "maxPacketBytes": 16384,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_GetAllThemes",
+          "direction": "ClientToServer",
+          "wireId": 1400,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.GetDeletedThemes",
+      "name": "GetDeletedThemes",
+      "className": "RemoteFunction",
+      "wireId": 1410,
+      "risk": "Inventory",
+      "policy": "inventory",
+      "maxPacketBytes": 16384,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_GetDeletedThemes",
+          "direction": "ClientToServer",
+          "wireId": 1410,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.Line.ChangeName",
+      "name": "ChangeName",
+      "className": "RemoteEvent",
+      "wireId": 1420,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyC2S_EXE6_STORAGE_events_Line_ChangeName",
+          "direction": "ClientToServer",
+          "wireId": 1420,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.Line.Explode",
+      "name": "Explode",
+      "className": "RemoteEvent",
+      "wireId": 1430,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyC2S_EXE6_STORAGE_events_Line_Explode",
+          "direction": "ClientToServer",
+          "wireId": 1430,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.Line.Fling",
+      "name": "Fling",
+      "className": "RemoteEvent",
+      "wireId": 1440,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyC2S_EXE6_STORAGE_events_Line_Fling",
+          "direction": "ClientToServer",
+          "wireId": 1440,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.Line.Morph",
+      "name": "Morph",
+      "className": "RemoteEvent",
+      "wireId": 1450,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyC2S_EXE6_STORAGE_events_Line_Morph",
+          "direction": "ClientToServer",
+          "wireId": 1450,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.Line.Spin",
+      "name": "Spin",
+      "className": "RemoteEvent",
+      "wireId": 1460,
+      "risk": "Admin",
+      "policy": "admin",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyC2S_EXE6_STORAGE_events_Line_Spin",
+          "direction": "ClientToServer",
+          "wireId": 1460,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.LoadTheme",
+      "name": "LoadTheme",
+      "className": "RemoteFunction",
+      "wireId": 1470,
+      "risk": "Inventory",
+      "policy": "inventory",
+      "maxPacketBytes": 16384,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_LoadTheme",
+          "direction": "ClientToServer",
+          "wireId": 1470,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.misc.GetBanHistory",
+      "name": "GetBanHistory",
+      "className": "RemoteFunction",
+      "wireId": 1480,
+      "risk": "Admin",
+      "policy": "admin",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_misc_GetBanHistory",
+          "direction": "ClientToServer",
+          "wireId": 1480,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.misc.GetPlaytime",
+      "name": "GetPlaytime",
+      "className": "RemoteFunction",
+      "wireId": 1490,
+      "risk": "Marketplace",
+      "policy": "marketplace",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_misc_GetPlaytime",
+          "direction": "ClientToServer",
+          "wireId": 1490,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.quick_actions.GetActions",
+      "name": "GetActions",
+      "className": "RemoteFunction",
+      "wireId": 1500,
+      "risk": "Cosmetic",
+      "policy": "server-admin-cosmetic",
+      "maxPacketBytes": 900,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_quick_actions_GetActions",
+          "direction": "ClientToServer",
+          "wireId": 1500,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.quick_actions.SaveActions",
+      "name": "SaveActions",
+      "className": "RemoteEvent",
+      "wireId": 1510,
+      "risk": "Cosmetic",
+      "policy": "server-admin-cosmetic",
+      "maxPacketBytes": 900,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyC2S_EXE6_STORAGE_events_quick_actions_SaveActions",
+          "direction": "ClientToServer",
+          "wireId": 1510,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.SaveTheme",
+      "name": "SaveTheme",
+      "className": "RemoteFunction",
+      "wireId": 1520,
+      "risk": "Inventory",
+      "policy": "inventory",
+      "maxPacketBytes": 16384,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_SaveTheme",
+          "direction": "ClientToServer",
+          "wireId": 1520,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.SearchProfile.Request",
+      "name": "Request",
+      "className": "RemoteEvent",
+      "wireId": 1530,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyC2S_EXE6_STORAGE_events_SearchProfile_Request",
+          "direction": "ClientToServer",
+          "wireId": 1530,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.team_connect.LoadThread",
+      "name": "LoadThread",
+      "className": "RemoteEvent",
+      "wireId": 1540,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_EXE6_STORAGE_events_team_connect_LoadThread",
+          "direction": "ServerToClient",
+          "wireId": 1540,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.team_connect.SendMessage",
+      "name": "SendMessage",
+      "className": "RemoteEvent",
+      "wireId": 1550,
+      "risk": "Moderation",
+      "policy": "moderation",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyC2S_EXE6_STORAGE_events_team_connect_SendMessage",
+          "direction": "ClientToServer",
+          "wireId": 1550,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.team_connect.UpdateThread",
+      "name": "UpdateThread",
+      "className": "RemoteEvent",
+      "wireId": 1560,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": false,
+      "serverToClient": true,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_EXE6_STORAGE_events_team_connect_UpdateThread",
+          "direction": "ServerToClient",
+          "wireId": 1560,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.ui.AlertsModuleEvent",
+      "name": "AlertsModuleEvent",
+      "className": "RemoteEvent",
+      "wireId": 1570,
+      "risk": "Cosmetic",
+      "policy": "server-admin-cosmetic",
+      "maxPacketBytes": 900,
+      "clientOrigin": true,
+      "serverToClient": true,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyC2S_EXE6_STORAGE_events_ui_AlertsModuleEvent",
+          "direction": "ClientToServer",
+          "wireId": 1570,
+          "kind": "Event"
+        },
+        {
+          "name": "LegacyS2C_EXE6_STORAGE_events_ui_AlertsModuleEvent",
+          "direction": "ServerToClient",
+          "wireId": 1571,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.ui.ChangePrivacy",
+      "name": "ChangePrivacy",
+      "className": "RemoteEvent",
+      "wireId": 1580,
+      "risk": "Cosmetic",
+      "policy": "server-admin-cosmetic",
+      "maxPacketBytes": 900,
+      "clientOrigin": true,
+      "serverToClient": true,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyC2S_EXE6_STORAGE_events_ui_ChangePrivacy",
+          "direction": "ClientToServer",
+          "wireId": 1580,
+          "kind": "Event"
+        },
+        {
+          "name": "LegacyS2C_EXE6_STORAGE_events_ui_ChangePrivacy",
+          "direction": "ServerToClient",
+          "wireId": 1581,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.ui.ExeInterfaceLoaded",
+      "name": "ExeInterfaceLoaded",
+      "className": "RemoteEvent",
+      "wireId": 1590,
+      "risk": "Cosmetic",
+      "policy": "server-admin-cosmetic",
+      "maxPacketBytes": 900,
+      "clientOrigin": true,
+      "serverToClient": true,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyC2S_EXE6_STORAGE_events_ui_ExeInterfaceLoaded",
+          "direction": "ClientToServer",
+          "wireId": 1590,
+          "kind": "Event"
+        },
+        {
+          "name": "LegacyS2C_EXE6_STORAGE_events_ui_ExeInterfaceLoaded",
+          "direction": "ServerToClient",
+          "wireId": 1591,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.ui.FilterString",
+      "name": "FilterString",
+      "className": "RemoteFunction",
+      "wireId": 1600,
+      "risk": "Moderation",
+      "policy": "moderation",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_ui_FilterString",
+          "direction": "ClientToServer",
+          "wireId": 1600,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.ui.GetAppIds",
+      "name": "GetAppIds",
+      "className": "RemoteFunction",
+      "wireId": 1610,
+      "risk": "Cosmetic",
+      "policy": "server-admin-cosmetic",
+      "maxPacketBytes": 900,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_ui_GetAppIds",
+          "direction": "ClientToServer",
+          "wireId": 1610,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.ui.GetGameDesignTable",
+      "name": "GetGameDesignTable",
+      "className": "RemoteFunction",
+      "wireId": 1620,
+      "risk": "Inventory",
+      "policy": "inventory",
+      "maxPacketBytes": 16384,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_ui_GetGameDesignTable",
+          "direction": "ClientToServer",
+          "wireId": 1620,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.ui.GetValue",
+      "name": "GetValue",
+      "className": "RemoteFunction",
+      "wireId": 1630,
+      "risk": "Cosmetic",
+      "policy": "server-admin-cosmetic",
+      "maxPacketBytes": 900,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_events_ui_GetValue",
+          "direction": "ClientToServer",
+          "wireId": 1630,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.ui.NotifyEveryone",
+      "name": "NotifyEveryone",
+      "className": "RemoteEvent",
+      "wireId": 1640,
+      "risk": "Moderation",
+      "policy": "moderation",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyC2S_EXE6_STORAGE_events_ui_NotifyEveryone",
+          "direction": "ClientToServer",
+          "wireId": 1640,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.ui.SetMarking",
+      "name": "SetMarking",
+      "className": "RemoteEvent",
+      "wireId": 1650,
+      "risk": "Cosmetic",
+      "policy": "server-admin-cosmetic",
+      "maxPacketBytes": 900,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_EXE6_STORAGE_events_ui_SetMarking",
+          "direction": "ServerToClient",
+          "wireId": 1650,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.events.ui.WarningPrompt",
+      "name": "WarningPrompt",
+      "className": "RemoteEvent",
+      "wireId": 1660,
+      "risk": "Admin",
+      "policy": "admin",
+      "maxPacketBytes": 4096,
+      "clientOrigin": false,
+      "serverToClient": true,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_EXE6_STORAGE_events_ui_WarningPrompt",
+          "direction": "ServerToClient",
+          "wireId": 1660,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.utilities.custom_commands.ChangeTime",
+      "name": "ChangeTime",
+      "className": "RemoteEvent",
+      "wireId": 1670,
+      "risk": "Marketplace",
+      "policy": "marketplace",
+      "maxPacketBytes": 4096,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_EXE6_STORAGE_utilities_custom_commands_ChangeTime",
+          "direction": "ServerToClient",
+          "wireId": 1670,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.utilities.custom_commands.ClearAccessories",
+      "name": "ClearAccessories",
+      "className": "RemoteEvent",
+      "wireId": 1680,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_EXE6_STORAGE_utilities_custom_commands_ClearAccessories",
+          "direction": "ServerToClient",
+          "wireId": 1680,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.utilities.custom_commands.ClearTools",
+      "name": "ClearTools",
+      "className": "RemoteEvent",
+      "wireId": 1690,
+      "risk": "Inventory",
+      "policy": "inventory",
+      "maxPacketBytes": 16384,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_EXE6_STORAGE_utilities_custom_commands_ClearTools",
+          "direction": "ServerToClient",
+          "wireId": 1690,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.utilities.custom_commands.Tools",
+      "name": "Tools",
+      "className": "RemoteEvent",
+      "wireId": 1700,
+      "risk": "Inventory",
+      "policy": "inventory",
+      "maxPacketBytes": 16384,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_EXE6_STORAGE_utilities_custom_commands_Tools",
+          "direction": "ServerToClient",
+          "wireId": 1700,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.SyncAPI.ServerEndpoint",
+      "name": "ServerEndpoint",
+      "className": "RemoteFunction",
+      "wireId": 1710,
+      "risk": "Inventory",
+      "policy": "inventory",
+      "maxPacketBytes": 16384,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_EXE6_STORAGE_utilities_tools_Building_Tools_SyncAPI_ServerEndpoint",
+          "direction": "ClientToServer",
+          "wireId": 1710,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteEvents.AFKUpdate",
+      "name": "AFKUpdate",
+      "className": "RemoteEvent",
+      "wireId": 1720,
+      "risk": "Cosmetic",
+      "policy": "server-admin-cosmetic",
+      "maxPacketBytes": 900,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyC2S_RemoteEvents_AFKUpdate",
+          "direction": "ClientToServer",
+          "wireId": 1720,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteEvents.BecomeControlled",
+      "name": "BecomeControlled",
+      "className": "RemoteEvent",
+      "wireId": 1730,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_RemoteEvents_BecomeControlled",
+          "direction": "ServerToClient",
+          "wireId": 1730,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteEvents.Blur",
+      "name": "Blur",
+      "className": "RemoteEvent",
+      "wireId": 1740,
+      "risk": "Cosmetic",
+      "policy": "server-admin-cosmetic",
+      "maxPacketBytes": 900,
+      "clientOrigin": false,
+      "serverToClient": true,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_RemoteEvents_Blur",
+          "direction": "ServerToClient",
+          "wireId": 1740,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteEvents.buildandstuff",
+      "name": "buildandstuff",
+      "className": "RemoteEvent",
+      "wireId": 1750,
+      "risk": "Inventory",
+      "policy": "inventory",
+      "maxPacketBytes": 16384,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_RemoteEvents_buildandstuff",
+          "direction": "ServerToClient",
+          "wireId": 1750,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteEvents.ControlThings",
+      "name": "ControlThings",
+      "className": "RemoteEvent",
+      "wireId": 1760,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_RemoteEvents_ControlThings",
+          "direction": "ServerToClient",
+          "wireId": 1760,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteEvents.ConvertOpen",
+      "name": "ConvertOpen",
+      "className": "RemoteEvent",
+      "wireId": 1770,
+      "risk": "Cosmetic",
+      "policy": "server-admin-cosmetic",
+      "maxPacketBytes": 900,
+      "clientOrigin": false,
+      "serverToClient": true,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_RemoteEvents_ConvertOpen",
+          "direction": "ServerToClient",
+          "wireId": 1770,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteEvents.DeafEvent",
+      "name": "DeafEvent",
+      "className": "RemoteEvent",
+      "wireId": 1780,
+      "risk": "Cosmetic",
+      "policy": "server-admin-cosmetic",
+      "maxPacketBytes": 900,
+      "clientOrigin": false,
+      "serverToClient": true,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_RemoteEvents_DeafEvent",
+          "direction": "ServerToClient",
+          "wireId": 1780,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteEvents.DealsOffer",
+      "name": "DealsOffer",
+      "className": "RemoteEvent",
+      "wireId": 1790,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_RemoteEvents_DealsOffer",
+          "direction": "ServerToClient",
+          "wireId": 1790,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteEvents.FIX MY CAMERA NOW YOU NOOB!",
+      "name": "FIX MY CAMERA NOW YOU NOOB!",
+      "className": "RemoteEvent",
+      "wireId": 1800,
+      "risk": "Cosmetic",
+      "policy": "server-admin-cosmetic",
+      "maxPacketBytes": 900,
+      "clientOrigin": true,
+      "serverToClient": true,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyC2S_RemoteEvents_FIX_MY_CAMERA_NOW_YOU_NOOB",
+          "direction": "ClientToServer",
+          "wireId": 1800,
+          "kind": "Event"
+        },
+        {
+          "name": "LegacyS2C_RemoteEvents_FIX_MY_CAMERA_NOW_YOU_NOOB",
+          "direction": "ServerToClient",
+          "wireId": 1801,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteEvents.FIX MY FREEZE POSITION OMG U CANT GET NUN RIGHT!",
+      "name": "FIX MY FREEZE POSITION OMG U CANT GET NUN RIGHT!",
+      "className": "RemoteEvent",
+      "wireId": 1810,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": false,
+      "serverToClient": true,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_RemoteEvents_FIX_MY_FREEZE_POSITION_OMG_U_CANT_GET_NUN_RIGHT",
+          "direction": "ServerToClient",
+          "wireId": 1810,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteEvents.ForceFirstPerson",
+      "name": "ForceFirstPerson",
+      "className": "RemoteEvent",
+      "wireId": 1820,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": false,
+      "serverToClient": true,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_RemoteEvents_ForceFirstPerson",
+          "direction": "ServerToClient",
+          "wireId": 1820,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteEvents.FOV",
+      "name": "FOV",
+      "className": "RemoteEvent",
+      "wireId": 1830,
+      "risk": "Cosmetic",
+      "policy": "server-admin-cosmetic",
+      "maxPacketBytes": 900,
+      "clientOrigin": true,
+      "serverToClient": true,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyC2S_RemoteEvents_FOV",
+          "direction": "ClientToServer",
+          "wireId": 1830,
+          "kind": "Event"
+        },
+        {
+          "name": "LegacyS2C_RemoteEvents_FOV",
+          "direction": "ServerToClient",
+          "wireId": 1831,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteEvents.GiftPlayerSelect",
+      "name": "GiftPlayerSelect",
+      "className": "RemoteEvent",
+      "wireId": 1840,
+      "risk": "Marketplace",
+      "policy": "marketplace",
+      "maxPacketBytes": 4096,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_RemoteEvents_GiftPlayerSelect",
+          "direction": "ServerToClient",
+          "wireId": 1840,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteEvents.GlobalAnnouncement",
+      "name": "GlobalAnnouncement",
+      "className": "RemoteEvent",
+      "wireId": 1850,
+      "risk": "Moderation",
+      "policy": "moderation",
+      "maxPacketBytes": 4096,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_RemoteEvents_GlobalAnnouncement",
+          "direction": "ServerToClient",
+          "wireId": 1850,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteEvents.HauntEvent",
+      "name": "HauntEvent",
+      "className": "RemoteEvent",
+      "wireId": 1860,
+      "risk": "Cosmetic",
+      "policy": "server-admin-cosmetic",
+      "maxPacketBytes": 900,
+      "clientOrigin": false,
+      "serverToClient": true,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_RemoteEvents_HauntEvent",
+          "direction": "ServerToClient",
+          "wireId": 1860,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteEvents.JoinServer",
+      "name": "JoinServer",
+      "className": "RemoteEvent",
+      "wireId": 1870,
+      "risk": "Teleport",
+      "policy": "teleport",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": true,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyC2S_RemoteEvents_JoinServer",
+          "direction": "ClientToServer",
+          "wireId": 1870,
+          "kind": "Event"
+        },
+        {
+          "name": "LegacyS2C_RemoteEvents_JoinServer",
+          "direction": "ServerToClient",
+          "wireId": 1871,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteEvents.NewAdminNotification",
+      "name": "NewAdminNotification",
+      "className": "RemoteEvent",
+      "wireId": 1880,
+      "risk": "Admin",
+      "policy": "admin",
+      "maxPacketBytes": 4096,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_RemoteEvents_NewAdminNotification",
+          "direction": "ServerToClient",
+          "wireId": 1880,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteEvents.OpenCommandsGui",
+      "name": "OpenCommandsGui",
+      "className": "RemoteEvent",
+      "wireId": 1890,
+      "risk": "Cosmetic",
+      "policy": "server-admin-cosmetic",
+      "maxPacketBytes": 900,
+      "clientOrigin": false,
+      "serverToClient": true,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_RemoteEvents_OpenCommandsGui",
+          "direction": "ServerToClient",
+          "wireId": 1890,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteEvents.OpenSlots",
+      "name": "OpenSlots",
+      "className": "RemoteEvent",
+      "wireId": 1900,
+      "risk": "Cosmetic",
+      "policy": "server-admin-cosmetic",
+      "maxPacketBytes": 900,
+      "clientOrigin": false,
+      "serverToClient": true,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_RemoteEvents_OpenSlots",
+          "direction": "ServerToClient",
+          "wireId": 1900,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteEvents.POV",
+      "name": "POV",
+      "className": "RemoteEvent",
+      "wireId": 1910,
+      "risk": "Cosmetic",
+      "policy": "server-admin-cosmetic",
+      "maxPacketBytes": 900,
+      "clientOrigin": false,
+      "serverToClient": true,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_RemoteEvents_POV",
+          "direction": "ServerToClient",
+          "wireId": 1910,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteEvents.PurchaseDuplicateEvent",
+      "name": "PurchaseDuplicateEvent",
+      "className": "RemoteEvent",
+      "wireId": 1920,
+      "risk": "Marketplace",
+      "policy": "marketplace",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": true,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyC2S_RemoteEvents_PurchaseDuplicateEvent",
+          "direction": "ClientToServer",
+          "wireId": 1920,
+          "kind": "Event"
+        },
+        {
+          "name": "LegacyS2C_RemoteEvents_PurchaseDuplicateEvent",
+          "direction": "ServerToClient",
+          "wireId": 1921,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteEvents.PurchaseEvent",
+      "name": "PurchaseEvent",
+      "className": "RemoteEvent",
+      "wireId": 1930,
+      "risk": "Marketplace",
+      "policy": "marketplace",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyC2S_RemoteEvents_PurchaseEvent",
+          "direction": "ClientToServer",
+          "wireId": 1930,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteEvents.PurchaseParticleEvent",
+      "name": "PurchaseParticleEvent",
+      "className": "RemoteEvent",
+      "wireId": 1940,
+      "risk": "Marketplace",
+      "policy": "marketplace",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyC2S_RemoteEvents_PurchaseParticleEvent",
+          "direction": "ClientToServer",
+          "wireId": 1940,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteEvents.PurchaseRotateEvent",
+      "name": "PurchaseRotateEvent",
+      "className": "RemoteEvent",
+      "wireId": 1950,
+      "risk": "Marketplace",
+      "policy": "marketplace",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyC2S_RemoteEvents_PurchaseRotateEvent",
+          "direction": "ClientToServer",
+          "wireId": 1950,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteEvents.PurchaseSprayEvent",
+      "name": "PurchaseSprayEvent",
+      "className": "RemoteEvent",
+      "wireId": 1960,
+      "risk": "Marketplace",
+      "policy": "marketplace",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyC2S_RemoteEvents_PurchaseSprayEvent",
+          "direction": "ClientToServer",
+          "wireId": 1960,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteEvents.RevertVersions",
+      "name": "RevertVersions",
+      "className": "RemoteEvent",
+      "wireId": 1970,
+      "risk": "Inventory",
+      "policy": "inventory",
+      "maxPacketBytes": 16384,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_RemoteEvents_RevertVersions",
+          "direction": "ServerToClient",
+          "wireId": 1970,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteEvents.RewardedAdEvent",
+      "name": "RewardedAdEvent",
+      "className": "RemoteEvent",
+      "wireId": 1980,
+      "risk": "Marketplace",
+      "policy": "marketplace",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": true,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyC2S_RemoteEvents_RewardedAdEvent",
+          "direction": "ClientToServer",
+          "wireId": 1980,
+          "kind": "Event"
+        },
+        {
+          "name": "LegacyS2C_RemoteEvents_RewardedAdEvent",
+          "direction": "ServerToClient",
+          "wireId": 1981,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteEvents.SaveTutorialDone",
+      "name": "SaveTutorialDone",
+      "className": "RemoteEvent",
+      "wireId": 1990,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyC2S_RemoteEvents_SaveTutorialDone",
+          "direction": "ClientToServer",
+          "wireId": 1990,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteEvents.SendBackMessages",
+      "name": "SendBackMessages",
+      "className": "RemoteEvent",
+      "wireId": 2000,
+      "risk": "Moderation",
+      "policy": "moderation",
+      "maxPacketBytes": 4096,
+      "clientOrigin": false,
+      "serverToClient": true,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_RemoteEvents_SendBackMessages",
+          "direction": "ServerToClient",
+          "wireId": 2000,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteEvents.setfly",
+      "name": "setfly",
+      "className": "RemoteEvent",
+      "wireId": 2010,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_RemoteEvents_setfly",
+          "direction": "ServerToClient",
+          "wireId": 2010,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteEvents.TestAnimationReveal",
+      "name": "TestAnimationReveal",
+      "className": "RemoteEvent",
+      "wireId": 2020,
+      "risk": "Cosmetic",
+      "policy": "server-admin-cosmetic",
+      "maxPacketBytes": 900,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyC2S_RemoteEvents_TestAnimationReveal",
+          "direction": "ClientToServer",
+          "wireId": 2020,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteEvents.Timer",
+      "name": "Timer",
+      "className": "RemoteEvent",
+      "wireId": 2030,
+      "risk": "Marketplace",
+      "policy": "marketplace",
+      "maxPacketBytes": 4096,
+      "clientOrigin": false,
+      "serverToClient": true,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_RemoteEvents_Timer",
+          "direction": "ServerToClient",
+          "wireId": 2030,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteEvents.VoteKickUIUpdate",
+      "name": "VoteKickUIUpdate",
+      "className": "RemoteEvent",
+      "wireId": 2040,
+      "risk": "Cosmetic",
+      "policy": "server-admin-cosmetic",
+      "maxPacketBytes": 900,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_RemoteEvents_VoteKickUIUpdate",
+          "direction": "ServerToClient",
+          "wireId": 2040,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteEvents.VoteKickVote",
+      "name": "VoteKickVote",
+      "className": "RemoteEvent",
+      "wireId": 2050,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_RemoteEvents_VoteKickVote",
+          "direction": "ServerToClient",
+          "wireId": 2050,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteFunctions.ConvertTimeToOrbs",
+      "name": "ConvertTimeToOrbs",
+      "className": "RemoteFunction",
+      "wireId": 2060,
+      "risk": "Marketplace",
+      "policy": "marketplace",
+      "maxPacketBytes": 4096,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyFn_RemoteFunctions_ConvertTimeToOrbs",
+          "direction": "ClientToServer",
+          "wireId": 2060,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteFunctions.GetCommands",
+      "name": "GetCommands",
+      "className": "RemoteFunction",
+      "wireId": 2070,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_RemoteFunctions_GetCommands",
+          "direction": "ClientToServer",
+          "wireId": 2070,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteFunctions.JoinEventServer",
+      "name": "JoinEventServer",
+      "className": "RemoteFunction",
+      "wireId": 2080,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": true,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_RemoteFunctions_JoinEventServer",
+          "direction": "ClientToServer",
+          "wireId": 2080,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteFunctions.PaintCustomColors",
+      "name": "PaintCustomColors",
+      "className": "RemoteFunction",
+      "wireId": 2090,
+      "risk": "Cosmetic",
+      "policy": "server-admin-cosmetic",
+      "maxPacketBytes": 900,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_RemoteFunctions_PaintCustomColors",
+          "direction": "ClientToServer",
+          "wireId": 2090,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteFunctions.Paste",
+      "name": "Paste",
+      "className": "RemoteFunction",
+      "wireId": 2100,
+      "risk": "Inventory",
+      "policy": "inventory",
+      "maxPacketBytes": 16384,
+      "clientOrigin": true,
+      "serverToClient": true,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_RemoteFunctions_Paste",
+          "direction": "ClientToServer",
+          "wireId": 2100,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteFunctions.RequestTutorialStatus",
+      "name": "RequestTutorialStatus",
+      "className": "RemoteFunction",
+      "wireId": 2110,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_RemoteFunctions_RequestTutorialStatus",
+          "direction": "ClientToServer",
+          "wireId": 2110,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteFunctions.Revert",
+      "name": "Revert",
+      "className": "RemoteFunction",
+      "wireId": 2120,
+      "risk": "Inventory",
+      "policy": "inventory",
+      "maxPacketBytes": 16384,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_RemoteFunctions_Revert",
+          "direction": "ClientToServer",
+          "wireId": 2120,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteFunctions.SkinsAction",
+      "name": "SkinsAction",
+      "className": "RemoteFunction",
+      "wireId": 2130,
+      "risk": "Inventory",
+      "policy": "inventory",
+      "maxPacketBytes": 16384,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_RemoteFunctions_SkinsAction",
+          "direction": "ClientToServer",
+          "wireId": 2130,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.RemoteFunctions.TimedReward",
+      "name": "TimedReward",
+      "className": "RemoteFunction",
+      "wireId": 2140,
+      "risk": "Marketplace",
+      "policy": "marketplace",
+      "maxPacketBytes": 4096,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyFn_RemoteFunctions_TimedReward",
+          "direction": "ClientToServer",
+          "wireId": 2140,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.SignPreview.Part.SurfaceGui.TextBox.ChangeText",
+      "name": "ChangeText",
+      "className": "RemoteFunction",
+      "wireId": 2150,
+      "risk": "Inventory",
+      "policy": "inventory",
+      "maxPacketBytes": 16384,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_SignPreview_Part_SurfaceGui_TextBox_ChangeText",
+          "direction": "ClientToServer",
+          "wireId": 2150,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.Skins.Sign.Cute.Part.SurfaceGui.TextBox.ChangeText",
+      "name": "ChangeText",
+      "className": "RemoteFunction",
+      "wireId": 2160,
+      "risk": "Inventory",
+      "policy": "inventory",
+      "maxPacketBytes": 16384,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_Skins_Sign_Cute_Part_SurfaceGui_TextBox_ChangeText",
+          "direction": "ClientToServer",
+          "wireId": 2160,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.Skins.Sign.Demon.Part.SurfaceGui.TextBox.ChangeText",
+      "name": "ChangeText",
+      "className": "RemoteFunction",
+      "wireId": 2170,
+      "risk": "Inventory",
+      "policy": "inventory",
+      "maxPacketBytes": 16384,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_Skins_Sign_Demon_Part_SurfaceGui_TextBox_ChangeText",
+          "direction": "ClientToServer",
+          "wireId": 2170,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.Skins.Sign.Evil.Part.SurfaceGui.TextBox.ChangeText",
+      "name": "ChangeText",
+      "className": "RemoteFunction",
+      "wireId": 2180,
+      "risk": "Inventory",
+      "policy": "inventory",
+      "maxPacketBytes": 16384,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_Skins_Sign_Evil_Part_SurfaceGui_TextBox_ChangeText",
+          "direction": "ClientToServer",
+          "wireId": 2180,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.Skins.Sign.Frozen.Part.SurfaceGui.TextBox.ChangeText",
+      "name": "ChangeText",
+      "className": "RemoteFunction",
+      "wireId": 2190,
+      "risk": "Inventory",
+      "policy": "inventory",
+      "maxPacketBytes": 16384,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_Skins_Sign_Frozen_Part_SurfaceGui_TextBox_ChangeText",
+          "direction": "ClientToServer",
+          "wireId": 2190,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.Skins.Sign.Hacked.Part.SurfaceGui.TextBox.ChangeText",
+      "name": "ChangeText",
+      "className": "RemoteFunction",
+      "wireId": 2200,
+      "risk": "Inventory",
+      "policy": "inventory",
+      "maxPacketBytes": 16384,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_Skins_Sign_Hacked_Part_SurfaceGui_TextBox_ChangeText",
+          "direction": "ClientToServer",
+          "wireId": 2200,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.Skins.Sign.Normal.Part.SurfaceGui.TextBox.ChangeText",
+      "name": "ChangeText",
+      "className": "RemoteFunction",
+      "wireId": 2210,
+      "risk": "Inventory",
+      "policy": "inventory",
+      "maxPacketBytes": 16384,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_Skins_Sign_Normal_Part_SurfaceGui_TextBox_ChangeText",
+          "direction": "ClientToServer",
+          "wireId": 2210,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.Skins.Sign.Overgrowth.Part.SurfaceGui.TextBox.ChangeText",
+      "name": "ChangeText",
+      "className": "RemoteFunction",
+      "wireId": 2220,
+      "risk": "Inventory",
+      "policy": "inventory",
+      "maxPacketBytes": 16384,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_Skins_Sign_Overgrowth_Part_SurfaceGui_TextBox_ChangeText",
+          "direction": "ClientToServer",
+          "wireId": 2220,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.Skins.Sign.Potato.Part.SurfaceGui.TextBox.ChangeText",
+      "name": "ChangeText",
+      "className": "RemoteFunction",
+      "wireId": 2230,
+      "risk": "Inventory",
+      "policy": "inventory",
+      "maxPacketBytes": 16384,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_Skins_Sign_Potato_Part_SurfaceGui_TextBox_ChangeText",
+          "direction": "ClientToServer",
+          "wireId": 2230,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.Skins.Sign.Valentines.Part.SurfaceGui.TextBox.ChangeText",
+      "name": "ChangeText",
+      "className": "RemoteFunction",
+      "wireId": 2240,
+      "risk": "Inventory",
+      "policy": "inventory",
+      "maxPacketBytes": 16384,
+      "clientOrigin": true,
+      "serverToClient": false,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyFn_Skins_Sign_Valentines_Part_SurfaceGui_TextBox_ChangeText",
+          "direction": "ClientToServer",
+          "wireId": 2240,
+          "kind": "Function"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.UselessStuff.CheckSizePass",
+      "name": "CheckSizePass",
+      "className": "RemoteEvent",
+      "wireId": 2250,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_UselessStuff_CheckSizePass",
+          "direction": "ServerToClient",
+          "wireId": 2250,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.UselessStuff.EditSignText",
+      "name": "EditSignText",
+      "className": "RemoteEvent",
+      "wireId": 2260,
+      "risk": "Inventory",
+      "policy": "inventory",
+      "maxPacketBytes": 16384,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_UselessStuff_EditSignText",
+          "direction": "ServerToClient",
+          "wireId": 2260,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.UselessStuff.FreecamRemote",
+      "name": "FreecamRemote",
+      "className": "RemoteEvent",
+      "wireId": 2270,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_UselessStuff_FreecamRemote",
+          "direction": "ServerToClient",
+          "wireId": 2270,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.UselessStuff.GetPlayerFlags",
+      "name": "GetPlayerFlags",
+      "className": "RemoteEvent",
+      "wireId": 2280,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_UselessStuff_GetPlayerFlags",
+          "direction": "ServerToClient",
+          "wireId": 2280,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.UselessStuff.IsVC",
+      "name": "IsVC",
+      "className": "RemoteEvent",
+      "wireId": 2290,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_UselessStuff_IsVC",
+          "direction": "ServerToClient",
+          "wireId": 2290,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.UselessStuff.PlayerAdded",
+      "name": "PlayerAdded",
+      "className": "RemoteEvent",
+      "wireId": 2300,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": true,
+      "serverToClient": true,
+      "mode": "QuarantineDeny",
+      "entries": [
+        {
+          "name": "LegacyC2S_UselessStuff_PlayerAdded",
+          "direction": "ClientToServer",
+          "wireId": 2300,
+          "kind": "Event"
+        },
+        {
+          "name": "LegacyS2C_UselessStuff_PlayerAdded",
+          "direction": "ServerToClient",
+          "wireId": 2301,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.UselessStuff.ProtestText",
+      "name": "ProtestText",
+      "className": "RemoteEvent",
+      "wireId": 2310,
+      "risk": "ServerState",
+      "policy": "server-state",
+      "maxPacketBytes": 4096,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_UselessStuff_ProtestText",
+          "direction": "ServerToClient",
+          "wireId": 2310,
+          "kind": "Event"
+        }
+      ]
+    },
+    {
+      "path": "ReplicatedStorage.UselessStuff.SprayEvent",
+      "name": "SprayEvent",
+      "className": "RemoteEvent",
+      "wireId": 2320,
+      "risk": "Inventory",
+      "policy": "inventory",
+      "maxPacketBytes": 16384,
+      "clientOrigin": false,
+      "serverToClient": false,
+      "mode": "ObserveServerToClient",
+      "entries": [
+        {
+          "name": "LegacyS2C_UselessStuff_SprayEvent",
+          "direction": "ServerToClient",
+          "wireId": 2320,
+          "kind": "Event"
+        }
+      ]
+    }
+  ]
+}

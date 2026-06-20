@@ -1,0 +1,212 @@
+option Casing = Pascal
+option ClientOutput = "generated/Client.luau"
+option ServerOutput = "generated/Server.luau"
+option TypesOutput = "generated/Types.luau"
+option RemoteScope = "ServerAdminInventory2"
+option ProtocolVersion = 2
+option EnableProtocolHandshake = true
+option Version = 1
+option MinimumSchemaVersion = 1
+option SecurityProfile = Production
+option RequirePolicies = true
+option MaxPacketBytes = 65536
+option MaxReliablePacketBytes = 65536
+option MaxUnreliablePacketBytes = 900
+option RateLimitPerSecond = 60
+option RateLimitBurst = 120
+option InvokeTimeoutSeconds = 10
+option ReliableFragmentBytes = 32768
+option MaxInFlightFragments = 128
+option FragmentTimeoutSeconds = 10
+option MaxQueuedBytes = 1048576
+option MaxQueuedEvents = 256
+option MaxBurstBytes = 262144
+option LowPriorityShedding = true
+option ReplayWindowSize = 256
+option ReplayStaleSeconds = 15
+option MaxDecodeOperations = 20000
+option MaxPayloadDepth = 12
+option MaxPayloadStringBytes = 4096
+option MaxTableKeys = 256
+option SyncValidation = false
+option WriteValidations = false
+
+function LegacyFn_RemoteFunctions_Revert {
+    WireId: 2120,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_RemoteFunctions_SkinsAction {
+    WireId: 2130,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_SignPreview_Part_SurfaceGui_TextBox_ChangeText {
+    WireId: 2150,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_Skins_Sign_Cute_Part_SurfaceGui_TextBox_ChangeText {
+    WireId: 2160,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_Skins_Sign_Demon_Part_SurfaceGui_TextBox_ChangeText {
+    WireId: 2170,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_Skins_Sign_Evil_Part_SurfaceGui_TextBox_ChangeText {
+    WireId: 2180,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_Skins_Sign_Frozen_Part_SurfaceGui_TextBox_ChangeText {
+    WireId: 2190,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_Skins_Sign_Hacked_Part_SurfaceGui_TextBox_ChangeText {
+    WireId: 2200,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_Skins_Sign_Normal_Part_SurfaceGui_TextBox_ChangeText {
+    WireId: 2210,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_Skins_Sign_Overgrowth_Part_SurfaceGui_TextBox_ChangeText {
+    WireId: 2220,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_Skins_Sign_Potato_Part_SurfaceGui_TextBox_ChangeText {
+    WireId: 2230,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_Skins_Sign_Valentines_Part_SurfaceGui_TextBox_ChangeText {
+    WireId: 2240,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}

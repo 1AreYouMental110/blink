@@ -4,5 +4,6 @@
     "3-cli": "Command-Line Usage",
     "4-plugin": "Roblox Studio Plugin",
     "5-production-upgrades": "Production Upgrades",
-    "6-blink-v2-fork": "Blink V2 Fork Guide"
+    "6-blink-v2-fork": "Blink V2 Fork Guide",
+    "7-server-admin-integration": "Server Admin Integration"
 }

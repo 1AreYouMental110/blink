@@ -1,0 +1,241 @@
+option Casing = Pascal
+option ClientOutput = "generated/Client.luau"
+option ServerOutput = "generated/Server.luau"
+option TypesOutput = "generated/Types.luau"
+option RemoteScope = "ServerAdminCosmetic1"
+option ProtocolVersion = 2
+option EnableProtocolHandshake = true
+option Version = 1
+option MinimumSchemaVersion = 1
+option SecurityProfile = Production
+option RequirePolicies = true
+option MaxPacketBytes = 65536
+option MaxReliablePacketBytes = 65536
+option MaxUnreliablePacketBytes = 900
+option RateLimitPerSecond = 60
+option RateLimitBurst = 120
+option InvokeTimeoutSeconds = 10
+option ReliableFragmentBytes = 32768
+option MaxInFlightFragments = 128
+option FragmentTimeoutSeconds = 10
+option MaxQueuedBytes = 1048576
+option MaxQueuedEvents = 256
+option MaxBurstBytes = 262144
+option LowPriorityShedding = true
+option ReplayWindowSize = 256
+option ReplayStaleSeconds = 15
+option MaxDecodeOperations = 20000
+option MaxPayloadDepth = 12
+option MaxPayloadStringBytes = 4096
+option MaxTableKeys = 256
+option SyncValidation = false
+option WriteValidations = false
+
+event LegacyC2S_Color {
+    WireId: 1000,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Policy: "server-admin-cosmetic",
+    PolicyGroup: "server-admin-cosmetic",
+    RateLimitPerSecond: 20,
+    RateLimitBurst: 40,
+    Data: unknown
+}
+
+event LegacyS2C_Color {
+    WireId: 1001,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Data: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_quick_actions_GetActions {
+    WireId: 1500,
+    Yield: Coroutine,
+    Policy: "server-admin-cosmetic",
+    PolicyGroup: "server-admin-cosmetic",
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    RateLimitPerSecond: 20,
+    RateLimitBurst: 40,
+    Data: unknown,
+    Return: unknown
+}
+
+event LegacyC2S_EXE6_STORAGE_events_quick_actions_SaveActions {
+    WireId: 1510,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Policy: "server-admin-cosmetic",
+    PolicyGroup: "server-admin-cosmetic",
+    RateLimitPerSecond: 20,
+    RateLimitBurst: 40,
+    Data: unknown
+}
+
+event LegacyC2S_EXE6_STORAGE_events_ui_AlertsModuleEvent {
+    WireId: 1570,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Policy: "server-admin-cosmetic",
+    PolicyGroup: "server-admin-cosmetic",
+    RateLimitPerSecond: 20,
+    RateLimitBurst: 40,
+    Data: unknown
+}
+
+event LegacyS2C_EXE6_STORAGE_events_ui_AlertsModuleEvent {
+    WireId: 1571,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Data: unknown
+}
+
+event LegacyC2S_EXE6_STORAGE_events_ui_ChangePrivacy {
+    WireId: 1580,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Policy: "server-admin-cosmetic",
+    PolicyGroup: "server-admin-cosmetic",
+    RateLimitPerSecond: 20,
+    RateLimitBurst: 40,
+    Data: unknown
+}
+
+event LegacyS2C_EXE6_STORAGE_events_ui_ChangePrivacy {
+    WireId: 1581,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Data: unknown
+}
+
+event LegacyC2S_EXE6_STORAGE_events_ui_ExeInterfaceLoaded {
+    WireId: 1590,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Policy: "server-admin-cosmetic",
+    PolicyGroup: "server-admin-cosmetic",
+    RateLimitPerSecond: 20,
+    RateLimitBurst: 40,
+    Data: unknown
+}
+
+event LegacyS2C_EXE6_STORAGE_events_ui_ExeInterfaceLoaded {
+    WireId: 1591,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Data: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_ui_GetAppIds {
+    WireId: 1610,
+    Yield: Coroutine,
+    Policy: "server-admin-cosmetic",
+    PolicyGroup: "server-admin-cosmetic",
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    RateLimitPerSecond: 20,
+    RateLimitBurst: 40,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_ui_GetValue {
+    WireId: 1630,
+    Yield: Coroutine,
+    Policy: "server-admin-cosmetic",
+    PolicyGroup: "server-admin-cosmetic",
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    RateLimitPerSecond: 20,
+    RateLimitBurst: 40,
+    Data: unknown,
+    Return: unknown
+}
+
+event LegacyS2C_EXE6_STORAGE_events_ui_SetMarking {
+    WireId: 1650,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Data: unknown
+}
+
+event LegacyC2S_RemoteEvents_AFKUpdate {
+    WireId: 1720,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Policy: "server-admin-cosmetic",
+    PolicyGroup: "server-admin-cosmetic",
+    RateLimitPerSecond: 20,
+    RateLimitBurst: 40,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_Blur {
+    WireId: 1740,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_ConvertOpen {
+    WireId: 1770,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Data: unknown
+}

@@ -1,0 +1,29 @@
+{
+	"protocol": 2,
+	"schemaVersion": 1,
+	"minimumSchemaVersion": 1,
+	"schemaHash": "schema-1",
+	"compatibility": "strict-v2-schema-hash",
+	"options": {
+		"securityProfile": "Production",
+		"requirePolicies": true,
+		"maxReliablePacketBytes": 65536,
+		"maxUnreliablePacketBytes": 900
+	},
+	"wireIds": {
+		"LegacyS2C_RemoteEvents_DeafEvent": { "id": 1780, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyC2S_RemoteEvents_FIX_MY_CAMERA_NOW_YOU_NOOB": { "id": 1800, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyS2C_RemoteEvents_FIX_MY_CAMERA_NOW_YOU_NOOB": { "id": 1801, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyC2S_RemoteEvents_FOV": { "id": 1830, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyS2C_RemoteEvents_FOV": { "id": 1831, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyS2C_RemoteEvents_HauntEvent": { "id": 1860, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyS2C_RemoteEvents_OpenCommandsGui": { "id": 1890, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyS2C_RemoteEvents_OpenSlots": { "id": 1900, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyS2C_RemoteEvents_POV": { "id": 1910, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyC2S_RemoteEvents_TestAnimationReveal": { "id": 2020, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyS2C_RemoteEvents_VoteKickUIUpdate": { "id": 2040, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyFn_RemoteFunctions_PaintCustomColors": { "id": 2090, "kind": "Function", "deprecated": false, "reserved": false }
+	},
+	"typeHashes": {
+	}
+}

@@ -1,0 +1,85 @@
+option Casing = Pascal
+option ClientOutput = "generated/Client.luau"
+option ServerOutput = "generated/Server.luau"
+option TypesOutput = "generated/Types.luau"
+option RemoteScope = "ServerAdminAdmin2"
+option ProtocolVersion = 2
+option EnableProtocolHandshake = true
+option Version = 1
+option MinimumSchemaVersion = 1
+option SecurityProfile = Production
+option RequirePolicies = true
+option MaxPacketBytes = 65536
+option MaxReliablePacketBytes = 65536
+option MaxUnreliablePacketBytes = 900
+option RateLimitPerSecond = 60
+option RateLimitBurst = 120
+option InvokeTimeoutSeconds = 10
+option ReliableFragmentBytes = 32768
+option MaxInFlightFragments = 128
+option FragmentTimeoutSeconds = 10
+option MaxQueuedBytes = 1048576
+option MaxQueuedEvents = 256
+option MaxBurstBytes = 262144
+option LowPriorityShedding = true
+option ReplayWindowSize = 256
+option ReplayStaleSeconds = 15
+option MaxDecodeOperations = 20000
+option MaxPayloadDepth = 12
+option MaxPayloadStringBytes = 4096
+option MaxTableKeys = 256
+option SyncValidation = false
+option WriteValidations = false
+
+event LegacyC2S_EXE6_STORAGE_events_Line_Spin {
+    WireId: 1460,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Admin,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Policy: "admin",
+    PolicyGroup: "server-admin-admin",
+    RateLimitPerSecond: 4,
+    RateLimitBurst: 8,
+    Idempotency: true,
+    Data: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_misc_GetBanHistory {
+    WireId: 1480,
+    Yield: Coroutine,
+    Policy: "admin",
+    PolicyGroup: "server-admin-admin",
+    Risk: Admin,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 4,
+    RateLimitBurst: 8,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+event LegacyS2C_EXE6_STORAGE_events_ui_WarningPrompt {
+    WireId: 1660,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Admin,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_NewAdminNotification {
+    WireId: 1880,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Admin,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}

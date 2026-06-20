@@ -1,0 +1,19 @@
+{
+	"protocol": 2,
+	"schemaVersion": 1,
+	"minimumSchemaVersion": 1,
+	"schemaHash": "schema-1",
+	"compatibility": "strict-v2-schema-hash",
+	"options": {
+		"securityProfile": "Production",
+		"requirePolicies": true,
+		"maxReliablePacketBytes": 65536,
+		"maxUnreliablePacketBytes": 900
+	},
+	"wireIds": {
+		"LegacyS2C_UselessStuff_EditSignText": { "id": 2260, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyS2C_UselessStuff_SprayEvent": { "id": 2320, "kind": "Event", "deprecated": false, "reserved": false }
+	},
+	"typeHashes": {
+	}
+}

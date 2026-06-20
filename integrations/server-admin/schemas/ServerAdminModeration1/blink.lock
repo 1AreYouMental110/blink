@@ -1,0 +1,30 @@
+{
+	"protocol": 2,
+	"schemaVersion": 1,
+	"minimumSchemaVersion": 1,
+	"schemaHash": "schema-1",
+	"compatibility": "strict-v2-schema-hash",
+	"options": {
+		"securityProfile": "Production",
+		"requirePolicies": true,
+		"maxReliablePacketBytes": 65536,
+		"maxUnreliablePacketBytes": 900
+	},
+	"wireIds": {
+		"LegacyC2S_EXE6_STORAGE_events_Activities_Announcement": { "id": 1010, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyS2C_EXE6_STORAGE_events_Activities_Announcement": { "id": 1011, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyFn_EXE6_STORAGE_events_Activities_FetchAnnouncementHistory": { "id": 1030, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyC2S_EXE6_STORAGE_events_Activities_History": { "id": 1050, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyC2S_EXE6_STORAGE_events_Activities_LogTeamConnectChat": { "id": 1070, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyC2S_EXE6_STORAGE_events_Activities_Notify": { "id": 1080, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyFn_EXE6_STORAGE_events_ai_DeleteChat": { "id": 1140, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyFn_EXE6_STORAGE_events_ai_GetChatList": { "id": 1150, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyFn_EXE6_STORAGE_events_ai_LoadChat": { "id": 1190, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyFn_EXE6_STORAGE_events_ai_SaveChat": { "id": 1210, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyFn_EXE6_STORAGE_events_components_GetChatHistory": { "id": 1360, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyC2S_EXE6_STORAGE_events_team_connect_SendMessage": { "id": 1550, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyFn_EXE6_STORAGE_events_ui_FilterString": { "id": 1600, "kind": "Function", "deprecated": false, "reserved": false }
+	},
+	"typeHashes": {
+	}
+}

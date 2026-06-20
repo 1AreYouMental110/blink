@@ -1,0 +1,4 @@
+Network/
+generated/
+integrations/server-admin/generated/
+integrations/server-admin/schemas/*/generated/

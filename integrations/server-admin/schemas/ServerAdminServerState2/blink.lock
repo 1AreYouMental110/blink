@@ -1,0 +1,29 @@
+{
+	"protocol": 2,
+	"schemaVersion": 1,
+	"minimumSchemaVersion": 1,
+	"schemaHash": "schema-1",
+	"compatibility": "strict-v2-schema-hash",
+	"options": {
+		"securityProfile": "Production",
+		"requirePolicies": true,
+		"maxReliablePacketBytes": 65536,
+		"maxUnreliablePacketBytes": 900
+	},
+	"wireIds": {
+		"LegacyS2C_EXE6_STORAGE_events_ai_TextGeneratorRemote": { "id": 1230, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyFn_EXE6_STORAGE_events_ai_web": { "id": 1240, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyFn_EXE6_STORAGE_events_GetAI": { "id": 1390, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyC2S_EXE6_STORAGE_events_Line_ChangeName": { "id": 1420, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyC2S_EXE6_STORAGE_events_Line_Explode": { "id": 1430, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyC2S_EXE6_STORAGE_events_Line_Fling": { "id": 1440, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyC2S_EXE6_STORAGE_events_Line_Morph": { "id": 1450, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyC2S_EXE6_STORAGE_events_SearchProfile_Request": { "id": 1530, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyS2C_EXE6_STORAGE_events_team_connect_LoadThread": { "id": 1540, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyS2C_EXE6_STORAGE_events_team_connect_UpdateThread": { "id": 1560, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyS2C_EXE6_STORAGE_utilities_custom_commands_ClearAccessories": { "id": 1680, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyS2C_RemoteEvents_BecomeControlled": { "id": 1730, "kind": "Event", "deprecated": false, "reserved": false }
+	},
+	"typeHashes": {
+	}
+}

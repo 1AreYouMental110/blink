@@ -1,0 +1,196 @@
+option Casing = Pascal
+option ClientOutput = "generated/Client.luau"
+option ServerOutput = "generated/Server.luau"
+option TypesOutput = "generated/Types.luau"
+option RemoteScope = "ServerAdminInventory1"
+option ProtocolVersion = 2
+option EnableProtocolHandshake = true
+option Version = 1
+option MinimumSchemaVersion = 1
+option SecurityProfile = Production
+option RequirePolicies = true
+option MaxPacketBytes = 65536
+option MaxReliablePacketBytes = 65536
+option MaxUnreliablePacketBytes = 900
+option RateLimitPerSecond = 60
+option RateLimitBurst = 120
+option InvokeTimeoutSeconds = 10
+option ReliableFragmentBytes = 32768
+option MaxInFlightFragments = 128
+option FragmentTimeoutSeconds = 10
+option MaxQueuedBytes = 1048576
+option MaxQueuedEvents = 256
+option MaxBurstBytes = 262144
+option LowPriorityShedding = true
+option ReplayWindowSize = 256
+option ReplayStaleSeconds = 15
+option MaxDecodeOperations = 20000
+option MaxPayloadDepth = 12
+option MaxPayloadStringBytes = 4096
+option MaxTableKeys = 256
+option SyncValidation = false
+option WriteValidations = false
+
+function LegacyFn_EXE6_STORAGE_events_DeleteTheme {
+    WireId: 1380,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_GetAllThemes {
+    WireId: 1400,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_GetDeletedThemes {
+    WireId: 1410,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_LoadTheme {
+    WireId: 1470,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_SaveTheme {
+    WireId: 1520,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_ui_GetGameDesignTable {
+    WireId: 1620,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+event LegacyS2C_EXE6_STORAGE_utilities_custom_commands_ClearTools {
+    WireId: 1690,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    Data: unknown
+}
+
+event LegacyS2C_EXE6_STORAGE_utilities_custom_commands_Tools {
+    WireId: 1700,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    Data: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_utilities_tools_Building_Tools_SyncAPI_ServerEndpoint {
+    WireId: 1710,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+event LegacyS2C_RemoteEvents_buildandstuff {
+    WireId: 1750,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_RevertVersions {
+    WireId: 1970,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    Data: unknown
+}
+
+function LegacyFn_RemoteFunctions_Paste {
+    WireId: 2100,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}

@@ -1,0 +1,32 @@
+{
+	"protocol": 2,
+	"schemaVersion": 1,
+	"minimumSchemaVersion": 1,
+	"schemaHash": "schema-1",
+	"compatibility": "strict-v2-schema-hash",
+	"options": {
+		"securityProfile": "Production",
+		"requirePolicies": true,
+		"maxReliablePacketBytes": 65536,
+		"maxUnreliablePacketBytes": 900
+	},
+	"wireIds": {
+		"LegacyC2S_EXE6_STORAGE_events_Activities_Character": { "id": 1020, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyS2C_EXE6_STORAGE_events_Activities_Character": { "id": 1021, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyS2C_EXE6_STORAGE_events_Activities_GameTeam": { "id": 1040, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyC2S_EXE6_STORAGE_events_Activities_Humanoid": { "id": 1060, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyS2C_EXE6_STORAGE_events_Activities_Humanoid": { "id": 1061, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyFn_EXE6_STORAGE_events_Activities_Primary": { "id": 1090, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyFn_EXE6_STORAGE_events_Activities_PrivacyAction": { "id": 1100, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyC2S_EXE6_STORAGE_events_Activities_Team": { "id": 1120, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyS2C_EXE6_STORAGE_events_Activities_Team": { "id": 1121, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyFn_EXE6_STORAGE_events_ai_AIresponse": { "id": 1130, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyFn_EXE6_STORAGE_events_ai_GetData": { "id": 1160, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyFn_EXE6_STORAGE_events_ai_GetPastPolls": { "id": 1170, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyFn_EXE6_STORAGE_events_ai_LoadAISettings": { "id": 1180, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyFn_EXE6_STORAGE_events_ai_SaveAISettings": { "id": 1200, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyS2C_EXE6_STORAGE_events_ai_Storedata": { "id": 1220, "kind": "Event", "deprecated": false, "reserved": false }
+	},
+	"typeHashes": {
+	}
+}

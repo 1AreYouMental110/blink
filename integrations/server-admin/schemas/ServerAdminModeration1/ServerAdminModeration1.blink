@@ -1,0 +1,228 @@
+option Casing = Pascal
+option ClientOutput = "generated/Client.luau"
+option ServerOutput = "generated/Server.luau"
+option TypesOutput = "generated/Types.luau"
+option RemoteScope = "ServerAdminModeration1"
+option ProtocolVersion = 2
+option EnableProtocolHandshake = true
+option Version = 1
+option MinimumSchemaVersion = 1
+option SecurityProfile = Production
+option RequirePolicies = true
+option MaxPacketBytes = 65536
+option MaxReliablePacketBytes = 65536
+option MaxUnreliablePacketBytes = 900
+option RateLimitPerSecond = 60
+option RateLimitBurst = 120
+option InvokeTimeoutSeconds = 10
+option ReliableFragmentBytes = 32768
+option MaxInFlightFragments = 128
+option FragmentTimeoutSeconds = 10
+option MaxQueuedBytes = 1048576
+option MaxQueuedEvents = 256
+option MaxBurstBytes = 262144
+option LowPriorityShedding = true
+option ReplayWindowSize = 256
+option ReplayStaleSeconds = 15
+option MaxDecodeOperations = 20000
+option MaxPayloadDepth = 12
+option MaxPayloadStringBytes = 4096
+option MaxTableKeys = 256
+option SyncValidation = false
+option WriteValidations = false
+
+event LegacyC2S_EXE6_STORAGE_events_Activities_Announcement {
+    WireId: 1010,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Moderation,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Policy: "moderation",
+    PolicyGroup: "server-admin-moderation",
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown
+}
+
+event LegacyS2C_EXE6_STORAGE_events_Activities_Announcement {
+    WireId: 1011,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Moderation,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_Activities_FetchAnnouncementHistory {
+    WireId: 1030,
+    Yield: Coroutine,
+    Policy: "moderation",
+    PolicyGroup: "server-admin-moderation",
+    Risk: Moderation,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+event LegacyC2S_EXE6_STORAGE_events_Activities_History {
+    WireId: 1050,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Moderation,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Policy: "moderation",
+    PolicyGroup: "server-admin-moderation",
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown
+}
+
+event LegacyC2S_EXE6_STORAGE_events_Activities_LogTeamConnectChat {
+    WireId: 1070,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Moderation,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Policy: "moderation",
+    PolicyGroup: "server-admin-moderation",
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown
+}
+
+event LegacyC2S_EXE6_STORAGE_events_Activities_Notify {
+    WireId: 1080,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Moderation,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Policy: "moderation",
+    PolicyGroup: "server-admin-moderation",
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_ai_DeleteChat {
+    WireId: 1140,
+    Yield: Coroutine,
+    Policy: "moderation",
+    PolicyGroup: "server-admin-moderation",
+    Risk: Moderation,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_ai_GetChatList {
+    WireId: 1150,
+    Yield: Coroutine,
+    Policy: "moderation",
+    PolicyGroup: "server-admin-moderation",
+    Risk: Moderation,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_ai_LoadChat {
+    WireId: 1190,
+    Yield: Coroutine,
+    Policy: "moderation",
+    PolicyGroup: "server-admin-moderation",
+    Risk: Moderation,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_ai_SaveChat {
+    WireId: 1210,
+    Yield: Coroutine,
+    Policy: "moderation",
+    PolicyGroup: "server-admin-moderation",
+    Risk: Moderation,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_components_GetChatHistory {
+    WireId: 1360,
+    Yield: Coroutine,
+    Policy: "moderation",
+    PolicyGroup: "server-admin-moderation",
+    Risk: Moderation,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+event LegacyC2S_EXE6_STORAGE_events_team_connect_SendMessage {
+    WireId: 1550,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Moderation,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Policy: "moderation",
+    PolicyGroup: "server-admin-moderation",
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_ui_FilterString {
+    WireId: 1600,
+    Yield: Coroutine,
+    Policy: "moderation",
+    PolicyGroup: "server-admin-moderation",
+    Risk: Moderation,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}

@@ -1,0 +1,21 @@
+{
+	"protocol": 2,
+	"schemaVersion": 1,
+	"minimumSchemaVersion": 1,
+	"schemaHash": "schema-1",
+	"compatibility": "strict-v2-schema-hash",
+	"options": {
+		"securityProfile": "Production",
+		"requirePolicies": true,
+		"maxReliablePacketBytes": 65536,
+		"maxUnreliablePacketBytes": 900
+	},
+	"wireIds": {
+		"LegacyC2S_EXE6_STORAGE_events_Activities_ServerTeleportation": { "id": 1110, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyS2C_EXE6_STORAGE_events_Activities_ServerTeleportation": { "id": 1111, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyC2S_RemoteEvents_JoinServer": { "id": 1870, "kind": "Event", "deprecated": false, "reserved": false },
+		"LegacyS2C_RemoteEvents_JoinServer": { "id": 1871, "kind": "Event", "deprecated": false, "reserved": false }
+	},
+	"typeHashes": {
+	}
+}

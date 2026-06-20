@@ -1,0 +1,289 @@
+# Server Admin Integration
+
+This page documents the Server Admin migration package that was generated from the live Roblox Studio place. Use it as the first handoff file when another Codex or Claude chat needs to continue the integration.
+
+The integration is v2-only. It does not keep protocol v1, does not negotiate with legacy clients, and does not route old `RemoteEvent` or `RemoteFunction` client-origin traffic into server authority. Old client-origin remotes are quarantined and replaced with deny/log honeypot stubs until their callers are rewritten to Blink v2.
+
+## Repository Files
+
+The Server Admin package lives in `integrations/server-admin`.
+
+- `ServerAdminLegacy.blink`: full source-of-truth schema containing the envelope API and explicit per-remote legacy entries.
+- `blink.lock`: lockfile for the full schema, including protocol v2, schema hash, explicit wire IDs, and compatibility metadata.
+- `legacy-remotes.json`: machine-readable map of every old legacy remote path, class, wire ID, risk, policy, max packet bytes, direction, and generated API names.
+- `legacy-callers.csv`: caller map from the Studio source scan. Rows include remote path, script class, script path, line, methods, and confidence.
+- `MIGRATION_REPORT.md`: concise migration report with inventory counts, live honeypot hits, and rewrite rules.
+- `LegacyManifest.luau`: runtime manifest installed into `ReplicatedStorage.BlinkV2`.
+- `LegacyClient.luau`: client-side migration adapter for old call shapes.
+- `LegacyServer.luau`: server-side migration adapter for old handler shapes.
+- `LegacyRemoteFirewall.server.luau`: server runtime firewall that quarantines old client-origin remotes.
+- `split-schemas.json`: index of installable split schemas and their generated API entries.
+- `schemas/*/*.blink`: split per-risk/per-chunk schemas used for Studio-safe generated modules.
+
+The full schema compiles, but the generated server/client modules are too large for a single Studio `ModuleScript.Source` assignment. The split schemas are the installable runtime form.
+
+## Live Studio Layout
+
+The installed Server Admin layout is:
+
+```text
+ReplicatedStorage
+  BlinkV2
+    Client
+    Types
+    LegacyManifest
+    LegacyClient
+    Generated
+      ServerAdminAdmin1
+        Client
+        Types
+      ...
+
+ServerScriptService
+  BlinkV2
+    Server
+    ServerAdminIntegration
+    LegacyServer
+    LegacyRemoteFirewall
+    Generated
+      ServerAdminAdmin1
+        Server
+      ...
+
+ServerStorage
+  BlinkV2LegacyQuarantine
+```
+
+`ReplicatedStorage.BlinkV2.Client` and `ServerScriptService.BlinkV2.Server` keep the envelope API used by the migration adapters. `BlinkV2.Generated.<chunk>` contains the split, explicit per-remote generated APIs for new code and direct rewrites.
+
+Studio Bridge cannot assign a source string of `200000` characters or more. The split install was verified with 15 chunks and a maximum installed source length of `176369`.
+
+## Remote Inventory
+
+The live scan found:
+
+- 133 legacy `ReplicatedStorage` remotes outside `BlinkV2`.
+- 74 `RemoteEvent` instances.
+- 59 `RemoteFunction` instances.
+- 81 client-origin surfaces quarantined by the firewall.
+- 52 server-facing or observed-only surfaces annotated and left observable.
+
+Risk classes:
+
+- `Admin`: admin, auth, roles, bans, warnings, audit, server bans.
+- `Marketplace`: purchases, rewards, duplicate grants, shops, currency-like flows.
+- `Inventory`: skins, build tools, paste/revert, tools, signs, themes.
+- `Teleport`: teleport and server join flows.
+- `Moderation`: chat, filtering, announcements, moderation history.
+- `Cosmetic`: camera, FOV, UI, AFK, effects, client presentation.
+- `ServerState`: remaining state-changing or unclear surfaces.
+
+Every manifest entry has:
+
+- `WireId`
+- `Risk`
+- `Policy`
+- `MaxPacketBytes`
+- `ClientOrigin`
+- `ServerToClient`
+- migration `Mode`
+
+## Schema Model
+
+The full schema keeps the existing envelope events:
+
+```blink
+event ClientAdminEnvelope {
+    WireId: 10,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Policy: "admin",
+    Risk: Admin,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Data: (string, unknown)
+}
+```
+
+It also adds explicit entries for each legacy surface. A bidirectional old `RemoteEvent` is split into two v2 events so the direction is explicit:
+
+```blink
+event LegacyC2S_RemoteEvents_AFKUpdate {
+    WireId: 1720,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Policy: "server-admin-cosmetic",
+    PolicyGroup: "server-admin-cosmetic",
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    RateLimitPerSecond: 20,
+    RateLimitBurst: 40,
+    Data: unknown
+}
+```
+
+`RemoteFunction` surfaces become Blink functions:
+
+```blink
+function LegacyFn_RemoteFunctions_GetCommands {
+    WireId: 1770,
+    Yield: Coroutine,
+    Policy: "admin",
+    PolicyGroup: "server-admin-admin",
+    Risk: Admin,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 4,
+    RateLimitBurst: 8,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+```
+
+Use the generated specific APIs for new code. Use `LegacyClient` and `LegacyServer` only as migration adapters for existing large Server Admin scripts.
+
+## Rewrite Rules
+
+Old client code must not call raw remotes:
+
+```lua
+RemoteEvent:FireServer(...)
+RemoteFunction:InvokeServer(...)
+```
+
+Replace old client roots with `LegacyClient` while migrating:
+
+```lua
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local LegacyClient = require(ReplicatedStorage:WaitForChild("BlinkV2"):WaitForChild("LegacyClient"))
+
+local events = LegacyClient.Tree("ReplicatedStorage.EXE6_STORAGE.events")
+local remoteEvents = LegacyClient.Tree("ReplicatedStorage.RemoteEvents")
+local remoteFunctions = LegacyClient.Tree("ReplicatedStorage.RemoteFunctions")
+```
+
+The proxy supports nested indexing, `WaitForChild`, `FindFirstChild`, `FireServer`, `InvokeServer`, and `OnClientEvent.Connect`.
+
+Old server handlers should use `LegacyServer` while migrating:
+
+```lua
+local ServerScriptService = game:GetService("ServerScriptService")
+local LegacyServer = require(ServerScriptService:WaitForChild("BlinkV2"):WaitForChild("LegacyServer"))
+
+local events = LegacyServer.Tree("ReplicatedStorage.EXE6_STORAGE.events")
+local remoteEvents = LegacyServer.Tree("ReplicatedStorage.RemoteEvents")
+local remoteFunctions = LegacyServer.Tree("ReplicatedStorage.RemoteFunctions")
+```
+
+The proxy supports `OnServerEvent.Connect`, `OnServerInvoke`, server-to-client sends, nested indexing, and no-handler deny/audit records.
+
+When a script is small enough to rewrite directly, prefer the generated split APIs:
+
+```lua
+local BlinkAdmin = require(game:GetService("ServerScriptService").BlinkV2.Generated.ServerAdminAdmin1.Server)
+
+BlinkAdmin.LegacyFn_RemoteFunctions_GetCommands.On(function(player, payload)
+    -- Validate server authority and return the safe command list.
+end)
+```
+
+## Firewall Behavior
+
+`LegacyRemoteFirewall` runs on the server and:
+
+- Reads `LegacyManifest`.
+- Annotates every mapped remote with `BlinkV2LegacyPath`, `BlinkV2WireId`, `BlinkV2Risk`, `BlinkV2Policy`, `BlinkV2MaxPacketBytes`, `BlinkV2Mode`, and `BlinkV2Protocol`.
+- Moves client-origin old remotes to `ServerStorage.BlinkV2LegacyQuarantine`.
+- Creates same-name honeypot stubs at the old paths.
+- Denies and logs any client that still calls a stub.
+- Starts the v2 legacy adapter dispatcher.
+
+This is intentional. Remaining old callers are bugs to rewrite, not compatibility paths to preserve.
+
+## Security Policy
+
+Do not claim remote spying can be fully prevented. This fork makes spying less useful by:
+
+- Keeping server authority.
+- Requiring policies on risky client-origin remotes.
+- Rejecting replay and stale packets.
+- Using idempotency on sensitive requests.
+- Avoiding secrets in remotes.
+- Using server-issued handles and object capabilities.
+- Rate limiting and bounding packet sizes.
+- Scoring abuse and emitting `Security.OnViolation` reports.
+- Leaving honeypot remotes that normal clients never call.
+
+Policy presets used by the manifest include `admin`, `marketplace`, `inventory`, `teleport`, `moderation`, `server-admin-cosmetic`, and `server-state`.
+
+## Validation Commands
+
+Run the full schema checks:
+
+```sh copy
+lune run src/CLI/init.luau integrations/server-admin/ServerAdminLegacy.blink --yes
+lune run src/CLI/init.luau integrations/server-admin/ServerAdminLegacy.blink --check-lock --yes
+lune run src/CLI/init.luau integrations/server-admin/ServerAdminLegacy.blink --doctor --yes
+lune run src/CLI/init.luau integrations/server-admin/ServerAdminLegacy.blink --hardening-checklist --yes
+lune run src/CLI/init.luau integrations/server-admin/ServerAdminLegacy.blink --benchmark --yes
+lune run src/CLI/init.luau integrations/server-admin/ServerAdminLegacy.blink --load-sim --yes
+lune run src/CLI/init.luau integrations/server-admin/ServerAdminLegacy.blink --capture-replay --yes
+lune run src/CLI/init.luau integrations/server-admin/ServerAdminLegacy.blink --golden-snapshots --yes
+lune run src/CLI/init.luau integrations/server-admin/ServerAdminLegacy.blink --compatibility --yes
+lune run src/CLI/init.luau integrations/server-admin/ServerAdminLegacy.blink --schema-docs --yes
+```
+
+Run every split schema before installing:
+
+```powershell copy
+$schemas = Get-ChildItem integrations\server-admin\schemas -Recurse -Filter *.blink
+foreach ($schema in $schemas) {
+    lune run src/CLI/init.luau $schema.FullName --yes
+    lune run src/CLI/init.luau $schema.FullName --check-lock --yes
+    lune run src/CLI/init.luau $schema.FullName --hardening-checklist --yes
+    lune run src/CLI/init.luau $schema.FullName --benchmark --yes
+}
+```
+
+Use the Rokit binary path on machines where `lune` is not on `PATH`:
+
+```powershell copy
+& "$env:USERPROFILE\.rokit\bin\lune.exe" run src/CLI/init.luau integrations/server-admin/ServerAdminLegacy.blink --yes
+```
+
+## Current Studio Evidence
+
+The live Server Admin Studio log confirmed:
+
+- `BlinkV2LegacyInstall` wrote the first manifest/adapters/firewall.
+- `BlinkV2LegacyFirewall` activated with `81` quarantined and `52` observed.
+- Honeypot hits were seen for `SaveActions`, `Auth`, `AFKUpdate`, `GetCommands`, `PaintCustomColors`, tutorial status, and theme/design calls.
+- `BlinkV2SplitInstall` prepared `15` chunks.
+- The split generated API install succeeded with `bulk_set_sources`.
+- `BlinkV2SplitVerify` reported `15 of 15` chunks installed, `maxLen 176369`, `LegacyClient 5160`, and `LegacyServer 6424`.
+
+## Next Rewrite Priority
+
+Start with high-confidence rows and live honeypot hits:
+
+- `ReplicatedStorage.EXE6_STORAGE.events.quick_actions.SaveActions`
+- `ReplicatedStorage.EXE6_STORAGE.events.auth.Auth`
+- `ReplicatedStorage.RemoteEvents.AFKUpdate`
+- `ReplicatedStorage.RemoteFunctions.GetCommands`
+- `ReplicatedStorage.RemoteFunctions.PaintCustomColors`
+- `ReplicatedStorage.RemoteFunctions.RequestTutorialStatus`
+- `ReplicatedStorage.EXE6_STORAGE.events.ui.GetGameDesignTable`
+
+For each script:
+
+1. Replace the old remote root with `LegacyClient.Tree` or `LegacyServer.Tree`.
+2. Move the handler body to a generated split Blink API when the behavior is understood.
+3. Replace arbitrary `Instance` arguments with server-issued handles or capabilities.
+4. Add policy checks for ownership, team, zone, match, inventory, cooldown, idempotency, and object handle validity.
+5. Retest in Studio and confirm no honeypot hit remains for that path.
+
+Keep Roblox engine/internal remotes and harmless UI-only server-to-client remotes only when they do not authorize server state changes.

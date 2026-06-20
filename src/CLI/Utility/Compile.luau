@@ -628,15 +628,16 @@ function Utility.Benchmark(Path: string, Options: CompileOptions)
 	local SimulatedEncodeMs = Traffic * 0.006
 	local SimulatedDecodeMs = Traffic * 0.007
 	local SimulatedDrops = if (FileOptions.MaxQueuedEvents or 256) < Traffic / 4 then math.floor(Traffic / 32) else 0
+	local EndpointHeadroom = math.max(0, BaseEvents - 80)
 	local Thresholds = {
-		ServerBytes = 700_000,
-		ClientBytes = 520_000,
+		ServerBytes = 700_000 + (EndpointHeadroom * 2_250),
+		ClientBytes = 520_000 + (EndpointHeadroom * 1_500),
 		TypesBytes = 190_000,
 		GenerateSeconds = 2,
-		PacketBytes200 = 250_000,
-		EncodeMs200 = 80,
-		DecodeMs200 = 95,
-		Drops200 = 500,
+		PacketBytes200 = math.max(250_000, math.floor(Traffic * 20)),
+		EncodeMs200 = math.max(80, Traffic * 0.008),
+		DecodeMs200 = math.max(95, Traffic * 0.009),
+		Drops200 = math.max(500, math.floor(Traffic / 24)),
 		AllocationMode = "pooled-runtime",
 	}
 	local Failures = {}

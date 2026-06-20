@@ -1,0 +1,2154 @@
+option Casing = Pascal
+option ClientOutput = "generated/Client.luau"
+option ServerOutput = "generated/Server.luau"
+option TypesOutput = "generated/Types.luau"
+option RemoteScope = "ServerAdminBlinkV2"
+option ProtocolVersion = 2
+option EnableProtocolHandshake = true
+option Version = 1
+option MinimumSchemaVersion = 1
+option SecurityProfile = Production
+option RequirePolicies = true
+option MaxPacketBytes = 65536
+option MaxReliablePacketBytes = 65536
+option MaxUnreliablePacketBytes = 900
+option RateLimitPerSecond = 60
+option RateLimitBurst = 120
+option InvokeTimeoutSeconds = 10
+option ReliableFragmentBytes = 32768
+option MaxInFlightFragments = 128
+option FragmentTimeoutSeconds = 10
+option MaxQueuedBytes = 1048576
+option MaxQueuedEvents = 256
+option MaxBurstBytes = 262144
+option LowPriorityShedding = true
+option ReplayWindowSize = 256
+option ReplayStaleSeconds = 15
+option MaxDecodeOperations = 20000
+option MaxPayloadDepth = 12
+option MaxPayloadStringBytes = 4096
+option MaxTableKeys = 256
+option SyncValidation = false
+option WriteValidations = false
+
+event ClientAdminEnvelope {
+    WireId: 10,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Admin,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Policy: "admin",
+    PolicyGroup: "server-admin-admin",
+    RateLimitPerSecond: 4,
+    RateLimitBurst: 8,
+    Idempotency: true,
+    Data: (string, unknown)
+}
+
+event ClientPurchaseEnvelope {
+    WireId: 20,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Marketplace,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Policy: "marketplace",
+    PolicyGroup: "server-admin-marketplace",
+    RateLimitPerSecond: 2,
+    RateLimitBurst: 4,
+    Idempotency: true,
+    Data: (string, unknown)
+}
+
+event ClientBuildEnvelope {
+    WireId: 30,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: (string, unknown)
+}
+
+event ClientModerationEnvelope {
+    WireId: 40,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Moderation,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Policy: "moderation",
+    PolicyGroup: "server-admin-moderation",
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: (string, unknown)
+}
+
+event ClientCosmeticEnvelope {
+    WireId: 50,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Policy: "server-admin-cosmetic",
+    PolicyGroup: "server-admin-cosmetic",
+    RateLimitPerSecond: 20,
+    RateLimitBurst: 40,
+    Data: (string, unknown)
+}
+
+event ServerAdminEnvelope {
+    WireId: 60,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Admin,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Data: (string, unknown)
+}
+
+event ServerCosmeticEnvelope {
+    WireId: 70,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Data: (string, unknown)
+}
+
+function ServerAdminRequest {
+    WireId: 80,
+    Yield: Coroutine,
+    Policy: "admin",
+    PolicyGroup: "server-admin-admin",
+    Risk: Admin,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 4,
+    RateLimitBurst: 8,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+event LegacyC2S_Color {
+    WireId: 1000,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Policy: "server-admin-cosmetic",
+    PolicyGroup: "server-admin-cosmetic",
+    RateLimitPerSecond: 20,
+    RateLimitBurst: 40,
+    Data: unknown
+}
+event LegacyS2C_Color {
+    WireId: 1001,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Data: unknown
+}
+
+event LegacyC2S_EXE6_STORAGE_events_Activities_Announcement {
+    WireId: 1010,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Moderation,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Policy: "moderation",
+    PolicyGroup: "server-admin-moderation",
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown
+}
+event LegacyS2C_EXE6_STORAGE_events_Activities_Announcement {
+    WireId: 1011,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Moderation,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyC2S_EXE6_STORAGE_events_Activities_Character {
+    WireId: 1020,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Policy: "server-state",
+    PolicyGroup: "server-admin-serverstate",
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown
+}
+event LegacyS2C_EXE6_STORAGE_events_Activities_Character {
+    WireId: 1021,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_Activities_FetchAnnouncementHistory {
+    WireId: 1030,
+    Yield: Coroutine,
+    Policy: "moderation",
+    PolicyGroup: "server-admin-moderation",
+    Risk: Moderation,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+event LegacyS2C_EXE6_STORAGE_events_Activities_GameTeam {
+    WireId: 1040,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyC2S_EXE6_STORAGE_events_Activities_History {
+    WireId: 1050,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Moderation,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Policy: "moderation",
+    PolicyGroup: "server-admin-moderation",
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown
+}
+
+event LegacyC2S_EXE6_STORAGE_events_Activities_Humanoid {
+    WireId: 1060,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Policy: "server-state",
+    PolicyGroup: "server-admin-serverstate",
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown
+}
+event LegacyS2C_EXE6_STORAGE_events_Activities_Humanoid {
+    WireId: 1061,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyC2S_EXE6_STORAGE_events_Activities_LogTeamConnectChat {
+    WireId: 1070,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Moderation,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Policy: "moderation",
+    PolicyGroup: "server-admin-moderation",
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown
+}
+
+event LegacyC2S_EXE6_STORAGE_events_Activities_Notify {
+    WireId: 1080,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Moderation,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Policy: "moderation",
+    PolicyGroup: "server-admin-moderation",
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_Activities_Primary {
+    WireId: 1090,
+    Yield: Coroutine,
+    Policy: "server-state",
+    PolicyGroup: "server-admin-serverstate",
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_Activities_PrivacyAction {
+    WireId: 1100,
+    Yield: Coroutine,
+    Policy: "server-state",
+    PolicyGroup: "server-admin-serverstate",
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+event LegacyC2S_EXE6_STORAGE_events_Activities_ServerTeleportation {
+    WireId: 1110,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Teleport,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Policy: "teleport",
+    PolicyGroup: "server-admin-teleport",
+    RateLimitPerSecond: 2,
+    RateLimitBurst: 4,
+    Idempotency: true,
+    Data: unknown
+}
+event LegacyS2C_EXE6_STORAGE_events_Activities_ServerTeleportation {
+    WireId: 1111,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Teleport,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyC2S_EXE6_STORAGE_events_Activities_Team {
+    WireId: 1120,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Policy: "server-state",
+    PolicyGroup: "server-admin-serverstate",
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown
+}
+event LegacyS2C_EXE6_STORAGE_events_Activities_Team {
+    WireId: 1121,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_ai_AIresponse {
+    WireId: 1130,
+    Yield: Coroutine,
+    Policy: "server-state",
+    PolicyGroup: "server-admin-serverstate",
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_ai_DeleteChat {
+    WireId: 1140,
+    Yield: Coroutine,
+    Policy: "moderation",
+    PolicyGroup: "server-admin-moderation",
+    Risk: Moderation,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_ai_GetChatList {
+    WireId: 1150,
+    Yield: Coroutine,
+    Policy: "moderation",
+    PolicyGroup: "server-admin-moderation",
+    Risk: Moderation,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_ai_GetData {
+    WireId: 1160,
+    Yield: Coroutine,
+    Policy: "server-state",
+    PolicyGroup: "server-admin-serverstate",
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_ai_GetPastPolls {
+    WireId: 1170,
+    Yield: Coroutine,
+    Policy: "server-state",
+    PolicyGroup: "server-admin-serverstate",
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_ai_LoadAISettings {
+    WireId: 1180,
+    Yield: Coroutine,
+    Policy: "server-state",
+    PolicyGroup: "server-admin-serverstate",
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_ai_LoadChat {
+    WireId: 1190,
+    Yield: Coroutine,
+    Policy: "moderation",
+    PolicyGroup: "server-admin-moderation",
+    Risk: Moderation,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_ai_SaveAISettings {
+    WireId: 1200,
+    Yield: Coroutine,
+    Policy: "server-state",
+    PolicyGroup: "server-admin-serverstate",
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_ai_SaveChat {
+    WireId: 1210,
+    Yield: Coroutine,
+    Policy: "moderation",
+    PolicyGroup: "server-admin-moderation",
+    Risk: Moderation,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+event LegacyS2C_EXE6_STORAGE_events_ai_Storedata {
+    WireId: 1220,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyS2C_EXE6_STORAGE_events_ai_TextGeneratorRemote {
+    WireId: 1230,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_ai_web {
+    WireId: 1240,
+    Yield: Coroutine,
+    Policy: "server-state",
+    PolicyGroup: "server-admin-serverstate",
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_auth_ActionPinning {
+    WireId: 1250,
+    Yield: Coroutine,
+    Policy: "admin",
+    PolicyGroup: "server-admin-admin",
+    Risk: Admin,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 4,
+    RateLimitBurst: 8,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_auth_Auth {
+    WireId: 1260,
+    Yield: Coroutine,
+    Policy: "admin",
+    PolicyGroup: "server-admin-admin",
+    Risk: Admin,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 4,
+    RateLimitBurst: 8,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_auth_FetchPins {
+    WireId: 1270,
+    Yield: Coroutine,
+    Policy: "admin",
+    PolicyGroup: "server-admin-admin",
+    Risk: Admin,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 4,
+    RateLimitBurst: 8,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_auth_FetchRecordedIds {
+    WireId: 1280,
+    Yield: Coroutine,
+    Policy: "admin",
+    PolicyGroup: "server-admin-admin",
+    Risk: Admin,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 4,
+    RateLimitBurst: 8,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_auth_FetchRoles {
+    WireId: 1290,
+    Yield: Coroutine,
+    Policy: "admin",
+    PolicyGroup: "server-admin-admin",
+    Risk: Admin,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 4,
+    RateLimitBurst: 8,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_auth_FetchServerBans {
+    WireId: 1300,
+    Yield: Coroutine,
+    Policy: "admin",
+    PolicyGroup: "server-admin-admin",
+    Risk: Admin,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 4,
+    RateLimitBurst: 8,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_auth_FetchUnsavedChats {
+    WireId: 1310,
+    Yield: Coroutine,
+    Policy: "admin",
+    PolicyGroup: "server-admin-admin",
+    Risk: Admin,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 4,
+    RateLimitBurst: 8,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_auth_IdSaving {
+    WireId: 1320,
+    Yield: Coroutine,
+    Policy: "admin",
+    PolicyGroup: "server-admin-admin",
+    Risk: Admin,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 4,
+    RateLimitBurst: 8,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_auth_VariableEncode {
+    WireId: 1330,
+    Yield: Coroutine,
+    Policy: "admin",
+    PolicyGroup: "server-admin-admin",
+    Risk: Admin,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 4,
+    RateLimitBurst: 8,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_components_GetAuditActivities {
+    WireId: 1340,
+    Yield: Coroutine,
+    Policy: "admin",
+    PolicyGroup: "server-admin-admin",
+    Risk: Admin,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 4,
+    RateLimitBurst: 8,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_components_GetBanHistory {
+    WireId: 1350,
+    Yield: Coroutine,
+    Policy: "admin",
+    PolicyGroup: "server-admin-admin",
+    Risk: Admin,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 4,
+    RateLimitBurst: 8,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_components_GetChatHistory {
+    WireId: 1360,
+    Yield: Coroutine,
+    Policy: "moderation",
+    PolicyGroup: "server-admin-moderation",
+    Risk: Moderation,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_components_GetWarningHistory {
+    WireId: 1370,
+    Yield: Coroutine,
+    Policy: "admin",
+    PolicyGroup: "server-admin-admin",
+    Risk: Admin,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 4,
+    RateLimitBurst: 8,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_DeleteTheme {
+    WireId: 1380,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_GetAI {
+    WireId: 1390,
+    Yield: Coroutine,
+    Policy: "server-state",
+    PolicyGroup: "server-admin-serverstate",
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_GetAllThemes {
+    WireId: 1400,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_GetDeletedThemes {
+    WireId: 1410,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+event LegacyC2S_EXE6_STORAGE_events_Line_ChangeName {
+    WireId: 1420,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Policy: "server-state",
+    PolicyGroup: "server-admin-serverstate",
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown
+}
+
+event LegacyC2S_EXE6_STORAGE_events_Line_Explode {
+    WireId: 1430,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Policy: "server-state",
+    PolicyGroup: "server-admin-serverstate",
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown
+}
+
+event LegacyC2S_EXE6_STORAGE_events_Line_Fling {
+    WireId: 1440,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Policy: "server-state",
+    PolicyGroup: "server-admin-serverstate",
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown
+}
+
+event LegacyC2S_EXE6_STORAGE_events_Line_Morph {
+    WireId: 1450,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Policy: "server-state",
+    PolicyGroup: "server-admin-serverstate",
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown
+}
+
+event LegacyC2S_EXE6_STORAGE_events_Line_Spin {
+    WireId: 1460,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Admin,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Policy: "admin",
+    PolicyGroup: "server-admin-admin",
+    RateLimitPerSecond: 4,
+    RateLimitBurst: 8,
+    Idempotency: true,
+    Data: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_LoadTheme {
+    WireId: 1470,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_misc_GetBanHistory {
+    WireId: 1480,
+    Yield: Coroutine,
+    Policy: "admin",
+    PolicyGroup: "server-admin-admin",
+    Risk: Admin,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 4,
+    RateLimitBurst: 8,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_misc_GetPlaytime {
+    WireId: 1490,
+    Yield: Coroutine,
+    Policy: "marketplace",
+    PolicyGroup: "server-admin-marketplace",
+    Risk: Marketplace,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 2,
+    RateLimitBurst: 4,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_quick_actions_GetActions {
+    WireId: 1500,
+    Yield: Coroutine,
+    Policy: "server-admin-cosmetic",
+    PolicyGroup: "server-admin-cosmetic",
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    RateLimitPerSecond: 20,
+    RateLimitBurst: 40,
+    Data: unknown,
+    Return: unknown
+}
+
+event LegacyC2S_EXE6_STORAGE_events_quick_actions_SaveActions {
+    WireId: 1510,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Policy: "server-admin-cosmetic",
+    PolicyGroup: "server-admin-cosmetic",
+    RateLimitPerSecond: 20,
+    RateLimitBurst: 40,
+    Data: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_SaveTheme {
+    WireId: 1520,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+event LegacyC2S_EXE6_STORAGE_events_SearchProfile_Request {
+    WireId: 1530,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Policy: "server-state",
+    PolicyGroup: "server-admin-serverstate",
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown
+}
+
+event LegacyS2C_EXE6_STORAGE_events_team_connect_LoadThread {
+    WireId: 1540,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyC2S_EXE6_STORAGE_events_team_connect_SendMessage {
+    WireId: 1550,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Moderation,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Policy: "moderation",
+    PolicyGroup: "server-admin-moderation",
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown
+}
+
+event LegacyS2C_EXE6_STORAGE_events_team_connect_UpdateThread {
+    WireId: 1560,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyC2S_EXE6_STORAGE_events_ui_AlertsModuleEvent {
+    WireId: 1570,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Policy: "server-admin-cosmetic",
+    PolicyGroup: "server-admin-cosmetic",
+    RateLimitPerSecond: 20,
+    RateLimitBurst: 40,
+    Data: unknown
+}
+event LegacyS2C_EXE6_STORAGE_events_ui_AlertsModuleEvent {
+    WireId: 1571,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Data: unknown
+}
+
+event LegacyC2S_EXE6_STORAGE_events_ui_ChangePrivacy {
+    WireId: 1580,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Policy: "server-admin-cosmetic",
+    PolicyGroup: "server-admin-cosmetic",
+    RateLimitPerSecond: 20,
+    RateLimitBurst: 40,
+    Data: unknown
+}
+event LegacyS2C_EXE6_STORAGE_events_ui_ChangePrivacy {
+    WireId: 1581,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Data: unknown
+}
+
+event LegacyC2S_EXE6_STORAGE_events_ui_ExeInterfaceLoaded {
+    WireId: 1590,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Policy: "server-admin-cosmetic",
+    PolicyGroup: "server-admin-cosmetic",
+    RateLimitPerSecond: 20,
+    RateLimitBurst: 40,
+    Data: unknown
+}
+event LegacyS2C_EXE6_STORAGE_events_ui_ExeInterfaceLoaded {
+    WireId: 1591,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Data: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_ui_FilterString {
+    WireId: 1600,
+    Yield: Coroutine,
+    Policy: "moderation",
+    PolicyGroup: "server-admin-moderation",
+    Risk: Moderation,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_ui_GetAppIds {
+    WireId: 1610,
+    Yield: Coroutine,
+    Policy: "server-admin-cosmetic",
+    PolicyGroup: "server-admin-cosmetic",
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    RateLimitPerSecond: 20,
+    RateLimitBurst: 40,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_ui_GetGameDesignTable {
+    WireId: 1620,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_events_ui_GetValue {
+    WireId: 1630,
+    Yield: Coroutine,
+    Policy: "server-admin-cosmetic",
+    PolicyGroup: "server-admin-cosmetic",
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    RateLimitPerSecond: 20,
+    RateLimitBurst: 40,
+    Data: unknown,
+    Return: unknown
+}
+
+event LegacyC2S_EXE6_STORAGE_events_ui_NotifyEveryone {
+    WireId: 1640,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Moderation,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Policy: "moderation",
+    PolicyGroup: "server-admin-moderation",
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown
+}
+
+event LegacyS2C_EXE6_STORAGE_events_ui_SetMarking {
+    WireId: 1650,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Data: unknown
+}
+
+event LegacyS2C_EXE6_STORAGE_events_ui_WarningPrompt {
+    WireId: 1660,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Admin,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyS2C_EXE6_STORAGE_utilities_custom_commands_ChangeTime {
+    WireId: 1670,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Marketplace,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyS2C_EXE6_STORAGE_utilities_custom_commands_ClearAccessories {
+    WireId: 1680,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyS2C_EXE6_STORAGE_utilities_custom_commands_ClearTools {
+    WireId: 1690,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    Data: unknown
+}
+
+event LegacyS2C_EXE6_STORAGE_utilities_custom_commands_Tools {
+    WireId: 1700,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    Data: unknown
+}
+
+function LegacyFn_EXE6_STORAGE_utilities_tools_Building_Tools_SyncAPI_ServerEndpoint {
+    WireId: 1710,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+event LegacyC2S_RemoteEvents_AFKUpdate {
+    WireId: 1720,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Policy: "server-admin-cosmetic",
+    PolicyGroup: "server-admin-cosmetic",
+    RateLimitPerSecond: 20,
+    RateLimitBurst: 40,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_BecomeControlled {
+    WireId: 1730,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_Blur {
+    WireId: 1740,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_buildandstuff {
+    WireId: 1750,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_ControlThings {
+    WireId: 1760,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_ConvertOpen {
+    WireId: 1770,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_DeafEvent {
+    WireId: 1780,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_DealsOffer {
+    WireId: 1790,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyC2S_RemoteEvents_FIX_MY_CAMERA_NOW_YOU_NOOB {
+    WireId: 1800,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Policy: "server-admin-cosmetic",
+    PolicyGroup: "server-admin-cosmetic",
+    RateLimitPerSecond: 20,
+    RateLimitBurst: 40,
+    Data: unknown
+}
+event LegacyS2C_RemoteEvents_FIX_MY_CAMERA_NOW_YOU_NOOB {
+    WireId: 1801,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_FIX_MY_FREEZE_POSITION_OMG_U_CANT_GET_NUN_RIGHT {
+    WireId: 1810,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_ForceFirstPerson {
+    WireId: 1820,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyC2S_RemoteEvents_FOV {
+    WireId: 1830,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Policy: "server-admin-cosmetic",
+    PolicyGroup: "server-admin-cosmetic",
+    RateLimitPerSecond: 20,
+    RateLimitBurst: 40,
+    Data: unknown
+}
+event LegacyS2C_RemoteEvents_FOV {
+    WireId: 1831,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_GiftPlayerSelect {
+    WireId: 1840,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Marketplace,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_GlobalAnnouncement {
+    WireId: 1850,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Moderation,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_HauntEvent {
+    WireId: 1860,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Data: unknown
+}
+
+event LegacyC2S_RemoteEvents_JoinServer {
+    WireId: 1870,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Teleport,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Policy: "teleport",
+    PolicyGroup: "server-admin-teleport",
+    RateLimitPerSecond: 2,
+    RateLimitBurst: 4,
+    Idempotency: true,
+    Data: unknown
+}
+event LegacyS2C_RemoteEvents_JoinServer {
+    WireId: 1871,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Teleport,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_NewAdminNotification {
+    WireId: 1880,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Admin,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_OpenCommandsGui {
+    WireId: 1890,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_OpenSlots {
+    WireId: 1900,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_POV {
+    WireId: 1910,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Data: unknown
+}
+
+event LegacyC2S_RemoteEvents_PurchaseDuplicateEvent {
+    WireId: 1920,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Marketplace,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Policy: "marketplace",
+    PolicyGroup: "server-admin-marketplace",
+    RateLimitPerSecond: 2,
+    RateLimitBurst: 4,
+    Idempotency: true,
+    Data: unknown
+}
+event LegacyS2C_RemoteEvents_PurchaseDuplicateEvent {
+    WireId: 1921,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Marketplace,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyC2S_RemoteEvents_PurchaseEvent {
+    WireId: 1930,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Marketplace,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Policy: "marketplace",
+    PolicyGroup: "server-admin-marketplace",
+    RateLimitPerSecond: 2,
+    RateLimitBurst: 4,
+    Idempotency: true,
+    Data: unknown
+}
+
+event LegacyC2S_RemoteEvents_PurchaseParticleEvent {
+    WireId: 1940,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Marketplace,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Policy: "marketplace",
+    PolicyGroup: "server-admin-marketplace",
+    RateLimitPerSecond: 2,
+    RateLimitBurst: 4,
+    Idempotency: true,
+    Data: unknown
+}
+
+event LegacyC2S_RemoteEvents_PurchaseRotateEvent {
+    WireId: 1950,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Marketplace,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Policy: "marketplace",
+    PolicyGroup: "server-admin-marketplace",
+    RateLimitPerSecond: 2,
+    RateLimitBurst: 4,
+    Idempotency: true,
+    Data: unknown
+}
+
+event LegacyC2S_RemoteEvents_PurchaseSprayEvent {
+    WireId: 1960,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Marketplace,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Policy: "marketplace",
+    PolicyGroup: "server-admin-marketplace",
+    RateLimitPerSecond: 2,
+    RateLimitBurst: 4,
+    Idempotency: true,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_RevertVersions {
+    WireId: 1970,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    Data: unknown
+}
+
+event LegacyC2S_RemoteEvents_RewardedAdEvent {
+    WireId: 1980,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Marketplace,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Policy: "marketplace",
+    PolicyGroup: "server-admin-marketplace",
+    RateLimitPerSecond: 2,
+    RateLimitBurst: 4,
+    Idempotency: true,
+    Data: unknown
+}
+event LegacyS2C_RemoteEvents_RewardedAdEvent {
+    WireId: 1981,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Marketplace,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyC2S_RemoteEvents_SaveTutorialDone {
+    WireId: 1990,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Policy: "server-state",
+    PolicyGroup: "server-admin-serverstate",
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_SendBackMessages {
+    WireId: 2000,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Moderation,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_setfly {
+    WireId: 2010,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyC2S_RemoteEvents_TestAnimationReveal {
+    WireId: 2020,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Policy: "server-admin-cosmetic",
+    PolicyGroup: "server-admin-cosmetic",
+    RateLimitPerSecond: 20,
+    RateLimitBurst: 40,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_Timer {
+    WireId: 2030,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Marketplace,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_VoteKickUIUpdate {
+    WireId: 2040,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_VoteKickVote {
+    WireId: 2050,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+function LegacyFn_RemoteFunctions_ConvertTimeToOrbs {
+    WireId: 2060,
+    Yield: Coroutine,
+    Policy: "marketplace",
+    PolicyGroup: "server-admin-marketplace",
+    Risk: Marketplace,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 2,
+    RateLimitBurst: 4,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_RemoteFunctions_GetCommands {
+    WireId: 2070,
+    Yield: Coroutine,
+    Policy: "server-state",
+    PolicyGroup: "server-admin-serverstate",
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_RemoteFunctions_JoinEventServer {
+    WireId: 2080,
+    Yield: Coroutine,
+    Policy: "server-state",
+    PolicyGroup: "server-admin-serverstate",
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_RemoteFunctions_PaintCustomColors {
+    WireId: 2090,
+    Yield: Coroutine,
+    Policy: "server-admin-cosmetic",
+    PolicyGroup: "server-admin-cosmetic",
+    Risk: Cosmetic,
+    Priority: Cosmetic,
+    MaxPacketBytes: 900,
+    RateLimitPerSecond: 20,
+    RateLimitBurst: 40,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_RemoteFunctions_Paste {
+    WireId: 2100,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_RemoteFunctions_RequestTutorialStatus {
+    WireId: 2110,
+    Yield: Coroutine,
+    Policy: "server-state",
+    PolicyGroup: "server-admin-serverstate",
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_RemoteFunctions_Revert {
+    WireId: 2120,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_RemoteFunctions_SkinsAction {
+    WireId: 2130,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_RemoteFunctions_TimedReward {
+    WireId: 2140,
+    Yield: Coroutine,
+    Policy: "marketplace",
+    PolicyGroup: "server-admin-marketplace",
+    Risk: Marketplace,
+    Priority: Critical,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 2,
+    RateLimitBurst: 4,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_SignPreview_Part_SurfaceGui_TextBox_ChangeText {
+    WireId: 2150,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_Skins_Sign_Cute_Part_SurfaceGui_TextBox_ChangeText {
+    WireId: 2160,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_Skins_Sign_Demon_Part_SurfaceGui_TextBox_ChangeText {
+    WireId: 2170,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_Skins_Sign_Evil_Part_SurfaceGui_TextBox_ChangeText {
+    WireId: 2180,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_Skins_Sign_Frozen_Part_SurfaceGui_TextBox_ChangeText {
+    WireId: 2190,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_Skins_Sign_Hacked_Part_SurfaceGui_TextBox_ChangeText {
+    WireId: 2200,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_Skins_Sign_Normal_Part_SurfaceGui_TextBox_ChangeText {
+    WireId: 2210,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_Skins_Sign_Overgrowth_Part_SurfaceGui_TextBox_ChangeText {
+    WireId: 2220,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_Skins_Sign_Potato_Part_SurfaceGui_TextBox_ChangeText {
+    WireId: 2230,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_Skins_Sign_Valentines_Part_SurfaceGui_TextBox_ChangeText {
+    WireId: 2240,
+    Yield: Coroutine,
+    Policy: "inventory",
+    PolicyGroup: "server-admin-inventory",
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    RateLimitPerSecond: 8,
+    RateLimitBurst: 16,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+event LegacyS2C_UselessStuff_CheckSizePass {
+    WireId: 2250,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyS2C_UselessStuff_EditSignText {
+    WireId: 2260,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    Data: unknown
+}
+
+event LegacyS2C_UselessStuff_FreecamRemote {
+    WireId: 2270,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyS2C_UselessStuff_GetPlayerFlags {
+    WireId: 2280,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyS2C_UselessStuff_IsVC {
+    WireId: 2290,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyC2S_UselessStuff_PlayerAdded {
+    WireId: 2300,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Policy: "server-state",
+    PolicyGroup: "server-admin-serverstate",
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown
+}
+event LegacyS2C_UselessStuff_PlayerAdded {
+    WireId: 2301,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyS2C_UselessStuff_ProtestText {
+    WireId: 2310,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyS2C_UselessStuff_SprayEvent {
+    WireId: 2320,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: Inventory,
+    Priority: Gameplay,
+    MaxPacketBytes: 16384,
+    Data: unknown
+}

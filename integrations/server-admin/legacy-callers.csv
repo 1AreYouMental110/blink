@@ -1,0 +1,767 @@
+remote_path,script_class,script_path,line,methods,confidence
+ReplicatedStorage.Color,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,3049,Fire,medium
+ReplicatedStorage.Color,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Core,70,"Fire,Invoke",medium
+ReplicatedStorage.Color,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Core,71,"Fire,Invoke",medium
+ReplicatedStorage.Color,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Libraries.SerializationV2,183,Fire,low
+ReplicatedStorage.Color,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Libraries.SerializationV2,184,Fire,medium
+ReplicatedStorage.Color,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Libraries.SerializationV2,185,Fire,medium
+ReplicatedStorage.Color,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Libraries.SerializationV2,198,Fire,medium
+ReplicatedStorage.Color,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Libraries.SerializationV2,199,Fire,medium
+ReplicatedStorage.Color,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Libraries.SerializationV2,200,Fire,medium
+ReplicatedStorage.Color,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Libraries.SerializationV2,372,Fire,low
+ReplicatedStorage.Color,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Libraries.SerializationV2,385,Fire,medium
+ReplicatedStorage.Color,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Libraries.SerializationV3,187,Fire,low
+ReplicatedStorage.Color,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Libraries.SerializationV3,188,Fire,medium
+ReplicatedStorage.Color,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Libraries.SerializationV3,189,Fire,medium
+ReplicatedStorage.Color,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Libraries.SerializationV3,202,Fire,medium
+ReplicatedStorage.Color,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Libraries.SerializationV3,203,Fire,medium
+ReplicatedStorage.Color,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Libraries.SerializationV3,204,Fire,medium
+ReplicatedStorage.Color,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Libraries.SerializationV3,384,Fire,low
+ReplicatedStorage.Color,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Libraries.SerializationV3,397,Fire,medium
+ReplicatedStorage.Color,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.SyncAPI.SyncModule,1036,Fire,low
+ReplicatedStorage.Color,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.SyncAPI.SyncModule,1037,Fire,medium
+ReplicatedStorage.Color,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Decorate,85,Fire,low
+ReplicatedStorage.Color,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Decorate,163,Fire,medium
+ReplicatedStorage.Color,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Decorate,171,Fire,medium
+ReplicatedStorage.Color,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Decorate,180,Fire,medium
+ReplicatedStorage.Color,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Decorate,183,Fire,medium
+ReplicatedStorage.Color,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Decorate,337,"Fire,Invoke",low
+ReplicatedStorage.Color,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Decorate,337,Fire,medium
+ReplicatedStorage.Color,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Decorate,344,Fire,medium
+ReplicatedStorage.Color,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Decorate,345,Fire,medium
+ReplicatedStorage.Color,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Decorate,351,Fire,medium
+ReplicatedStorage.Color,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Lighting,477,Fire,medium
+ReplicatedStorage.Color,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.NewPart,128,Fire,low
+ReplicatedStorage.Color,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Paint.PaintHistoryRecord,19,Invoke,medium
+ReplicatedStorage.Color,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Weld,245,Invoke,low
+ReplicatedStorage.Color,ModuleScript,ServerScriptService.Chat/Commands.Commands.Color,31,"FireClient,Fire",medium
+ReplicatedStorage.Color,ModuleScript,ServerScriptService.Chat/Commands.Commands.Poop,24,"FireClient,Fire",medium
+ReplicatedStorage.Color,ModuleScript,ServerScriptService.Chat/Commands.Commands.Uncolor,4,"FireClient,Fire",medium
+ReplicatedStorage.Color,Script,ServerScriptService.Chat/Commands.CommandsHandler,112,"FireClient,FireAllClients,Fire",medium
+ReplicatedStorage.Color,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6Nonmember.interface_handler,58,OnClientEvent,medium
+ReplicatedStorage.Color,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,3064,Fire,medium
+ReplicatedStorage.Color,Script,ServerScriptService.Misc.Leaderstats,750,OnServerEvent,low
+ReplicatedStorage.Color,Script,ServerScriptService.Misc.Leaderstats,751,OnServerEvent,medium
+ReplicatedStorage.Color,LocalScript,StarterGui.ChatTags,20,"InvokeServer,Invoke",medium
+ReplicatedStorage.Color,LocalScript,StarterGui.ChatTags,38,"InvokeServer,Invoke",medium
+ReplicatedStorage.Color,LocalScript,StarterGui.JoinEvent.LocalScript,32,"InvokeServer,OnClientInvoke,Invoke",medium
+ReplicatedStorage.Color,LocalScript,StarterGui.JoinEvent.LocalScript,35,"OnClientInvoke,Invoke",high
+ReplicatedStorage.Color,LocalScript,StarterGui.Orbs.OrbShopBeta.LocalScript,24,"InvokeServer,Invoke",low
+ReplicatedStorage.Color,LocalScript,StarterGui.RevertGUI.RevertImage.revert,26,OnClientEvent,medium
+ReplicatedStorage.Color,LocalScript,StarterGui.RevertGUI.RevertImage.revert,27,OnClientEvent,medium
+ReplicatedStorage.Color,LocalScript,StarterGui.RevertGUI.RevertImage.revert,89,"InvokeServer,Invoke",medium
+ReplicatedStorage.Color,LocalScript,StarterGui.Shop.LocalScript,236,"FireServer,Fire",low
+ReplicatedStorage.Color,LocalScript,StarterGui.Shop.LocalScript,258,"FireServer,Fire",medium
+ReplicatedStorage.Color,LocalScript,StarterGui.Shop.LocalScript,260,"FireServer,Fire",medium
+ReplicatedStorage.Color,LocalScript,StarterGui.Shop.LocalScript,263,"FireServer,Fire",medium
+ReplicatedStorage.Color,LocalScript,StarterGui.Shop2.0.LocalScript,236,"FireServer,Fire",low
+ReplicatedStorage.Color,LocalScript,StarterGui.Shop2.0.LocalScript,258,"FireServer,Fire",medium
+ReplicatedStorage.Color,LocalScript,StarterGui.Shop2.0.LocalScript,260,"FireServer,Fire",medium
+ReplicatedStorage.Color,LocalScript,StarterGui.Shop2.0.LocalScript,263,"FireServer,Fire",medium
+ReplicatedStorage.Color,LocalScript,StarterGui.Size.Frame.ResizeSelection,124,"OnClientInvoke,Invoke",medium
+ReplicatedStorage.Color,LocalScript,StarterPlayer.StarterPlayerScripts.ReceiveMessage,239,OnClientEvent,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Announcement,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.Alerts,230,"InvokeServer,FireClient,Fire,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Announcement,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.Alerts,239,"InvokeServer,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Announcement,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.Alerts,240,"InvokeServer,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Announcement,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,1665,Fire,low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Announcement,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,1673,Fire,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Announcement,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,1681,Fire,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Announcement,ModuleScript,ServerScriptService.EXE6_SERVER.Components.EXE6.CommandLine.CommandLineManager.DefaultCommandMap,657,"FireServer,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Announcement,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.interface_handler,264,OnClientEvent,low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Announcement,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,2154,"InvokeServer,OnClientEvent,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Announcement,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,2169,"InvokeServer,OnClientEvent,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Announcement,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,41,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Announcement,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1349,"FireServer,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Announcement,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1350,"FireServer,InvokeServer,Fire,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Announcement,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1352,"FireServer,InvokeServer,Fire,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Announcement,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1365,"FireServer,InvokeServer,Fire,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Announcement,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6Nonmember.interface_handler,69,OnClientEvent,low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Announcement,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,1680,Fire,low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Announcement,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,1688,Fire,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Announcement,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,1696,Fire,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Announcement,Script,ServerScriptService.EXE6_SERVER.Server,898,OnServerEvent,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Announcement,Script,ServerScriptService.EXE6_SERVER.Server,920,OnServerEvent,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Announcement,Script,ServerScriptService.EXE6_SERVER.Server,984,"FireAllClients,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Announcement,Script,ServerScriptService.EXE6_SERVER.Server,992,"FireAllClients,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Announcement,Script,ServerScriptService.EXE6_SERVER.Server,1006,"OnServerEvent,FireAllClients,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Announcement,Script,ServerScriptService.EXE6_SERVER.Server,1139,"FireAllClients,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ReplicatedStorage.Configs.NexusVRCharacterModelLoader.MainModule.NexusVRCharacterModel.Character,140,"FireServer,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,1332,Fire,low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,1822,"InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,1867,Fire,low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ReplicatedStorage.SatchelLoader.Satchel.Packages.satchel,2085,Fire,low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ReplicatedStorage.SatchelLoader.Satchel.Packages.satchel,2086,Fire,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ReplicatedStorage.SatchelLoader.Satchel.Packages.satchel,2087,Fire,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.Chat/Commands.Commands.deafen,16,"FireClient,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.Chat/Commands.Commands.deafen,17,"FireClient,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.Chat/Commands.Commands.deafen,28,"FireClient,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.Chat/Commands.Commands.deafen,29,"FireClient,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.Chat/Commands.Commands.Debug,83,"FireClient,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.Chat/Commands.Commands.Debug,84,"FireClient,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.Chat/Commands.Commands.Debug,92,"FireClient,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.Chat/Commands.Commands.Fire,9,Fire,high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.Chat/Commands.Commands.Fire,10,Fire,high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.Chat/Commands.Commands.Hammer,139,OnServerEvent,low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.Chat/Commands.Commands.Horse,42,"FireClient,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.Chat/Commands.Commands.Horse,43,"FireClient,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.Chat/Commands.Commands.Morph,78,Fire,high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.Chat/Commands.Commands.Morph,84,Fire,high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.Chat/Commands.Commands.Morph,85,Fire,high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.Chat/Commands.Commands.Morph,86,Fire,high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.Chat/Commands.Commands.Morph,87,Fire,high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.Chat/Commands.Commands.Morph,89,Fire,high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.Chat/Commands.Commands.Morph,90,Fire,high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.Chat/Commands.Commands.Morph,93,Fire,high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.Chat/Commands.Commands.Morph,96,Fire,high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.Chat/Commands.Commands.Poop,44,"FireClient,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.Chat/Commands.Commands.Poop,48,"FireClient,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.Chat/Commands.Commands.Poop,49,"FireClient,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.Chat/Commands.Commands.R6,38,Fire,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.Chat/Commands.Commands.R6,88,"FireClient,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.Chat/Commands.Commands.Spectate,7,"FireClient,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.Chat/Commands.Commands.Spectate,8,"FireClient,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.Chat/Commands.Commands.Unfire,7,Fire,high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.Chat/Commands.Commands.Unfire,8,Fire,high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.Chat/Commands.Commands.Unspectate,5,"FireClient,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,Script,ServerScriptService.Chat/Commands.LineServer,6,OnServerEvent,high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,Script,ServerScriptService.Chat/Commands.LineServer,48,OnServerEvent,low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,Script,ServerScriptService.Chat/Commands.LineServer,56,OnServerEvent,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,Script,ServerScriptService.Chat/Commands.LineServer,68,OnServerEvent,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,Script,ServerScriptService.Chat/Commands.LineServer,87,OnServerEvent,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.EXE6_SERVER.Components.EXE6.CommandLine.CommandLineManager.DefaultCommandMap,179,"FireServer,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.EXE6_SERVER.Components.EXE6.CommandLine.CommandLineManager.DefaultCommandMap,210,"FireServer,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.EXE6_SERVER.Components.EXE6.CommandLine.CommandLineManager.DefaultCommandMap,231,"FireServer,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.EXE6_SERVER.Components.EXE6.CommandLine.CommandLineManager.DefaultCommandMap,258,"FireServer,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.EXE6_SERVER.Components.EXE6.CommandLine.CommandLineManager.DefaultCommandMap,289,"FireServer,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.EXE6_SERVER.Components.EXE6.CommandLine.CommandLineManager.DefaultCommandMap,320,"FireServer,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.EXE6_SERVER.Components.EXE6.CommandLine.CommandLineManager.DefaultCommandMap,360,"FireServer,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.EXE6_SERVER.Components.EXE6.CommandLine.CommandLineManager.DefaultCommandMap,441,"FireServer,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.EXE6_SERVER.Components.EXE6.CommandLine.CommandLineManager.DefaultCommandMap,472,"FireServer,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.EXE6_SERVER.Components.EXE6.CommandLine.CommandLineManager.DefaultCommandMap,493,"FireServer,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,486,"FireServer,InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,488,"FireServer,InvokeServer,Fire,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,39,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,333,"FireServer,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,337,"FireServer,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,341,"FireServer,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,345,"FireServer,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,349,"FireServer,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,353,"FireServer,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,362,"FireServer,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,366,"FireServer,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,370,"FireServer,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,374,"FireServer,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,381,"FireServer,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1057,"InvokeServer,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1071,"InvokeServer,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,Script,ServerScriptService.EXE6_SERVER.CustomCommands,77,OnServerEvent,low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,1347,Fire,low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,1837,"InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,1882,Fire,low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,Script,ServerScriptService.EXE6_SERVER.Server,26,"OnServerInvoke,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,Script,ServerScriptService.EXE6_SERVER.Server,633,"OnServerEvent,FireClient,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,Script,ServerScriptService.Misc.Leaderstats,418,"FireClient,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,Script,ServerScriptService.Misc.Leaderstats,424,"FireClient,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,Script,ServerScriptService.Misc.Leaderstats,425,"FireClient,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,Script,ServerScriptService.Misc.Leaderstats,426,"FireClient,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,Script,ServerScriptService.Misc.Leaderstats,576,OnServerEvent,low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,Script,ServerScriptService.Misc.Leaderstats,577,OnServerEvent,high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,Script,ServerScriptService.Misc.Leaderstats,697,"FireAllClients,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,Script,ServerScriptService.Misc.Leaderstats,709,"FireAllClients,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,Script,ServerScriptService.Misc.TimedRewards,51,"OnServerInvoke,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,Script,ServerScriptService.Misc.TimedRewards,52,"OnServerInvoke,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,LocalScript,StarterGui.Tutorial.LocalScript,36,"FireServer,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,LocalScript,StarterGui.Tutorial.LocalScript,41,"FireServer,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,LocalScript,StarterGui.Tutorial.LocalScript,41,"FireServer,Fire,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,LocalScript,StarterGui.Tutorial.LocalScript,88,"FireServer,InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,LocalScript,StarterGui.Tutorial.LocalScript,89,"FireServer,InvokeServer,Fire,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,LocalScript,StarterPlayer.StarterPlayerScripts.Animation Test,83,"FireServer,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,LocalScript,StarterPlayer.StarterPlayerScripts.Control,7,OnClientEvent,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,LocalScript,StarterPlayer.StarterPlayerScripts.Control,36,"FireServer,OnClientEvent,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,LocalScript,StarterPlayer.StarterPlayerScripts.Control,39,"FireServer,OnClientEvent,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,LocalScript,StarterPlayer.StarterPlayerScripts.Control,40,"FireServer,OnClientEvent,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,LocalScript,StarterPlayer.StarterPlayerScripts.Control,45,"FireServer,OnClientEvent,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,LocalScript,StarterPlayer.StarterPlayerScripts.Control,46,"FireServer,OnClientEvent,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,LocalScript,StarterPlayer.StarterPlayerScripts.Control,52,"FireServer,OnClientEvent,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,LocalScript,StarterPlayer.StarterPlayerScripts.Control,53,"FireServer,OnClientEvent,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,LocalScript,StarterPlayer.StarterPlayerScripts.ReceiveMessage,125,"FireServer,OnClientEvent,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,LocalScript,StarterPlayer.StarterPlayerScripts.ReceiveMessage,140,OnClientEvent,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,LocalScript,StarterPlayer.StarterPlayerScripts.ReceiveMessage,181,OnClientEvent,low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Character,LocalScript,StarterPlayer.StarterPlayerScripts.ReceiveMessage,194,OnClientEvent,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,1009,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,1022,"InvokeServer,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Anchor,255,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Collision,253,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Decorate,316,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Decorate,639,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Decorate,684,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Lighting,569,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Lighting,614,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Lighting,664,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Material,376,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Mesh,505,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Mesh,547,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Mesh,837,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Move,470,Invoke,low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Move,471,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Move,474,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Move,475,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Move,485,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Move,491,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Move,492,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Move,499,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Move,500,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Move,512,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Move,513,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.NewPart,212,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Resize,763,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Rotate,917,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Surface,423,Invoke,low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Texture,560,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Texture,602,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Texture,652,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Weld,184,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Weld,232,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.UI.Explorer.ItemRow,103,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.UI.Explorer.ItemRow,129,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.ai_chat.LocalScript,502,"InvokeServer,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,320,"FireServer,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,321,"FireServer,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,324,"FireServer,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,325,"FireServer,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,328,"FireServer,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,329,"FireServer,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,1024,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.History,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,1037,"InvokeServer,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.ClassIcons,85,Fire,low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,1858,Fire,low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,1867,Fire,high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,ModuleScript,ServerScriptService.Chat/Commands.Commands.Debug,83,"FireClient,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,ModuleScript,ServerScriptService.Chat/Commands.Commands.Debug,84,"FireClient,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,ModuleScript,ServerScriptService.Chat/Commands.Commands.Debug,90,"FireClient,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,ModuleScript,ServerScriptService.Chat/Commands.Commands.Fire,9,Fire,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,ModuleScript,ServerScriptService.Chat/Commands.Commands.Fire,10,Fire,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,ModuleScript,ServerScriptService.Chat/Commands.Commands.Hammer,120,OnServerEvent,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,ModuleScript,ServerScriptService.Chat/Commands.Commands.Horse,52,"FireClient,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,ModuleScript,ServerScriptService.Chat/Commands.Commands.Horse,53,"FireClient,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,ModuleScript,ServerScriptService.Chat/Commands.Commands.Horse,54,"FireClient,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,ModuleScript,ServerScriptService.Chat/Commands.Commands.Morph,84,Fire,low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,ModuleScript,ServerScriptService.Chat/Commands.Commands.Morph,85,Fire,high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,ModuleScript,ServerScriptService.Chat/Commands.Commands.Poop,56,"FireClient,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,ModuleScript,ServerScriptService.Chat/Commands.Commands.Poop,65,"FireClient,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,ModuleScript,ServerScriptService.Chat/Commands.Commands.R6,51,"FireClient,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,ModuleScript,ServerScriptService.Chat/Commands.Commands.R6,60,"FireClient,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,ModuleScript,ServerScriptService.Chat/Commands.Commands.R6,66,"FireClient,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,ModuleScript,ServerScriptService.Chat/Commands.Commands.Spectate,7,"FireClient,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,ModuleScript,ServerScriptService.Chat/Commands.Commands.Spectate,8,"FireClient,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,ModuleScript,ServerScriptService.Chat/Commands.Commands.Spectate,16,"FireClient,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,ModuleScript,ServerScriptService.Chat/Commands.Commands.Spectate,17,"FireClient,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,ModuleScript,ServerScriptService.Chat/Commands.Commands.Unfire,7,Fire,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,ModuleScript,ServerScriptService.Chat/Commands.Commands.Unfire,8,Fire,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,ModuleScript,ServerScriptService.Chat/Commands.Commands.Unspectate,5,"FireClient,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,Script,ServerScriptService.Chat/Commands.LineServer,6,OnServerEvent,high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,Script,ServerScriptService.Chat/Commands.LineServer,48,OnServerEvent,low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,Script,ServerScriptService.Chat/Commands.LineServer,69,OnServerEvent,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,ModuleScript,ServerScriptService.EXE6_SERVER.Components.EXE6.CommandLine.CommandLineManager.DefaultCommandMap,566,"FireServer,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,ModuleScript,ServerScriptService.EXE6_SERVER.Components.EXE6.CommandLine.CommandLineManager.DefaultCommandMap,606,"FireServer,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,ModuleScript,ServerScriptService.EXE6_SERVER.Components.EXE6.CommandLine.CommandLineManager.DefaultCommandMap,646,"FireServer,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,289,"FireServer,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,290,"FireServer,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,293,"FireServer,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,296,"FireServer,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,297,"FireServer,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,300,"FireServer,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,303,"FireServer,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,304,"FireServer,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,307,"FireServer,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,1873,Fire,low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,1882,Fire,high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,Script,ServerScriptService.EXE6_SERVER.Server,797,OnServerEvent,low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,ModuleScript,ServerScriptService.EXE6_SERVER.Systems.Warning,134,"FireClient,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,ModuleScript,ServerScriptService.EXE6_SERVER.Systems.Warning,156,"FireClient,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,Script,ServerScriptService.Misc.Leaderstats,418,"FireClient,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,Script,ServerScriptService.Misc.Leaderstats,424,"FireClient,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,LocalScript,StarterGui.Tutorial.LocalScript,36,"FireServer,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,LocalScript,StarterGui.Tutorial.LocalScript,41,"FireServer,InvokeServer,Fire,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,LocalScript,StarterPlayer.StarterCharacterScripts.Flying,2,OnClientEvent,high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,LocalScript,StarterPlayer.StarterCharacterScripts.Flying,38,OnClientEvent,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,LocalScript,StarterPlayer.StarterPlayerScripts.Animation Test,64,"FireServer,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,LocalScript,StarterPlayer.StarterPlayerScripts.Control,36,"FireServer,OnClientEvent,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,LocalScript,StarterPlayer.StarterPlayerScripts.Control,40,"FireServer,OnClientEvent,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,LocalScript,StarterPlayer.StarterPlayerScripts.Control,46,"FireServer,OnClientEvent,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Humanoid,LocalScript,StarterPlayer.StarterPlayerScripts.ReceiveMessage,126,OnClientEvent,low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.LogTeamConnectChat,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,2685,"FireServer,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.LogTeamConnectChat,Script,ServerScriptService.EXE6_SERVER.Server,232,"OnServerEvent,OnServerInvoke,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Notify,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.Alerts,239,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Notify,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,1734,Fire,low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Notify,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,216,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Notify,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,217,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Notify,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1558,"FireServer,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Notify,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1560,"FireServer,InvokeServer,Fire,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Notify,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1562,"FireServer,InvokeServer,Fire,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Notify,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1575,"FireServer,InvokeServer,Fire,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Notify,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1581,"FireServer,InvokeServer,Fire,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Notify,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1588,"InvokeServer,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Notify,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1597,"InvokeServer,Fire,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Notify,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.Quick Actions.Script,490,"InvokeServer,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Notify,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,1749,Fire,low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Notify,Script,ServerScriptService.EXE6_SERVER.Server,197,"OnServerEvent,OnServerInvoke,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Notify,Script,ServerScriptService.EXE6_SERVER.Server,1028,OnServerEvent,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Notify,Script,ServerScriptService.EXE6_SERVER.Server,1034,OnServerEvent,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Primary,ModuleScript,ReplicatedStorage.EXE6_STORAGE.Addix.controller,58,"FireServer,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Primary,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.Utilities,521,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Primary,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.Weld,152,Invoke,low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Primary,ModuleScript,ReplicatedStorage.UselessStuff.Addix.controller,58,"FireServer,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Primary,ModuleScript,ServerScriptService.Chat/Commands.Commands.Poop,64,"FireClient,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Primary,Script,ServerScriptService.Chat/Commands.CommandsHandler,196,"OnServerInvoke,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Primary,Script,ServerScriptService.Chat/Commands.CommandsHandler,202,"OnServerInvoke,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Primary,Script,ServerScriptService.Chat/Commands.LineServer,61,OnServerEvent,low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Primary,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.navigation.navigation_handler,78,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Primary,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.navigation.navigation_handler,89,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Primary,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.navigation.navigation_handler,91,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Primary,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.navigation.navigation_handler,95,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Primary,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.navigation.navigation_handler,97,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Primary,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,1462,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Primary,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,2018,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Primary,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,2049,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Primary,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,2096,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Primary,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,2127,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Primary,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,209,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Primary,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,212,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Primary,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,213,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Primary,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,216,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Primary,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,217,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Primary,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,220,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Primary,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,221,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Primary,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,469,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Primary,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,726,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Primary,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,734,"InvokeServer,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Primary,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1647,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Primary,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.SearchUser.Script_Handler,96,Fire,low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Primary,Script,ServerScriptService.EXE6_SERVER.Server,309,"OnServerInvoke,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.PrivacyAction,ModuleScript,ServerScriptService.EXE6_SERVER.Components.EXE6.CommandLine.CommandLineManager.DefaultCommandMap,37,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.PrivacyAction,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1806,"InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.PrivacyAction,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1832,"InvokeServer,OnClientEvent,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.ServerTeleportation,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,1202,Fire,low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.ServerTeleportation,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,503,"FireServer,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.ServerTeleportation,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,942,"FireServer,OnClientEvent,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.ServerTeleportation,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,944,"FireServer,OnClientEvent,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.ServerTeleportation,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,966,"FireServer,OnClientEvent,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.ServerTeleportation,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,987,OnClientEvent,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.ServerTeleportation,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,1217,Fire,low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.ServerTeleportation,Script,ServerScriptService.EXE6_SERVER.Server,557,"OnServerEvent,FireClient,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.ServerTeleportation,Script,ServerScriptService.EXE6_SERVER.Server,563,"OnServerEvent,FireClient,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.ServerTeleportation,Script,ServerScriptService.EXE6_SERVER.Server,572,"OnServerEvent,FireClient,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.ServerTeleportation,Script,ServerScriptService.EXE6_SERVER.Server,597,"FireClient,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.ServerTeleportation,Script,ServerScriptService.EXE6_SERVER.Server,608,"OnServerEvent,FireClient,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.ServerTeleportation,Script,ServerScriptService.EXE6_SERVER.Server,611,"OnServerEvent,FireClient,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.ServerTeleportation,Script,ServerScriptService.EXE6_SERVER.Server,614,"OnServerEvent,FireClient,Fire",high
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,ModuleScript,ReplicatedStorage.BlinkV2.Client,2735,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,ModuleScript,ReplicatedStorage.BlinkV2.Types,2725,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,595,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,597,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,618,"InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,ModuleScript,ServerScriptService.BlinkV2.Server,2737,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,Script,ServerScriptService.BlinkV2.ServerAdminIntegration,227,OnServerEvent,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,ModuleScript,ServerScriptService.Chat/Commands.addcmd,56,OnServerEvent,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,ModuleScript,ServerScriptService.Chat/Commands.addcmd,57,OnServerEvent,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,ModuleScript,ServerScriptService.Chat/Commands.Commands.Announce,36,"FireAllClients,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,Script,ServerScriptService.Chat/Commands.CommandsHandler,112,"FireClient,FireAllClients,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.navigation.navigation_handler,64,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.navigation.navigation_handler,77,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.navigation.navigation_handler,78,"InvokeServer,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.navigation.navigation_handler,95,"InvokeServer,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.navigation.navigation_handler,97,"InvokeServer,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.ai_chat.LocalScript,879,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.ai_chat.LocalScript,1220,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,465,"FireServer,InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,628,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,2552,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,2669,"FireServer,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,2807,OnClientEvent,low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,239,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,240,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,243,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,244,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1157,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1792,"InvokeServer,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1793,"InvokeServer,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.Quick Actions.Script,510,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.Quick Actions.Script,537,"InvokeServer,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,610,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,612,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,633,"InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,Script,ServerScriptService.EXE6_SERVER.Server,973,"FireAllClients,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,Script,ServerScriptService.EXE6_SERVER.Server,1126,"FireAllClients,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,Script,ServerScriptService.EXE6_SERVER.Server,1212,"OnServerEvent,OnServerInvoke,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,Script,ServerScriptService.EXE6_SERVER.Server,1215,"OnServerEvent,OnServerInvoke,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,Script,ServerScriptService.EXE6_SERVER.Server,1283,"FireAllClients,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,Script,ServerScriptService.EXE6_SERVER.Server,1288,"FireAllClients,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,Script,ServerScriptService.EXE6_SERVER.Server,1301,"FireClient,FireAllClients,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,Script,ServerScriptService.EXE6_SERVER.Server,1308,"FireClient,FireAllClients,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,Script,ServerScriptService.EXE6_SERVER.Server,1329,"FireClient,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,Script,ServerScriptService.Misc.Leaderstats,442,"FireClient,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,Script,ServerScriptService.Misc.Leaderstats,544,OnServerEvent,low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,Script,ServerScriptService.Misc.Leaderstats,704,"FireAllClients,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,Script,ServerScriptService.Misc.Leaderstats,714,"FireAllClients,Fire",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,LocalScript,StarterGui.Commands.Background.Manager,297,OnClientEvent,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,LocalScript,StarterGui.JoinEvent.LocalScript,32,"InvokeServer,OnClientInvoke,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,LocalScript,StarterGui.JoinEvent.LocalScript,35,"InvokeServer,OnClientInvoke,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,LocalScript,StarterGui.RevertGUI.RevertImage.revert,24,OnClientEvent,medium
+ReplicatedStorage.EXE6_STORAGE.events.Activities.Team,LocalScript,StarterGui.RevertGUI.RevertImage.revert,25,OnClientEvent,medium
+ReplicatedStorage.EXE6_STORAGE.events.ai.AIresponse,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.ai_chat.LocalScript,653,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.ai.DeleteChat,Script,ServerScriptService.EXE6_SERVER.AI_saving,9,"OnServerInvoke,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.ai.GetData,ModuleScript,ServerScriptService.Configs.SaveHandler,1961,Fire,low
+ReplicatedStorage.EXE6_STORAGE.events.ai.GetData,ModuleScript,ServerScriptService.Configs.SaveHandler,1964,Fire,low
+ReplicatedStorage.EXE6_STORAGE.events.ai.LoadChat,Script,ServerScriptService.EXE6_SERVER.AI_saving,8,"OnServerInvoke,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.ai.SaveChat,Script,ServerScriptService.EXE6_SERVER.AI_saving,6,"OnServerInvoke,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.ai.web,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.ai_chat.LocalScript,905,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.ActionPinning,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,175,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.ActionPinning,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,259,"InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.ActionPinning,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,294,"InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.ActionPinning,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,687,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.ActionPinning,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,696,"InvokeServer,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.events.auth.ActionPinning,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,826,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.ActionPinning,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,835,"InvokeServer,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.events.auth.ActionPinning,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1082,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.ActionPinning,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1091,"InvokeServer,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.events.auth.ActionPinning,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1118,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.ActionPinning,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1127,"InvokeServer,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.events.auth.ActionPinning,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1376,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.ActionPinning,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1385,"InvokeServer,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.events.auth.ActionPinning,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1586,"FireServer,InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.ActionPinning,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1595,"InvokeServer,Fire,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.events.auth.ActionPinning,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1732,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.ActionPinning,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1741,"InvokeServer,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.events.auth.ActionPinning,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,2274,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.ActionPinning,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,2283,"InvokeServer,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.events.auth.ActionPinning,Script,ServerScriptService.EXE6_SERVER.Server,25,"OnServerInvoke,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.auth.ActionPinning,Script,ServerScriptService.EXE6_SERVER.Server,40,"OnServerInvoke,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ReplicatedStorage.BlinkV2.Client,681,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ReplicatedStorage.BlinkV2.Types,671,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.Alerts,233,"InvokeServer,FireClient,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,586,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,616,"InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,942,"InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,945,"InvokeServer,Fire,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,1004,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,1016,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,1098,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,1110,"InvokeServer,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,1123,"InvokeServer,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,1133,"InvokeServer,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,1507,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,1821,"InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,2097,"InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,2100,"InvokeServer,Fire,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,2156,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,2243,"InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,2246,"InvokeServer,Fire,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,3189,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,3297,"InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.Utilities,982,"InvokeServer,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.Utilities,997,"InvokeServer,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.Utilities,1019,"InvokeServer,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.Utilities,1028,"InvokeServer,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.Utilities,1056,"InvokeServer,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.Utilities,1065,"InvokeServer,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ServerScriptService.BlinkV2.Server,683,Invoke,medium
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.interface_handler,250,OnClientEvent,low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.navigation.navigation_handler,25,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.navigation.navigation_handler,81,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.navigation.navigation_handler,83,"InvokeServer,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.navigation.navigation_handler,85,"InvokeServer,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,175,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,216,"InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,259,"InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,294,"InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,462,"FireServer,InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,618,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,710,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,1554,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,1557,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,1558,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,2086,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,2173,"InvokeServer,OnClientEvent,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,2553,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,2814,OnClientEvent,medium
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,2845,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,23,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,225,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,683,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,687,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,696,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,822,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,826,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,835,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1078,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1082,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1091,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1114,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1118,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1127,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1161,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1372,"FireServer,InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1376,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1385,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1582,"FireServer,InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1586,"FireServer,InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1595,"InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1728,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1732,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1741,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,2270,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,2274,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,2283,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.Quick Actions.Script,161,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.Quick Actions.Script,507,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.SearchUser.Script_Handler,48,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.SearchUser.Script_Handler,50,"InvokeServer,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,Script,ServerScriptService.EXE6_SERVER.CustomCommands,8,OnServerEvent,medium
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,601,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,631,"InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,957,"InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,960,"InvokeServer,Fire,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,1019,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,1031,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,1113,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,1125,"InvokeServer,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,1138,"InvokeServer,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,1148,"InvokeServer,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,1522,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,1836,"InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,2112,"InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,2115,"InvokeServer,Fire,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,2171,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,2258,"InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,2261,"InvokeServer,Fire,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,3204,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,3312,"InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,Script,ServerScriptService.EXE6_SERVER.Server,36,"OnServerInvoke,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,Script,ServerScriptService.EXE6_SERVER.Server,40,"OnServerInvoke,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,Script,ServerScriptService.EXE6_SERVER.Server,46,"OnServerInvoke,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,Script,ServerScriptService.EXE6_SERVER.Server,52,"OnServerInvoke,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,Script,ServerScriptService.EXE6_SERVER.Server,58,"OnServerInvoke,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,Script,ServerScriptService.EXE6_SERVER.Server,70,"OnServerInvoke,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,Script,ServerScriptService.EXE6_SERVER.Server,119,"OnServerInvoke,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,Script,ServerScriptService.EXE6_SERVER.Server,125,"OnServerInvoke,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.auth.Auth,Script,ServerScriptService.EXE6_SERVER.Server,261,"OnServerEvent,OnServerInvoke,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.FetchPins,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,216,"InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.FetchPins,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,683,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.FetchPins,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,822,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.FetchPins,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1078,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.FetchPins,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1114,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.FetchPins,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1372,"FireServer,InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.FetchPins,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1582,"FireServer,InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.FetchPins,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1728,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.FetchPins,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,2270,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.FetchPins,Script,ServerScriptService.EXE6_SERVER.Server,46,"OnServerInvoke,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.FetchRecordedIds,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,1016,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.FetchRecordedIds,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,1554,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.FetchRecordedIds,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,1031,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.FetchRecordedIds,Script,ServerScriptService.EXE6_SERVER.Server,58,"OnServerInvoke,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.FetchRoles,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,1507,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.FetchRoles,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,462,"FireServer,InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.FetchRoles,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.Quick Actions.Script,507,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.FetchRoles,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,1522,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.FetchRoles,Script,ServerScriptService.EXE6_SERVER.Server,125,"OnServerInvoke,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.FetchServerBans,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,2086,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.FetchServerBans,Script,ServerScriptService.EXE6_SERVER.Server,119,"OnServerInvoke,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.FetchUnsavedChats,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,2156,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.FetchUnsavedChats,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,2171,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.FetchUnsavedChats,Script,ServerScriptService.EXE6_SERVER.Server,261,"OnServerEvent,OnServerInvoke,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.IdSaving,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,1004,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.IdSaving,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,1019,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.IdSaving,Script,ServerScriptService.EXE6_SERVER.Server,19,"OnServerInvoke,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.auth.IdSaving,Script,ServerScriptService.EXE6_SERVER.Server,52,"OnServerInvoke,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.VariableEncode,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,1557,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.auth.VariableEncode,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,1558,"InvokeServer,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.events.auth.VariableEncode,Script,ServerScriptService.EXE6_SERVER.Server,70,"OnServerInvoke,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.components.GetAuditActivities,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,2417,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.components.GetAuditActivities,Script,ServerScriptService.EXE6_SERVER.Server,109,"OnServerInvoke,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.components.GetBanHistory,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,1015,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.components.GetBanHistory,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,1030,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.components.GetBanHistory,Script,ServerScriptService.EXE6_SERVER.Server,76,"OnServerInvoke,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.components.GetBanHistory,Script,ServerScriptService.EXE6_SERVER.Server,132,"OnServerInvoke,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.components.GetChatHistory,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,2155,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.components.GetChatHistory,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,2170,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.components.GetChatHistory,Script,ServerScriptService.EXE6_SERVER.Server,165,"OnServerInvoke,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.components.GetWarningHistory,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,2300,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.components.GetWarningHistory,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,2315,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.components.GetWarningHistory,Script,ServerScriptService.EXE6_SERVER.Server,171,"OnServerInvoke,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.GetAI,Script,ServerScriptService.EXE6_SERVER.Script,4,"OnServerInvoke,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.events.GetDeletedThemes,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.customization.scroll.display.scroll.LocalScript,306,"InvokeServer,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.GetDeletedThemes,Script,ServerScriptService.EXE6_SERVER.Script,64,"OnServerInvoke,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.Line.ChangeName,Script,ServerScriptService.Chat/Commands.LineServer,52,OnServerEvent,low
+ReplicatedStorage.EXE6_STORAGE.events.Line.ChangeName,ModuleScript,ServerScriptService.EXE6_SERVER.Components.EXE6.CommandLine.CommandLineManager.DefaultCommandMap,814,"FireServer,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Line.Explode,Script,ServerScriptService.Chat/Commands.LineServer,55,OnServerEvent,medium
+ReplicatedStorage.EXE6_STORAGE.events.Line.Explode,ModuleScript,ServerScriptService.EXE6_SERVER.Components.EXE6.CommandLine.CommandLineManager.DefaultCommandMap,742,"FireServer,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Line.Fling,Script,ServerScriptService.Chat/Commands.LineServer,66,OnServerEvent,medium
+ReplicatedStorage.EXE6_STORAGE.events.Line.Fling,ModuleScript,ServerScriptService.EXE6_SERVER.Components.EXE6.CommandLine.CommandLineManager.DefaultCommandMap,775,"FireServer,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Line.Morph,Script,ServerScriptService.Chat/Commands.LineServer,5,OnServerEvent,medium
+ReplicatedStorage.EXE6_STORAGE.events.Line.Morph,ModuleScript,ServerScriptService.EXE6_SERVER.Components.EXE6.CommandLine.CommandLineManager.DefaultCommandMap,389,"FireServer,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.Line.Spin,Script,ServerScriptService.Chat/Commands.LineServer,86,OnServerEvent,medium
+ReplicatedStorage.EXE6_STORAGE.events.Line.Spin,ModuleScript,ServerScriptService.EXE6_SERVER.Components.EXE6.CommandLine.CommandLineManager.DefaultCommandMap,854,"FireServer,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.misc.GetBanHistory,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,1015,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.misc.GetBanHistory,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,1030,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.misc.GetBanHistory,Script,ServerScriptService.EXE6_SERVER.Server,76,"OnServerInvoke,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.misc.GetBanHistory,Script,ServerScriptService.EXE6_SERVER.Server,132,"OnServerInvoke,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.misc.GetPlaytime,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.MainModule,589,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.misc.GetPlaytime,ModuleScript,ServerScriptService.EXE6_SERVER.FastLoadServer.MainModule,604,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.misc.GetPlaytime,Script,ServerScriptService.EXE6_SERVER.Server,1197,"OnServerEvent,OnServerInvoke,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.quick_actions.GetActions,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.Quick Actions.Script,659,"FireServer,InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.quick_actions.GetActions,Script,ServerScriptService.EXE6_SERVER.Quick Actions,10,"OnServerEvent,OnServerInvoke,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.quick_actions.SaveActions,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.Quick Actions.Script,674,"FireServer,InvokeServer,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.quick_actions.SaveActions,Script,ServerScriptService.EXE6_SERVER.Quick Actions,7,"OnServerEvent,OnServerInvoke,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.SearchProfile.Request,Script,ServerScriptService.Configs.SettingsDatastore,191,OnServerEvent,low
+ReplicatedStorage.EXE6_STORAGE.events.SearchProfile.Request,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.SearchUser.Script_Handler,30,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.SearchProfile.Request,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.SearchUser.Script_Handler,33,"InvokeServer,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.SearchProfile.Request,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.SearchUser.Script_Handler,181,OnClientEvent,low
+ReplicatedStorage.EXE6_STORAGE.events.team_connect.SendMessage,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,2669,"FireServer,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.team_connect.SendMessage,Script,ServerScriptService.EXE6_SERVER.Server,1212,"OnServerEvent,OnServerInvoke,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.team_connect.UpdateThread,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,2807,OnClientEvent,low
+ReplicatedStorage.EXE6_STORAGE.events.team_connect.UpdateThread,Script,ServerScriptService.EXE6_SERVER.Server,1283,"FireAllClients,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.team_connect.UpdateThread,Script,ServerScriptService.EXE6_SERVER.Server,1329,"FireClient,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.ui.AlertsModuleEvent,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.Alerts,205,"InvokeServer,FireClient,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.ui.AlertsModuleEvent,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.interface_handler,260,OnClientEvent,low
+ReplicatedStorage.EXE6_STORAGE.events.ui.AlertsModuleEvent,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6Nonmember.interface_handler,65,OnClientEvent,low
+ReplicatedStorage.EXE6_STORAGE.events.ui.ChangePrivacy,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1836,"InvokeServer,OnClientEvent,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.ui.ExeInterfaceLoaded,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.interface_handler,249,OnClientEvent,low
+ReplicatedStorage.EXE6_STORAGE.events.ui.ExeInterfaceLoaded,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.modal_frame.modal_handler,1840,"InvokeServer,OnClientEvent,Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.ui.FilterString,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.Utilities,480,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.ui.FilterString,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.Utilities,503,"InvokeServer,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.ui.FilterString,ModuleScript,ReplicatedStorage.EXE6_STORAGE.modules.Utilities,510,"InvokeServer,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.events.ui.FilterString,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.ai_chat.LocalScript,879,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.ui.FilterString,Script,ServerScriptService.EXE6_SERVER.Server,191,"OnServerEvent,OnServerInvoke,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.ui.FilterString,Script,ServerScriptService.EXE6_SERVER.Server,192,"OnServerEvent,OnServerInvoke,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.events.ui.GetAppIds,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,3258,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.ui.GetGameDesignTable,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,553,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.ui.GetGameDesignTable,Script,ServerScriptService.EXE6_SERVER.Server,177,"OnServerEvent,OnServerInvoke,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.ui.GetValue,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,3257,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.ui.NotifyEveryone,Script,ServerScriptService.EXE6_SERVER.Server,197,"OnServerEvent,OnServerInvoke,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.events.ui.WarningPrompt,LocalScript,ServerScriptService.EXE6_SERVER.Components.Exe6WarnSystem.interface_handler,16,OnClientEvent,medium
+ReplicatedStorage.EXE6_STORAGE.events.ui.WarningPrompt,ModuleScript,ServerScriptService.EXE6_SERVER.Systems.Warning,146,"FireClient,Fire",low
+ReplicatedStorage.EXE6_STORAGE.events.ui.WarningPrompt,ModuleScript,ServerScriptService.EXE6_SERVER.Systems.Warning,161,"FireClient,Fire",high
+ReplicatedStorage.EXE6_STORAGE.utilities.custom_commands.ChangeTime,Script,ServerScriptService.EXE6_SERVER.CustomCommands,61,OnServerEvent,low
+ReplicatedStorage.EXE6_STORAGE.utilities.custom_commands.ClearAccessories,Script,ServerScriptService.EXE6_SERVER.CustomCommands,73,OnServerEvent,low
+ReplicatedStorage.EXE6_STORAGE.utilities.custom_commands.ClearTools,Script,ServerScriptService.EXE6_SERVER.CustomCommands,39,OnServerEvent,low
+ReplicatedStorage.EXE6_STORAGE.utilities.custom_commands.Tools,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Core,229,"Fire,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.utilities.custom_commands.Tools,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.Tools.NewPart,218,Invoke,low
+ReplicatedStorage.EXE6_STORAGE.utilities.custom_commands.Tools,Script,ServerScriptService.EXE6_SERVER.CustomCommands,15,OnServerEvent,medium
+ReplicatedStorage.EXE6_STORAGE.utilities.custom_commands.Tools,Script,ServerScriptService.EXE6_SERVER.CustomCommands,21,OnServerEvent,medium
+ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.SyncAPI.ServerEndpoint,LocalScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.SyncAPI.LocalEndpoint,3,"InvokeServer,Invoke",medium
+ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.SyncAPI.ServerEndpoint,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.SyncAPI.SyncModule,1605,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.SyncAPI.ServerEndpoint,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.SyncAPI.SyncModule,1662,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.SyncAPI.ServerEndpoint,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.SyncAPI.SyncModule,1690,"InvokeServer,Invoke",low
+ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.SyncAPI.ServerEndpoint,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.SyncAPI.SyncModule,1708,"InvokeServer,Invoke",high
+ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.SyncAPI.ServerEndpoint,ModuleScript,ReplicatedStorage.EXE6_STORAGE.utilities.tools.Building Tools.SyncAPI.SyncModule,1721,"InvokeServer,Invoke",high
+ReplicatedStorage.RemoteEvents.AFKUpdate,LocalScript,StarterPlayer.StarterPlayerScripts.AFKScript,4,"FireServer,Fire",high
+ReplicatedStorage.RemoteEvents.BecomeControlled,LocalScript,StarterPlayer.StarterPlayerScripts.Control,1,OnClientEvent,high
+ReplicatedStorage.RemoteEvents.Blur,ModuleScript,ServerScriptService.Chat/Commands.Commands.Blur,3,"FireClient,Fire",medium
+ReplicatedStorage.RemoteEvents.Blur,ModuleScript,ServerScriptService.Chat/Commands.Commands.Blur,8,"FireClient,Fire",medium
+ReplicatedStorage.RemoteEvents.Blur,ModuleScript,ServerScriptService.Chat/Commands.Commands.Blur,13,"FireClient,Fire",medium
+ReplicatedStorage.RemoteEvents.Blur,ModuleScript,ServerScriptService.Chat/Commands.Commands.Unblur,3,"FireClient,Fire",medium
+ReplicatedStorage.RemoteEvents.Blur,ModuleScript,ServerScriptService.Chat/Commands.Commands.Unblur,8,"FireClient,Fire",medium
+ReplicatedStorage.RemoteEvents.Blur,LocalScript,StarterPlayer.StarterPlayerScripts.ReceiveMessage,209,OnClientEvent,medium
+ReplicatedStorage.RemoteEvents.Blur,LocalScript,StarterPlayer.StarterPlayerScripts.ReceiveMessage,211,OnClientEvent,high
+ReplicatedStorage.RemoteEvents.Blur,LocalScript,StarterPlayer.StarterPlayerScripts.ReceiveMessage,215,OnClientEvent,high
+ReplicatedStorage.RemoteEvents.buildandstuff,Script,ServerScriptService.Configs.ToolConfig.ToolHandler,306,OnServerEvent,low
+ReplicatedStorage.RemoteEvents.ControlThings,LocalScript,StarterPlayer.StarterPlayerScripts.ReceiveMessage,153,OnClientEvent,low
+ReplicatedStorage.RemoteEvents.ConvertOpen,ModuleScript,ServerScriptService.Chat/Commands.Commands.Convert,4,"FireClient,Fire",medium
+ReplicatedStorage.RemoteEvents.ConvertOpen,ModuleScript,ServerScriptService.Chat/Commands.Commands.Convert,5,"FireClient,Fire",medium
+ReplicatedStorage.RemoteEvents.ConvertOpen,LocalScript,StarterGui.Orbs.Convert.ConvertClient,27,OnClientEvent,medium
+ReplicatedStorage.RemoteEvents.DeafEvent,ModuleScript,ServerScriptService.Chat/Commands.Commands.deafen,4,"FireClient,Fire",medium
+ReplicatedStorage.RemoteEvents.DeafEvent,ModuleScript,ServerScriptService.Chat/Commands.Commands.deafen,8,"FireClient,Fire",medium
+ReplicatedStorage.RemoteEvents.FIX MY CAMERA NOW YOU NOOB!,LocalScript,StarterPlayer.StarterPlayerScripts.ReceiveMessage,115,"FireServer,OnClientEvent,Fire",low
+ReplicatedStorage.RemoteEvents.FIX MY FREEZE POSITION OMG U CANT GET NUN RIGHT!,ModuleScript,ServerScriptService.Chat/Commands.Commands.Freeze,46,"FireClient,Fire",low
+ReplicatedStorage.RemoteEvents.FIX MY FREEZE POSITION OMG U CANT GET NUN RIGHT!,Script,ServerScriptService.Misc.Leaderstats,431,"FireClient,Fire",low
+ReplicatedStorage.RemoteEvents.FIX MY FREEZE POSITION OMG U CANT GET NUN RIGHT!,LocalScript,StarterPlayer.StarterPlayerScripts.ReceiveMessage,138,OnClientEvent,low
+ReplicatedStorage.RemoteEvents.ForceFirstPerson,ModuleScript,ServerScriptService.Chat/Commands.Commands.Firstperson,4,"FireClient,Fire",high
+ReplicatedStorage.RemoteEvents.ForceFirstPerson,ModuleScript,ServerScriptService.Chat/Commands.Commands.Unfirstperson,4,"FireClient,Fire",high
+ReplicatedStorage.RemoteEvents.ForceFirstPerson,LocalScript,StarterPlayer.StarterPlayerScripts.FirstPerson,3,OnClientEvent,high
+ReplicatedStorage.RemoteEvents.FOV,ModuleScript,ServerScriptService.Chat/Commands.Commands.Fov,4,"FireClient,Fire",high
+ReplicatedStorage.RemoteEvents.FOV,ModuleScript,ServerScriptService.Chat/Commands.Commands.Fov,11,"FireClient,Fire",high
+ReplicatedStorage.RemoteEvents.FOV,LocalScript,StarterPlayer.StarterPlayerScripts.ReceiveMessage,80,"FireServer,OnClientEvent,Fire",medium
+ReplicatedStorage.RemoteEvents.GiftPlayerSelect,Script,ServerScriptService.Misc.Leaderstats,772,OnServerEvent,low
+ReplicatedStorage.RemoteEvents.GlobalAnnouncement,Script,ServerScriptService.EXE6_SERVER.Server,905,OnServerEvent,medium
+ReplicatedStorage.RemoteEvents.HauntEvent,ModuleScript,ServerScriptService.Chat/Commands.Commands.Haunt,2,"FireClient,Fire",high
+ReplicatedStorage.RemoteEvents.JoinServer,ModuleScript,ServerScriptService.Chat/Commands.addcmd,39,OnServerEvent,low
+ReplicatedStorage.RemoteEvents.JoinServer,ModuleScript,ServerScriptService.Chat/Commands.Commands.Joinvc,3,"FireClient,Fire",high
+ReplicatedStorage.RemoteEvents.JoinServer,Script,ServerScriptService.Chat/Commands.CommandsHandler,104,"FireClient,FireAllClients,Fire",low
+ReplicatedStorage.RemoteEvents.JoinServer,LocalScript,StarterPlayer.StarterPlayerScripts.ReceiveMessage,88,"FireServer,OnClientEvent,Fire",medium
+ReplicatedStorage.RemoteEvents.OpenCommandsGui,ModuleScript,ServerScriptService.Chat/Commands.Commands.Cmdgui,4,"FireClient,Fire",high
+ReplicatedStorage.RemoteEvents.OpenCommandsGui,ModuleScript,ServerScriptService.Chat/Commands.Commands.Cmdgui,5,"FireClient,Fire",high
+ReplicatedStorage.RemoteEvents.OpenCommandsGui,ModuleScript,ServerScriptService.Chat/Commands.Commands.Cmdgui,7,"FireClient,Fire",high
+ReplicatedStorage.RemoteEvents.OpenCommandsGui,LocalScript,StarterGui.Commands.Background.Manager,274,OnClientEvent,medium
+ReplicatedStorage.RemoteEvents.OpenSlots,ModuleScript,ServerScriptService.Chat/Commands.Commands.Slots,4,"FireClient,Fire",medium
+ReplicatedStorage.RemoteEvents.OpenSlots,ModuleScript,ServerScriptService.Chat/Commands.Commands.Slots,5,"FireClient,Fire",medium
+ReplicatedStorage.RemoteEvents.OpenSlots,LocalScript,StarterGui.Files.FilesManager,81,OnClientEvent,medium
+ReplicatedStorage.RemoteEvents.POV,ModuleScript,ServerScriptService.Chat/Commands.Commands.Debug,103,"FireClient,Fire",low
+ReplicatedStorage.RemoteEvents.POV,ModuleScript,ServerScriptService.Chat/Commands.Commands.Debug,104,"FireClient,Fire",medium
+ReplicatedStorage.RemoteEvents.POV,ModuleScript,ServerScriptService.Chat/Commands.Commands.Horse,54,"FireClient,Fire",low
+ReplicatedStorage.RemoteEvents.POV,ModuleScript,ServerScriptService.Chat/Commands.Commands.Poop,48,"FireClient,Fire",low
+ReplicatedStorage.RemoteEvents.POV,ModuleScript,ServerScriptService.Chat/Commands.Commands.R6,66,"FireClient,Fire",low
+ReplicatedStorage.RemoteEvents.POV,ModuleScript,ServerScriptService.Chat/Commands.Commands.Spectate,4,"FireClient,Fire",high
+ReplicatedStorage.RemoteEvents.POV,ModuleScript,ServerScriptService.Chat/Commands.Commands.Spectate,8,"FireClient,Fire",high
+ReplicatedStorage.RemoteEvents.POV,ModuleScript,ServerScriptService.Chat/Commands.Commands.Spectate,17,"FireClient,Fire",high
+ReplicatedStorage.RemoteEvents.POV,ModuleScript,ServerScriptService.Chat/Commands.Commands.Unspectate,5,"FireClient,Fire",high
+ReplicatedStorage.RemoteEvents.POV,LocalScript,StarterPlayer.StarterPlayerScripts.ReceiveMessage,72,OnClientEvent,medium
+ReplicatedStorage.RemoteEvents.PurchaseDuplicateEvent,LocalScript,StarterGui.Shop.LocalScript,55,"FireServer,Fire,Invoke",medium
+ReplicatedStorage.RemoteEvents.PurchaseDuplicateEvent,LocalScript,StarterGui.Shop2.0.LocalScript,55,"FireServer,Fire,Invoke",medium
+ReplicatedStorage.RemoteEvents.PurchaseDuplicateEvent,LocalScript,StarterGui.Size.Frame.ResizeSelection,21,"InvokeServer,OnClientInvoke,Invoke",medium
+ReplicatedStorage.RemoteEvents.PurchaseEvent,LocalScript,StarterGui.Shop.LocalScript,54,"FireServer,Fire,Invoke",medium
+ReplicatedStorage.RemoteEvents.PurchaseEvent,LocalScript,StarterGui.Shop2.0.LocalScript,54,"FireServer,Fire,Invoke",medium
+ReplicatedStorage.RemoteEvents.PurchaseParticleEvent,LocalScript,StarterGui.Shop.LocalScript,23,"FireServer,Fire",medium
+ReplicatedStorage.RemoteEvents.PurchaseParticleEvent,LocalScript,StarterGui.Shop2.0.LocalScript,23,"FireServer,Fire",medium
+ReplicatedStorage.RemoteEvents.PurchaseRotateEvent,LocalScript,StarterGui.Shop.LocalScript,21,"FireServer,Fire",medium
+ReplicatedStorage.RemoteEvents.PurchaseRotateEvent,LocalScript,StarterGui.Shop2.0.LocalScript,21,"FireServer,Fire",medium
+ReplicatedStorage.RemoteEvents.PurchaseSprayEvent,LocalScript,StarterGui.Shop.LocalScript,22,"FireServer,Fire",medium
+ReplicatedStorage.RemoteEvents.PurchaseSprayEvent,LocalScript,StarterGui.Shop2.0.LocalScript,22,"FireServer,Fire",medium
+ReplicatedStorage.RemoteEvents.RewardedAdEvent,Script,ServerScriptService.Misc.RewardedAdsServer,8,"OnServerEvent,FireClient,Fire",high
+ReplicatedStorage.RemoteEvents.SaveTutorialDone,Script,ServerScriptService.Configs.SettingsDatastore,12,"OnServerEvent,OnServerInvoke,Invoke",low
+ReplicatedStorage.RemoteEvents.SendBackMessages,Script,ServerScriptService.Chat/Commands.CommandsHandler,103,"FireClient,FireAllClients,Fire",low
+ReplicatedStorage.RemoteEvents.SendBackMessages,LocalScript,StarterPlayer.StarterPlayerScripts.ReceiveMessage,47,OnClientEvent,medium
+ReplicatedStorage.RemoteEvents.setfly,LocalScript,StarterPlayer.StarterCharacterScripts.Flying,21,OnClientEvent,high
+ReplicatedStorage.RemoteEvents.TestAnimationReveal,LocalScript,StarterPlayer.StarterPlayerScripts.Animation Test,59,"FireServer,Fire",low
+ReplicatedStorage.RemoteEvents.Timer,ModuleScript,ServerScriptService.Chat/Commands.Commands.Timer,45,"FireClient,Fire",low
+ReplicatedStorage.RemoteEvents.Timer,LocalScript,StarterGui.Timer.TimerImage.LocalScript,4,OnClientEvent,high
+ReplicatedStorage.RemoteEvents.Timer,LocalScript,StarterGui.Timer.TimerImage.LocalScript,5,OnClientEvent,high
+ReplicatedStorage.RemoteEvents.VoteKickUIUpdate,LocalScript,StarterGui.Votekick.PoopDate,3,OnClientEvent,high
+ReplicatedStorage.RemoteFunctions.ConvertTimeToOrbs,LocalScript,StarterGui.Orbs.Convert.ConvertClient,10,OnClientEvent,high
+ReplicatedStorage.RemoteFunctions.GetCommands,Script,ServerScriptService.Chat/Commands.CommandsHandler,184,"OnServerInvoke,Invoke",medium
+ReplicatedStorage.RemoteFunctions.GetCommands,Script,ServerScriptService.Chat/Commands.CommandsHandler,185,"OnServerInvoke,Invoke",medium
+ReplicatedStorage.RemoteFunctions.GetCommands,LocalScript,ServerScriptService.EXE6_SERVER.Components.EXE6.main_frame.content.screen.screen_handler,2551,"InvokeServer,Invoke",low
+ReplicatedStorage.RemoteFunctions.GetCommands,LocalScript,StarterGui.Commands.Background.Manager,240,"InvokeServer,Invoke",medium
+ReplicatedStorage.RemoteFunctions.JoinEventServer,ModuleScript,ServerScriptService.Chat/Commands.Commands.Joinevent,2,Invoke,high
+ReplicatedStorage.RemoteFunctions.JoinEventServer,Script,ServerScriptService.Chat/Commands.CommandsHandler,357,"OnServerInvoke,Invoke",low
+ReplicatedStorage.RemoteFunctions.JoinEventServer,LocalScript,StarterGui.JoinEvent.LocalScript,6,"InvokeServer,OnClientInvoke,Invoke",high
+ReplicatedStorage.RemoteFunctions.PaintCustomColors,Script,ServerScriptService.Configs.PaintCustomColorsServer,4,"OnServerInvoke,Invoke",medium
+ReplicatedStorage.RemoteFunctions.PaintCustomColors,Script,ServerScriptService.Configs.PaintCustomColorsServer,7,"OnServerInvoke,Invoke",medium
+ReplicatedStorage.RemoteFunctions.Paste,Script,ServerScriptService.Configs.ToolConfig.ToolHandler,524,"OnServerInvoke,Invoke",low
+ReplicatedStorage.RemoteFunctions.Paste,LocalScript,StarterGui.Size.Frame.ResizeSelection,10,"InvokeServer,OnClientInvoke,Invoke",low
+ReplicatedStorage.RemoteFunctions.RequestTutorialStatus,Script,ServerScriptService.Configs.SettingsDatastore,11,"OnServerEvent,OnServerInvoke,Invoke",high
+ReplicatedStorage.RemoteFunctions.Revert,ModuleScript,ServerScriptService.Configs.SaveHandler,2251,"OnServerInvoke,Invoke",low
+ReplicatedStorage.RemoteFunctions.SkinsAction,Script,ServerScriptService.Misc.Leaderstats,866,"OnServerInvoke,Invoke",low
+ReplicatedStorage.RemoteFunctions.SkinsAction,LocalScript,StarterGui.Orbs.OrbShopBeta.LocalScript,19,"InvokeServer,Invoke",high
+ReplicatedStorage.RemoteFunctions.SkinsAction,LocalScript,StarterGui.Orbs.OrbShopBeta.LocalScript,65,"InvokeServer,Invoke",low
+ReplicatedStorage.RemoteFunctions.SkinsAction,LocalScript,StarterGui.Orbs.OrbShopBeta.LocalScript,84,"InvokeServer,Invoke",high
+ReplicatedStorage.SignPreview.Part.SurfaceGui.TextBox.ChangeText,LocalScript,StarterPlayer.StarterPlayerScripts.SignText,134,"InvokeServer,Invoke",low
+ReplicatedStorage.Skins.Sign.Cute.Part.SurfaceGui.TextBox.ChangeText,LocalScript,StarterPlayer.StarterPlayerScripts.SignText,134,"InvokeServer,Invoke",low
+ReplicatedStorage.Skins.Sign.Demon.Part.SurfaceGui.TextBox.ChangeText,LocalScript,StarterPlayer.StarterPlayerScripts.SignText,134,"InvokeServer,Invoke",low
+ReplicatedStorage.Skins.Sign.Evil.Part.SurfaceGui.TextBox.ChangeText,LocalScript,StarterPlayer.StarterPlayerScripts.SignText,134,"InvokeServer,Invoke",low
+ReplicatedStorage.Skins.Sign.Frozen.Part.SurfaceGui.TextBox.ChangeText,LocalScript,StarterPlayer.StarterPlayerScripts.SignText,134,"InvokeServer,Invoke",low
+ReplicatedStorage.Skins.Sign.Hacked.Part.SurfaceGui.TextBox.ChangeText,LocalScript,StarterPlayer.StarterPlayerScripts.SignText,134,"InvokeServer,Invoke",low
+ReplicatedStorage.Skins.Sign.Normal.Part.SurfaceGui.TextBox.ChangeText,LocalScript,StarterPlayer.StarterPlayerScripts.SignText,134,"InvokeServer,Invoke",low
+ReplicatedStorage.Skins.Sign.Overgrowth.Part.SurfaceGui.TextBox.ChangeText,LocalScript,StarterPlayer.StarterPlayerScripts.SignText,134,"InvokeServer,Invoke",low
+ReplicatedStorage.Skins.Sign.Potato.Part.SurfaceGui.TextBox.ChangeText,LocalScript,StarterPlayer.StarterPlayerScripts.SignText,134,"InvokeServer,Invoke",low
+ReplicatedStorage.Skins.Sign.Valentines.Part.SurfaceGui.TextBox.ChangeText,LocalScript,StarterPlayer.StarterPlayerScripts.SignText,134,"InvokeServer,Invoke",low
+ReplicatedStorage.UselessStuff.PlayerAdded,Script,ServerScriptService.BlinkV2.ServerAdminIntegration,225,OnServerEvent,low
+ReplicatedStorage.UselessStuff.PlayerAdded,ModuleScript,ServerScriptService.Chat/Commands.Commands.R6,87,"FireClient,Fire",low
+ReplicatedStorage.UselessStuff.PlayerAdded,Script,ServerScriptService.Chat/Commands.CreditsManager,97,"OnServerInvoke,Invoke",low
+ReplicatedStorage.UselessStuff.PlayerAdded,Script,ServerScriptService.EXE6_SERVER.Server,243,"OnServerEvent,OnServerInvoke,Invoke",low
+ReplicatedStorage.UselessStuff.PlayerAdded,Script,ServerScriptService.EXE6_SERVER.Server,1179,"OnServerInvoke,FireAllClients,Fire,Invoke",low
+ReplicatedStorage.UselessStuff.PlayerAdded,Script,ServerScriptService.EXE6_SERVER.Server,1328,"FireClient,Fire",low
+ReplicatedStorage.UselessStuff.PlayerAdded,Script,ServerScriptService.Misc.DealsOfferServer,163,"FireClient,Fire",low
+ReplicatedStorage.UselessStuff.PlayerAdded,Script,ServerScriptService.Misc.GroupChecker,48,Fire,low
+ReplicatedStorage.UselessStuff.PlayerAdded,Script,ServerScriptService.Misc.Leaderstats,558,OnServerEvent,low
+ReplicatedStorage.UselessStuff.PlayerAdded,Script,ServerScriptService.Misc.PrivateServerSlotManager,154,"OnServerEvent,FireClient,Fire",low

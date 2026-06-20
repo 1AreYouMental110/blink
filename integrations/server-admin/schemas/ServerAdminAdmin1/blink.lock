@@ -1,0 +1,29 @@
+{
+	"protocol": 2,
+	"schemaVersion": 1,
+	"minimumSchemaVersion": 1,
+	"schemaHash": "schema-1",
+	"compatibility": "strict-v2-schema-hash",
+	"options": {
+		"securityProfile": "Production",
+		"requirePolicies": true,
+		"maxReliablePacketBytes": 65536,
+		"maxUnreliablePacketBytes": 900
+	},
+	"wireIds": {
+		"LegacyFn_EXE6_STORAGE_events_auth_ActionPinning": { "id": 1250, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyFn_EXE6_STORAGE_events_auth_Auth": { "id": 1260, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyFn_EXE6_STORAGE_events_auth_FetchPins": { "id": 1270, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyFn_EXE6_STORAGE_events_auth_FetchRecordedIds": { "id": 1280, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyFn_EXE6_STORAGE_events_auth_FetchRoles": { "id": 1290, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyFn_EXE6_STORAGE_events_auth_FetchServerBans": { "id": 1300, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyFn_EXE6_STORAGE_events_auth_FetchUnsavedChats": { "id": 1310, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyFn_EXE6_STORAGE_events_auth_IdSaving": { "id": 1320, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyFn_EXE6_STORAGE_events_auth_VariableEncode": { "id": 1330, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyFn_EXE6_STORAGE_events_components_GetAuditActivities": { "id": 1340, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyFn_EXE6_STORAGE_events_components_GetBanHistory": { "id": 1350, "kind": "Function", "deprecated": false, "reserved": false },
+		"LegacyFn_EXE6_STORAGE_events_components_GetWarningHistory": { "id": 1370, "kind": "Function", "deprecated": false, "reserved": false }
+	},
+	"typeHashes": {
+	}
+}

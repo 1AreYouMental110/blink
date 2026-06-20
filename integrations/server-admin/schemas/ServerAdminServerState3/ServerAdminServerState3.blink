@@ -1,0 +1,181 @@
+option Casing = Pascal
+option ClientOutput = "generated/Client.luau"
+option ServerOutput = "generated/Server.luau"
+option TypesOutput = "generated/Types.luau"
+option RemoteScope = "ServerAdminServerState3"
+option ProtocolVersion = 2
+option EnableProtocolHandshake = true
+option Version = 1
+option MinimumSchemaVersion = 1
+option SecurityProfile = Production
+option RequirePolicies = true
+option MaxPacketBytes = 65536
+option MaxReliablePacketBytes = 65536
+option MaxUnreliablePacketBytes = 900
+option RateLimitPerSecond = 60
+option RateLimitBurst = 120
+option InvokeTimeoutSeconds = 10
+option ReliableFragmentBytes = 32768
+option MaxInFlightFragments = 128
+option FragmentTimeoutSeconds = 10
+option MaxQueuedBytes = 1048576
+option MaxQueuedEvents = 256
+option MaxBurstBytes = 262144
+option LowPriorityShedding = true
+option ReplayWindowSize = 256
+option ReplayStaleSeconds = 15
+option MaxDecodeOperations = 20000
+option MaxPayloadDepth = 12
+option MaxPayloadStringBytes = 4096
+option MaxTableKeys = 256
+option SyncValidation = false
+option WriteValidations = false
+
+event LegacyS2C_RemoteEvents_ControlThings {
+    WireId: 1760,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_DealsOffer {
+    WireId: 1790,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_FIX_MY_FREEZE_POSITION_OMG_U_CANT_GET_NUN_RIGHT {
+    WireId: 1810,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_ForceFirstPerson {
+    WireId: 1820,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyC2S_RemoteEvents_SaveTutorialDone {
+    WireId: 1990,
+    From: Client,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Policy: "server-state",
+    PolicyGroup: "server-admin-serverstate",
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_setfly {
+    WireId: 2010,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyS2C_RemoteEvents_VoteKickVote {
+    WireId: 2050,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+function LegacyFn_RemoteFunctions_GetCommands {
+    WireId: 2070,
+    Yield: Coroutine,
+    Policy: "server-state",
+    PolicyGroup: "server-admin-serverstate",
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_RemoteFunctions_JoinEventServer {
+    WireId: 2080,
+    Yield: Coroutine,
+    Policy: "server-state",
+    PolicyGroup: "server-admin-serverstate",
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+function LegacyFn_RemoteFunctions_RequestTutorialStatus {
+    WireId: 2110,
+    Yield: Coroutine,
+    Policy: "server-state",
+    PolicyGroup: "server-admin-serverstate",
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    RateLimitPerSecond: 6,
+    RateLimitBurst: 12,
+    Idempotency: true,
+    Data: unknown,
+    Return: unknown
+}
+
+event LegacyS2C_UselessStuff_CheckSizePass {
+    WireId: 2250,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
+
+event LegacyS2C_UselessStuff_FreecamRemote {
+    WireId: 2270,
+    From: Server,
+    Type: Reliable,
+    Call: ManyAsync,
+    Risk: ServerState,
+    Priority: Gameplay,
+    MaxPacketBytes: 4096,
+    Data: unknown
+}
