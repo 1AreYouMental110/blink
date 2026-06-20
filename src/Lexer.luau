@@ -35,7 +35,7 @@ export type Types =
 	| "Unknown"
 	| "EndOfFile"
 
-export type Keywords = "type" | "enum" | "struct" | "event" | "function"
+export type Keywords = "type" | "enum" | "struct" | "event" | "function" | "channel"
 
 export type Token = {
 	Type: Types,
@@ -113,6 +113,13 @@ local TOKENS = {
 		"^(['\"]).-.*",
 		function(Token: string)
 			return "String", string.sub(Token, 2)
+		end,
+	},
+
+	{
+		`^{NUMBER}`,
+		function(Token: string)
+			return "Number", tonumber(Token)
 		end,
 	},
 

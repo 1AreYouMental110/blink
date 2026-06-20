@@ -14,8 +14,10 @@ export type Cases = {
 	FireAll: string,
 	FireList: string,
 	FireExcept: string,
+	FireGroup: string,
 	On: string,
 	Invoke: string,
+	Predict: string,
 	StepReplication: string,
 	Next: string,
 	Iter: string,
@@ -41,10 +43,12 @@ local Indexes = {
 local Cases = {
 	On = { "On", "on", "on" },
 	Invoke = { "Invoke", "invoke", "invoke" },
+	Predict = { "Predict", "predict", "predict" },
 	Fire = { "Fire", "fire", "fire" },
 	FireAll = { "FireAll", "fireAll", "fire_all" },
 	FireList = { "FireList", "fireList", "fire_list" },
 	FireExcept = { "FireExcept", "fireExcept", "fire_except" },
+	FireGroup = { "FireGroup", "fireGroup", "fire_group" },
 	StepReplication = { "StepReplication", "stepReplication", "step_replication" },
 	Next = { "Next", "next", "next" },
 	Iter = { "Iter", "iter", "iter" },
@@ -204,6 +208,7 @@ return {
 
 		event = true,
 		["function"] = true,
+		channel = true,
 
 		scope = true,
 		option = true,

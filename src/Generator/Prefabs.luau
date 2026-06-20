@@ -109,6 +109,16 @@ local function GetTypeToUse(UpperSize: number): TypePrefab
 	error("Value is too large to be written to a buffer.")
 end
 
+local function GetLengthBytes(UpperSize: number): number
+	for _, NumberType in NumberTypeBounds do
+		if NumberType.Maximum >= UpperSize then
+			return NumberType.Bits // 8
+		end
+	end
+
+	error("Value is too large to be written to a buffer.")
+end
+
 local function GetTypeToUseByBits(UpperBits: number): TypePrefab
 	for _, NumberType in NumberTypeBounds do
 		if NumberType.Bits >= UpperBits then
@@ -178,12 +188,34 @@ local function GeneratePrimitivePrefab(Type: string, Prefab: TypePrefab, AssertG
 end
 
 local function GenerateNumberGenerator(Type: string, Size: number): (TypePrefab, { Type: string, Generate: Generate })
+	local Prefix = string.sub(Type, 1, 1)
+	local IsInteger = Prefix == "u" or Prefix == "i"
+	local IsVarintCandidate = IsInteger and Size > BYTE and (string.sub(Type, 2) == "16" or string.sub(Type, 2) == "32")
+	local IsSigned = Prefix == "i"
 	local Prefab = {
 		Read = function(Variable: string, Block: Block)
-			Block:Line(`{Block:Declare(Variable)} = buffer.read{Type}({RECIEVE_BUFFER}, {Block:Read(Size)})`)
+			if IsVarintCandidate then
+				Block:Declare(Variable, true)
+				Block:Line("if UseVarints() then")
+				Block:Line(`{Variable} = {IsSigned and "ReadSignedVarint" or "ReadVarint"}()`, Block.Indent + 1)
+				Block:Line("else")
+				Block:Line(`{Variable} = buffer.read{Type}({RECIEVE_BUFFER}, Read({Size}))`, Block.Indent + 1)
+				Block:Line("end")
+			else
+				Block:Line(`{Block:Declare(Variable)} = buffer.read{Type}({RECIEVE_BUFFER}, {Block:Read(Size)})`)
+			end
 		end,
 		Write = function(Value: string, Block: Block)
-			Block:Line(`buffer.write{Type}({SEND_BUFFER}, {Block:Allocate(Size)}, {Value})`)
+			if IsVarintCandidate then
+				Block:Line("if UseVarints() then")
+				Block:Line(`{IsSigned and "WriteSignedVarint" or "WriteVarint"}({Value})`, Block.Indent + 1)
+				Block:Line("else")
+				Block:Line(`local Offset = Allocate({Size})`, Block.Indent + 1)
+				Block:Line(`buffer.write{Type}({SEND_BUFFER}, Offset, {Value})`, Block.Indent + 1)
+				Block:Line("end")
+			else
+				Block:Line(`buffer.write{Type}({SEND_BUFFER}, {Block:Allocate(Size)}, {Value})`)
+			end
 		end,
 	}
 
@@ -209,7 +241,7 @@ Types.f64, Primitives.f64 = GenerateNumberGenerator("f64", DOUBLE)
 
 Types.f16 = {
 	Read = function(Variable: string, Block: Block)
-		Types.u16.Read("Encoded", Block)
+		Block:Line(`local Encoded = buffer.readu16({RECIEVE_BUFFER}, {Block:Read(HALF_FLOAT)})`)
 		Block:Declare(Variable, true)
 		Block:Line(`local MantissaExponent = Encoded % 0x8000`)
 		Block:Compare("MantissaExponent", "0b0_11111_0000000000 ", "Equals")
@@ -276,10 +308,20 @@ Primitives.f16 = {
 do
 	Types.boolean = {
 		Read = function(Variable: string, Block: Block)
-			Block:Line(`{Block:Declare(Variable)} = (buffer.readu8({RECIEVE_BUFFER}, {Block:Read(BYTE)}) == 1)`)
+			Block:Declare(Variable, true)
+			Block:Line("if UseBitPacking() then")
+			Block:Line(`{Variable} = ReadBit()`, Block.Indent + 1)
+			Block:Line("else")
+			Block:Line(`{Variable} = (buffer.readu8({RECIEVE_BUFFER}, Read({BYTE})) == 1)`, Block.Indent + 1)
+			Block:Line("end")
 		end,
 		Write = function(Value: string, Block: Block)
-			Block:Line(`buffer.writeu8({SEND_BUFFER}, {Block:Allocate(BYTE)}, {Value} and 1 or 0)`)
+			Block:Line("if UseBitPacking() then")
+			Block:Line(`WriteBit({Value})`, Block.Indent + 1)
+			Block:Line("else")
+			Block:Line(`local Offset = Allocate({BYTE})`, Block.Indent + 1)
+			Block:Line(`buffer.writeu8({SEND_BUFFER}, Offset, {Value} and 1 or 0)`, Block.Indent + 1)
+			Block:Line("end")
 		end,
 	}
 
@@ -302,10 +344,9 @@ do
 			end
 
 			local Upper = Range and Range.Max or (2 ^ 16 - 1)
-			local LengthType = GetTypeToUse(Upper)
+			local LengthBytes = GetLengthBytes(Upper)
 
-			LengthType.Read("Length", Block)
-			Block:Line(`{Block:Declare(Variable)} = buffer.readstring({RECIEVE_BUFFER}, Read(Length), Length)`)
+			Block:Line(`{Block:Declare(Variable)} = ReadStringValue({LengthBytes})`)
 		end,
 		Write = function(Value: string, Block: Block, Range: NumberRange?)
 			if Range and Range.Min == Range.Max then
@@ -314,12 +355,8 @@ do
 			end
 
 			local Upper = Range and Range.Max or (2 ^ 16 - 1)
-			local LengthType = GetTypeToUse(Upper)
-
-			Block:Line(`local Length = #{Value}`)
-			LengthType.Write("Length", Block)
-			Block:Line(`Allocate(Length)`)
-			Block:Line(`buffer.writestring({SEND_BUFFER}, {SEND_POSITION}, {Value}, Length)`)
+			local LengthBytes = GetLengthBytes(Upper)
+			Block:Line(`WriteStringValue({Value}, {LengthBytes})`)
 		end,
 	}
 
@@ -374,8 +411,8 @@ do
 			end
 
 			local Upper = Range and Range.Max or (2 ^ 16 - 1)
-			local LengthType = GetTypeToUse(Upper)
-			LengthType.Read("Length", Block)
+			local LengthBytes = GetLengthBytes(Upper)
+			Block:Line(`local Length = ReadLength({LengthBytes})`)
 			Block:Line(`{Block:Declare(Variable)} = buffer.create(Length)`)
 			Block:Line(`buffer.copy({Variable}, 0, {RECIEVE_BUFFER}, Read(Length), Length)`)
 		end,
@@ -386,9 +423,9 @@ do
 			end
 
 			local Upper = Range and Range.Max or (2 ^ 16 - 1)
-			local LengthType = GetTypeToUse(Upper)
+			local LengthBytes = GetLengthBytes(Upper)
 			Block:Line(`local Length = buffer.len({Value})`)
-			LengthType.Write("Length", Block)
+			Block:Line(`WriteLength(Length, {LengthBytes})`)
 			Block:Line(`Allocate(Length)`)
 			Block:Line(`buffer.copy({SEND_BUFFER}, {SEND_POSITION}, {Value}, 0, Length)`)
 		end,
@@ -506,8 +543,8 @@ end
 do
 	Types.BrickColor = {
 		Read = function(Variable: string, Block: Block)
-			local Number = Block:Read(SHORT)
-			Block:Line(`{Block:Declare(Variable)} = BrickColor.new(buffer.readu16({RECIEVE_BUFFER}, {Number}))`)
+			Types.u16.Read("BrickColorNumber", Block)
+			Block:Line(`{Block:Declare(Variable)} = BrickColor.new(BrickColorNumber)`)
 		end,
 		Write = function(Value: string, Block: Block)
 			Block:Line(`local BrickColor = {Value}`)
@@ -566,4 +603,5 @@ return {
 	Structures = Structures,
 	GetTypeToUse = GetTypeToUse,
 	GetTypeToUseByBits = GetTypeToUseByBits,
+	GetLengthBytes = GetLengthBytes,
 }

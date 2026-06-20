@@ -81,6 +81,7 @@ local SYMBOLS: { [string]: { { Label: string, Insert: string } } } = {
 		{ Label = "struct", Insert = "struct %s {}" },
 		{ Label = "event", Insert = "event %s {}" },
 		{ Label = "function", Insert = "function %s {}" },
+		{ Label = "channel", Insert = "channel %s {\n\tScope: Player,\n\tTickRate: 20,\n\tDelta: true,\n\tData: \n}" },
 		{ Label = "import", Insert = "import %s as " },
 		{ Label = "scope", Insert = "scope %s {}" },
 		{ Label = "export", Insert = "export " },
@@ -109,6 +110,8 @@ local RICH_TEXT_ESCAPES: { [string]: string } = {
 local SCROLL_LINES = 2
 local CURSOR_BLINK_RATE = 0.5
 local PRE_ALLOCATED_LINES = 2_000
+local SOURCE_REFRESH_DEBOUNCE = 0.06
+local LARGE_SCHEMA_HIGHLIGHT_LIMIT = 100_000
 
 type CompletionItem = {
 	Icon: string,
@@ -163,6 +166,8 @@ local PreviousLine: TextLabel?
 local PreviousCursorPosition: number?
 local NavigationPending: { Direction: number, Position: number }?
 local CompletionPending: boolean?
+local SourceRefreshRevision = 0
+local SourceRefreshScheduled = false
 local IgnoreCursorChange: boolean?
 
 local AnalysisError: State.Class<Error.Class?> = State.new(nil :: any)
@@ -221,6 +226,10 @@ local function UpdateColors()
 	--> Render text immediately
 	Display.Text = Source
 	Display.TextColor3 = THEME.Text
+
+	if #Source > LARGE_SCHEMA_HIGHLIGHT_LIMIT then
+		return
+	end
 
 	--> Initiialize lexer
 	SourceLexer:Initialize(Source)
@@ -371,6 +380,36 @@ local function UpdateCompletion()
 	})
 end
 
+local function ScheduleSourceRefresh()
+	SourceRefreshRevision += 1
+	local Revision = SourceRefreshRevision
+
+	if SourceRefreshScheduled then
+		return
+	end
+
+	SourceRefreshScheduled = true
+	task.delay(SOURCE_REFRESH_DEBOUNCE, function()
+		SourceRefreshScheduled = false
+		if Revision ~= SourceRefreshRevision then
+			ScheduleSourceRefresh()
+			return
+		end
+
+		Profiler.profileBegin("Analysis")
+		UpdateAnalysis()
+		Profiler.profileEnd()
+
+		Profiler.profileBegin("Completion")
+		UpdateCompletion()
+		Profiler.profileEnd()
+
+		Profiler.profileBegin("Highlighting")
+		UpdateColors()
+		Profiler.profileEnd()
+	end)
+end
+
 local function UpdateHighlightedLine()
 	local Line = Utility.GetCurrentLine(Input.Text, Input.CursorPosition)
 	Line = math.clamp(Line, 1, PRE_ALLOCATED_LINES)
@@ -431,19 +470,25 @@ end
 --> State functions
 local function OnLinesChanged(Value: number)
 	--> Insert new or delete lines
-	local Difference = (Value - Lines)
+	local PreviousVisible = math.min(Lines, PRE_ALLOCATED_LINES)
+	local Visible = math.min(Value, PRE_ALLOCATED_LINES)
+	local Difference = (Visible - PreviousVisible)
 
 	if Difference > 0 then
-		for Index = (Lines + 1), Value do
+		for Index = (PreviousVisible + 1), Visible do
 			local Name = tostring(Index)
 			local Line = LinesContainer[Name]
-			Line.TextTransparency = 0
+			if Line then
+				Line.TextTransparency = 0
+			end
 		end
 	elseif Difference < 0 then
-		for Index = Lines, (Value + 1), -1 do
+		for Index = PreviousVisible, (Visible + 1), -1 do
 			local Name = tostring(Index)
 			local Line = LinesContainer[Name]
-			Line.TextTransparency = 1
+			if Line then
+				Line.TextTransparency = 1
+			end
 		end
 	end
 
@@ -809,18 +854,8 @@ local function OnSourceChanged()
 
 	Profiler.profileEnd()
 
-	--> Perform lexer pass
-	Profiler.profileBegin("Analysis")
-	UpdateAnalysis()
-	Profiler.profileEnd()
-
-	Profiler.profileBegin("Completion")
-	UpdateCompletion()
-	Profiler.profileEnd()
-
-	Profiler.profileBegin("Highlighting")
-	UpdateColors()
-	Profiler.profileEnd()
+	--> Perform parser/lexer work after typing settles.
+	ScheduleSourceRefresh()
 
 	--> Update cursor after text change
 	PreviousCursorPosition = Input.CursorPosition

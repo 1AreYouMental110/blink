@@ -52,6 +52,14 @@ local ARGUMENTS: { [string]: Argument } = {
 		Aliases = { "-S", "--stats" },
 		Description = "Output compilation time statistics",
 	},
+	Doctor = {
+		Aliases = { "--doctor" },
+		Description = "Validate configuration, limits, auth, and output paths without writing files",
+	},
+	Benchmark = {
+		Aliases = { "--benchmark" },
+		Description = "Compare protocol v1 and v2 generation size/timing",
+	},
 }
 
 ---- Functions -----
@@ -122,7 +130,27 @@ if Arguments.Version then
 	return nil
 end
 
-if not Arguments.Watch then
+if Arguments.Doctor then
+	local CompileOptions: Compile.CompileOptions = {
+		Debug = (_G.RELEASE == nil) or Arguments.Statistics,
+		Silent = Arguments.Silent,
+		Compact = Arguments.Compact,
+		YesToEverything = Arguments.YesToAll,
+		OutputAbstractSyntaxTree = Arguments.OutputAst,
+	}
+
+	Compile.Doctor(Path, CompileOptions)
+elseif Arguments.Benchmark then
+	local CompileOptions: Compile.CompileOptions = {
+		Debug = (_G.RELEASE == nil) or Arguments.Statistics,
+		Silent = Arguments.Silent,
+		Compact = Arguments.Compact,
+		YesToEverything = Arguments.YesToAll,
+		OutputAbstractSyntaxTree = Arguments.OutputAst,
+	}
+
+	Compile.Benchmark(Path, CompileOptions)
+elseif not Arguments.Watch then
 	local CompileOptions: Compile.CompileOptions = {
 		Debug = (_G.RELEASE == nil) or Arguments.Statistics,
 		Silent = Arguments.Silent,

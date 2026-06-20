@@ -46,6 +46,12 @@ If no issues arise Blink will generate the following Folder containing your netw
 
 ![Output](/plugin/Output.png)
 
+The plugin respects `TypesOutput`, `ServerOutput`, and `ClientOutput` options as paths relative to the selected output destination. For example, `option ServerOutput = "Network/Server.luau"` writes or updates `Network.Server` under the selected instance.
+
+## Observability
+The toolbar includes a metrics panel that records the latest parse and generation time, generated output sizes, and the last generation error.
+Generated modules also expose `Stats()`, `Report()`, and `StartReporter(intervalSeconds)` so you can inspect bytes sent, bytes received, dropped packets, validation failures, rate-limit hits, and invoke queue state while tuning a game.
+
 ## Editor
 The editor is the center piece of the plugin, it has various rudimentary intellisense features built-in to help with your writing speed, and analysis to correct any mistakes.
 ![Editor](/plugin/Editor.png)

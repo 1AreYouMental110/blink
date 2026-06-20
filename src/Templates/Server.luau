@@ -1,6 +1,7 @@
 return [[local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local PlayersMap: {[Player]: any} = {}
 
 -- SPLIT --
 if not RunService:IsServer() then
@@ -23,25 +24,38 @@ if not Unreliable then
     Unreliable = UnreliableRemoteEvent
 end
 
-local PlayersMap: {[Player]: BufferSave} = {}
-
 Players.PlayerRemoving:Connect(function(Player)
     PlayersMap[Player] = nil
+    ClearPlayerRuntimeState(Player)
 end)
 
 local function StepReplication()
+    RunStateFlushers()
     for Player, Send in PlayersMap do
+        Load(Send)
+        FlushBits()
+        PlayersMap[Player] = Save()
+        Send = PlayersMap[Player]
         if Send.Cursor <= 0 then
             continue
         end
 
         local Buffer = buffer.create(Send.Cursor)
         buffer.copy(Buffer, 0, Send.Buffer, 0, Send.Cursor)
-        Reliable:FireClient(Player, Buffer, Send.Instances)
+        if RuntimeConfig.MaxReliablePacketBytes > 0 and Send.Cursor > RuntimeConfig.MaxReliablePacketBytes then
+            DropPacket(Player, "Reliable", "MaxPacketBytes", Send.Cursor)
+        elseif IsPlayerActive(Player) then
+            Reliable:FireClient(Player, Buffer, InstancePayload(Send.Instances))
+            TrackSend("Reliable", Send.Cursor, Player)
+        end
 
         Send.Size = 64
         Send.Cursor = 0
-        Send.Buffer = buffer.create(64)
+        Send.Buffer = AcquireBuffer(64)
+        Send.BitByte = 0
+        Send.BitCount = 0
+        Send.StringIds = {}
+        Send.NextStringId = 1
         table.clear(Send.Instances)
     end
 end

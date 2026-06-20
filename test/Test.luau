@@ -9,6 +9,8 @@ local Compiler = "init"
 local Sources = fs.readDir("./Sources")
 
 local COMPILE_TEST_FILE = "../../test/Sources/Test"
+local FORCE_COMPILE = table.find(process.args, "--compile") ~= nil
+local SKIP_COMPILE = table.find(process.args, "--no-compile") ~= nil
 
 local function OkPrint(Message: string)
 	stdio.write(`\r[{stdio.color("green")}OK{stdio.color("reset")}] {Message}\n`)
@@ -23,7 +25,7 @@ local function PrettyPrint(Color: stdio.Color, Message: string, DontReturn: bool
 	stdio.write(`{stdio.color(Color)}{Message}{not DontReturn and "\n" or ""}{stdio.color("reset")}`)
 end
 
-if stdio.prompt("confirm" :: "confirm", "Compile files?") then
+if FORCE_COMPILE or (not SKIP_COMPILE and stdio.prompt("confirm" :: "confirm", "Compile files?")) then
 	PrettyPrint("blue", "Clearing Network folder...")
 	if fs.isDir("../Network") then
 		fs.removeDir("../Network")
@@ -626,6 +628,35 @@ local function RunClosure(Name: string, Closure: () -> ())
 	end)
 end
 
+local function FireSignalSync(Signal, ...)
+	for _, Callback in Signal.Connections do
+		local Success, Error = pcall(Callback, ...)
+		if not Success then
+			ErrorPrint(`Malformed packet handler threw: {Error}`)
+		end
+	end
+end
+
+local function RandomBuffer(Size: number): buffer
+	local Buffer = buffer.create(Size)
+	for Offset = 0, Size - 1 do
+		buffer.writeu8(Buffer, Offset, math.random(0, 255))
+	end
+
+	return Buffer
+end
+
+local function DroppedTotal(Module): number
+	local Metrics = Module.Stats()
+	local DroppedPackets = Metrics.DroppedPackets or {}
+	local Total = 0
+	for _, Count in DroppedPackets do
+		Total += Count
+	end
+
+	return Total
+end
+
 --> Tests
 local Instance = setmetatable({
 	__typeof = "Instance",
@@ -666,6 +697,46 @@ FireAndExpect("Reliable Server", Server.ReliableServer, Client.ReliableServer, 1
 FireAndExpect("Unreliable Server", Server.UnreliableServer, Client.UnreliableServer, 1)
 FireAndExpect("Empty Reliable Server", Server.EmptyEvent, Client.EmptyEvent, nil)
 FireAndExpect("Empty Unreliable Server", Server.EmptyUnreliableEvent, Client.EmptyUnreliableEvent, nil)
+
+RunClosure("State Channel Snapshot And Patch", function()
+	local Updates = {}
+	local Disconnect = Client.PlayerState.On(function(Value, Version, Patch)
+		table.insert(Updates, {
+			Value = Value,
+			Version = Version,
+			Patch = Patch,
+		})
+	end)
+
+	Server.PlayerState.SetAll({
+		Health = 100,
+		Stamina = 80,
+		Equipped = "Sword",
+	})
+	task.wait(1 / 10)
+
+	local Snapshot = Client.PlayerState.Get()
+	assert(Snapshot, "Expected PlayerState snapshot")
+	assert(Snapshot.Health == 100, `Expected Health 100, got {Snapshot.Health}`)
+	assert(Snapshot.Stamina == 80, `Expected Stamina 80, got {Snapshot.Stamina}`)
+	assert(Snapshot.Equipped == "Sword", `Expected Equipped Sword, got {Snapshot.Equipped}`)
+	assert(Client.PlayerState.Version() == 1, `Expected version 1, got {Client.PlayerState.Version()}`)
+
+	Server.PlayerState.PatchAll({
+		Stamina = 50,
+	})
+	task.wait(1 / 10)
+
+	Snapshot = Client.PlayerState.Get()
+	assert(Snapshot, "Expected PlayerState snapshot after patch")
+	assert(Snapshot.Health == 100, `Expected Health 100 after patch, got {Snapshot.Health}`)
+	assert(Snapshot.Stamina == 50, `Expected Stamina 50 after patch, got {Snapshot.Stamina}`)
+	assert(Client.PlayerState.Version() == 2, `Expected version 2, got {Client.PlayerState.Version()}`)
+	assert(#Updates == 2, `Expected 2 channel updates, got {#Updates}`)
+	assert(Updates[2].Patch.Stamina == 50, "Expected patch payload to include Stamina")
+
+	Disconnect()
+end)
 
 FireAndExpect("Reliable Client", Client.ReliableClient, Server.ReliableClient, 1)
 FireAndExpect("Unreliable Client", Client.UnreliableClient, Server.UnreliableClient, 1)
@@ -1224,6 +1295,50 @@ RunClosure("Buffer (Default, Fixed, Bounded)", function()
 		local Serialised = Client.BoundedBuffer.Write(BoundedBuffer)
 		local Deserialised = Client.BoundedBuffer.Read(Serialised)
 		assert(Equals(BoundedBuffer, Deserialised), `Bounded buffer serdes failed`)
+	end
+end)
+
+RunClosure("Fuzz malformed packets", function()
+	Server.Configure({
+		ProtocolVersion = 2,
+		MaxReliablePacketBytes = 256,
+		MaxUnreliablePacketBytes = 256,
+		RateLimitPerSecond = 0,
+	})
+	Client.Configure({
+		ProtocolVersion = 2,
+		MaxReliablePacketBytes = 256,
+		MaxUnreliablePacketBytes = 256,
+		RateLimitPerSecond = 0,
+	})
+
+	local ServerReliable = ServerEnvironment.Instances.BLINK_RELIABLE_REMOTE.OnServerEvent
+	local ServerUnreliable = ServerEnvironment.Instances.BLINK_UNRELIABLE_REMOTE.OnServerEvent
+	local ClientReliable = ClientEnvironment.Instances.BLINK_RELIABLE_REMOTE.OnClientEvent
+	local ClientUnreliable = ClientEnvironment.Instances.BLINK_UNRELIABLE_REMOTE.OnClientEvent
+
+	local Before = DroppedTotal(Server) + DroppedTotal(Client)
+	local Oversized = buffer.create(257)
+	FireSignalSync(ServerReliable, Shared.Player, Oversized, {})
+	FireSignalSync(ClientReliable, Oversized, {})
+
+	local Empty = buffer.create(0)
+	FireSignalSync(ServerReliable, Shared.Player, Empty, { "not an instance" })
+	FireSignalSync(ServerReliable, Shared.Player, Empty, "not a table")
+	FireSignalSync(ClientReliable, Empty, { "not an instance" })
+	FireSignalSync(ClientReliable, Empty, "not a table")
+
+	for _ = 1, 128 do
+		local Packet = RandomBuffer(math.random(1, 96))
+		FireSignalSync(ServerReliable, Shared.Player, Packet, {})
+		FireSignalSync(ServerUnreliable, Shared.Player, Packet, {})
+		FireSignalSync(ClientReliable, Packet, {})
+		FireSignalSync(ClientUnreliable, Packet, {})
+	end
+
+	local After = DroppedTotal(Server) + DroppedTotal(Client)
+	if After <= Before then
+		ErrorPrint("Expected malformed packet fuzzing to record dropped packets.")
 	end
 end)
 

@@ -12,6 +12,7 @@ event MyEvent {
     From: Server,
     Type: Reliable,
     Call: SingleAsync,
+    Auth: "AlivePlayer",
     Data: f64
 }
 ```
@@ -42,6 +43,33 @@ Determines the listening API exposed on the receiving side.
 Determines the data that is sent through the event, can be any [type](./4-types.mdx).<br/>
 This field can be omitted if no data is required.
 
+#### `Auth`
+Names an auth rule for generated middleware. Register the rule at runtime with `blink.UseAuth(name, callback)`.
+If an auth rule returns false, the incoming event is dropped before the listener runs.
+
+```lua filename="server.luau" copy
+blink.UseAuth("AlivePlayer", function(context)
+    return context.Source.Character ~= nil
+end)
+```
+
+#### Guard Overrides
+Events can override runtime guardrails:
+
+```blink copy
+event Attack {
+    From: Client,
+    Type: Reliable,
+    Call: SingleAsync,
+    Auth: "AlivePlayer",
+    RateLimitPerSecond: 20,
+    RateLimitBurst: 40,
+    MaxQueuedEvents: 64,
+    MaxPacketBytes: 512,
+    Data: u16
+}
+```
+
 ##### Type Packs
 Multiple data values are supported through the usage of a type pack (commonly referred to as a tuple).
 Type packs can be defined as a list of [types](./4-types.mdx) seperated by a comma within parenthesis.<br/>
@@ -67,7 +95,10 @@ blink.MyEvent.Fire(Player, 5)
 blink.MyEvent.FireAll(5)
 blink.MyEvent.FireList({Player}, 5)
 blink.MyEvent.FireExcept(Player, 5)
+blink.MyEvent.FireGroup("RedTeam", 5)
 ```
+
+Client-origin events also expose `Predict(...)`, which sends the event and returns a local prediction id that can be passed to `blink.Prediction.Ack(id)` or `blink.Prediction.Rollback(id)`.
 
 ### Listening to an Event
 ```lua filename="client.luau" copy

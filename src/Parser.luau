@@ -25,7 +25,7 @@ local NumberRange = {
 
 type Token = Lexer.Token
 
-type Type = "Type" | "Event" | "Scope"
+type Type = "Type" | "Event" | "Function" | "Channel" | "Scope"
 type Node<Type, Body, Tokens> = {
 	Type: Type,
 	Name: string,
@@ -87,6 +87,26 @@ export type Options = {
 	WriteValidations: boolean?,
 	ManualReplication: boolean?,
 	RemoteScope: string?,
+	MaxPacketBytes: number?,
+	MaxReliablePacketBytes: number?,
+	MaxUnreliablePacketBytes: number?,
+	RateLimitPerSecond: number?,
+	RateLimitBurst: number?,
+	MaxQueuedEvents: number?,
+	MaxPendingInvokes: number?,
+	InvokeTimeoutSeconds: number?,
+	ExposeMetrics: boolean?,
+	EnableMiddleware: boolean?,
+	EnablePrediction: boolean?,
+	EnableStateChannels: boolean?,
+	UseEmptyInstanceOptimization: boolean?,
+	ProtocolVersion: number?,
+	UseVarints: boolean?,
+	UseBitPacking: boolean?,
+	UseStringDictionaries: boolean?,
+	UseBufferPooling: boolean?,
+	BufferPoolLimit: number?,
+	SecurityProfile: string?,
 }
 
 export type Body = Node<"Body", {
@@ -107,6 +127,7 @@ type Declarations =
 	| "Array"
 	| "Event"
 	| "Function"
+	| "Channel"
 	| "Scope"
 	| "Optional"
 export type TypeNode = | Map | Set | Enum | TagEnum | Tuple | Struct | Primitive | Generic | Array | Optional
@@ -166,12 +187,41 @@ export type Event = Node<"Event", {
 	Type: "Reliable" | "Unreliable",
 	Call: "SingleSync" | "SingleAsync" | "ManySync" | "ManyAsync" | "Polling",
 	Data: (TypeNode | Tuple)?,
+	MaxPacketBytes: number?,
+	RateLimitPerSecond: number?,
+	RateLimitBurst: number?,
+	MaxQueuedEvents: number?,
+	Predict: boolean?,
+	Auth: string?,
 }, {}>
 
 export type Function = Node<"Function", {
 	Yield: "Future" | "Promise" | "Coroutine",
 	Data: (TypeNode | Tuple)?,
 	Return: (TypeNode | Tuple)?,
+	MaxPacketBytes: number?,
+	RateLimitPerSecond: number?,
+	RateLimitBurst: number?,
+	MaxQueuedEvents: number?,
+	MaxPendingInvokes: number?,
+	InvokeTimeoutSeconds: number?,
+	Auth: string?,
+}, {}>
+
+export type Channel = Node<"Channel", {
+	Scope: "Player" | "Global" | "Group",
+	Type: "Reliable" | "Unreliable",
+	TickRate: number?,
+	Delta: boolean?,
+	KeyframeRate: number?,
+	Interest: "None" | "Zone" | "Distance"?,
+	InterestRadius: number?,
+	Data: TypeNode,
+	MaxPacketBytes: number?,
+	RateLimitPerSecond: number?,
+	RateLimitBurst: number?,
+	MaxQueuedEvents: number?,
+	Auth: string?,
 }, {}>
 
 export type ScopeNode = Node<"Scope", {
@@ -195,6 +245,26 @@ local OPTIONS: { [string]: Lexer.Types } = {
 	WriteValidations = "Boolean",
 	ManualReplication = "Boolean",
 	RemoteScope = "String",
+	MaxPacketBytes = "Number",
+	MaxReliablePacketBytes = "Number",
+	MaxUnreliablePacketBytes = "Number",
+	RateLimitPerSecond = "Number",
+	RateLimitBurst = "Number",
+	MaxQueuedEvents = "Number",
+	MaxPendingInvokes = "Number",
+	InvokeTimeoutSeconds = "Number",
+	ExposeMetrics = "Boolean",
+	EnableMiddleware = "Boolean",
+	EnablePrediction = "Boolean",
+	EnableStateChannels = "Boolean",
+	UseEmptyInstanceOptimization = "Boolean",
+	ProtocolVersion = "Number",
+	UseVarints = "Boolean",
+	UseBitPacking = "Boolean",
+	UseStringDictionaries = "Boolean",
+	UseBufferPooling = "Boolean",
+	BufferPoolLimit = "Number",
+	SecurityProfile = "Identifier",
 }
 
 local EVENT: { EventOption } = {
@@ -203,12 +273,41 @@ local EVENT: { EventOption } = {
 	{ Key = "Call", Type = "Identifier", Values = { "SingleSync", "SingleAsync", "ManySync", "ManyAsync", "Polling" } },
 	{ Key = "Poll", Type = "Boolean", Values = { true, false }, Optional = true },
 	{ Key = "Data", Type = "Identifier", Values = {}, Optional = true },
+	{ Key = "MaxPacketBytes", Type = "Number", Values = {}, Optional = true },
+	{ Key = "RateLimitPerSecond", Type = "Number", Values = {}, Optional = true },
+	{ Key = "RateLimitBurst", Type = "Number", Values = {}, Optional = true },
+	{ Key = "MaxQueuedEvents", Type = "Number", Values = {}, Optional = true },
+	{ Key = "Predict", Type = "Boolean", Values = { true, false }, Optional = true },
+	{ Key = "Auth", Type = "String", Values = {}, Optional = true },
 }
 
 local FUNCTION: { EventOption } = {
 	{ Key = "Yield", Type = "Identifier", Values = { "Future", "Promise", "Coroutine" } },
 	{ Key = "Data", Type = "Identifier", Values = {}, Optional = true },
 	{ Key = "Return", Type = "Identifier", Values = {}, Optional = true },
+	{ Key = "MaxPacketBytes", Type = "Number", Values = {}, Optional = true },
+	{ Key = "RateLimitPerSecond", Type = "Number", Values = {}, Optional = true },
+	{ Key = "RateLimitBurst", Type = "Number", Values = {}, Optional = true },
+	{ Key = "MaxQueuedEvents", Type = "Number", Values = {}, Optional = true },
+	{ Key = "MaxPendingInvokes", Type = "Number", Values = {}, Optional = true },
+	{ Key = "InvokeTimeoutSeconds", Type = "Number", Values = {}, Optional = true },
+	{ Key = "Auth", Type = "String", Values = {}, Optional = true },
+}
+
+local CHANNEL: { EventOption } = {
+	{ Key = "Scope", Type = "Identifier", Values = { "Player", "Global", "Group" }, Optional = true },
+	{ Key = "Type", Type = "Identifier", Values = { "Reliable", "Unreliable" }, Optional = true },
+	{ Key = "TickRate", Type = "Number", Values = {}, Optional = true },
+	{ Key = "Delta", Type = "Boolean", Values = { true, false }, Optional = true },
+	{ Key = "KeyframeRate", Type = "Number", Values = {}, Optional = true },
+	{ Key = "Interest", Type = "Identifier", Values = { "None", "Zone", "Distance" }, Optional = true },
+	{ Key = "InterestRadius", Type = "Number", Values = {}, Optional = true },
+	{ Key = "Data", Type = "Identifier", Values = {} },
+	{ Key = "MaxPacketBytes", Type = "Number", Values = {}, Optional = true },
+	{ Key = "RateLimitPerSecond", Type = "Number", Values = {}, Optional = true },
+	{ Key = "RateLimitBurst", Type = "Number", Values = {}, Optional = true },
+	{ Key = "MaxQueuedEvents", Type = "Number", Values = {}, Optional = true },
+	{ Key = "Auth", Type = "String", Values = {}, Optional = true },
 }
 
 type Bucket = "Types" | "Scopes"
@@ -217,6 +316,7 @@ local BUCKETS: { [string]: Bucket } = {
 	Type = "Types",
 	Event = "Scopes",
 	Function = "Scopes",
+	Channel = "Scopes",
 	Scope = "Scopes",
 }
 
@@ -267,6 +367,12 @@ local KEYWORDS: { [string]: Keyword } = {
 	["function"] = {
 		Type = "Function",
 		Class = "Function",
+		Generics = false,
+		Exportable = false,
+	},
+	channel = {
+		Type = "Channel",
+		Class = "Channel",
 		Generics = false,
 		Exportable = false,
 	},
@@ -1017,6 +1123,8 @@ function Parser.Declarations(self: Parser): { Declaration }
 			Declaration = self:Event(Name)
 		elseif Type == "Function" then
 			Declaration = self:Function(Name)
+		elseif Type == "Channel" then
+			Declaration = self:Channel(Name)
 		elseif Type == "Scope" then
 			Declaration = self:Namespace(Name)
 		end
@@ -1114,7 +1222,7 @@ function Parser.Structure(self: Parser, Name: Token, Structure: { EventOption })
 			local Token = self:Consume(Option.Type)
 			Value = Token.Value
 
-			if not table.find(Option.Values, Value) then
+			if #Option.Values > 0 and not table.find(Option.Values, Value) then
 				Error.new(Error.ParserUnknownOption, self.Source, `Unknown option "{Value}"`, self.File)
 					:Primary(Token, `Expected one of "{table.concat(Option.Values, `" or "`)}"`)
 					:Emit()
@@ -1171,6 +1279,12 @@ function Parser.Event(self: Parser, Name: Token): Event
 			Type = Structure.Type,
 			Call = Call,
 			Data = Structure.Data,
+			MaxPacketBytes = Structure.MaxPacketBytes,
+			RateLimitPerSecond = Structure.RateLimitPerSecond,
+			RateLimitBurst = Structure.RateLimitBurst,
+			MaxQueuedEvents = Structure.MaxQueuedEvents,
+			Predict = Structure.Predict,
+			Auth = Structure.Auth,
 		},
 		Tokens = {},
 	}
@@ -1186,6 +1300,38 @@ function Parser.Function(self: Parser, Name: Token): Function
 			Yield = Structure.Yield,
 			Data = Structure.Data,
 			Return = Structure.Return,
+			MaxPacketBytes = Structure.MaxPacketBytes,
+			RateLimitPerSecond = Structure.RateLimitPerSecond,
+			RateLimitBurst = Structure.RateLimitBurst,
+			MaxQueuedEvents = Structure.MaxQueuedEvents,
+			MaxPendingInvokes = Structure.MaxPendingInvokes,
+			InvokeTimeoutSeconds = Structure.InvokeTimeoutSeconds,
+			Auth = Structure.Auth,
+		},
+		Tokens = {},
+	}
+end
+
+function Parser.Channel(self: Parser, Name: Token): Channel
+	local Structure = self:Structure(Name, CHANNEL)
+
+	return {
+		Type = "Channel",
+		Name = Name.Value,
+		Value = {
+			Scope = Structure.Scope or "Player",
+			Type = Structure.Type or "Reliable",
+			TickRate = Structure.TickRate,
+			Delta = Structure.Delta,
+			KeyframeRate = Structure.KeyframeRate,
+			Interest = Structure.Interest,
+			InterestRadius = Structure.InterestRadius,
+			Data = Structure.Data,
+			MaxPacketBytes = Structure.MaxPacketBytes,
+			RateLimitPerSecond = Structure.RateLimitPerSecond,
+			RateLimitBurst = Structure.RateLimitBurst,
+			MaxQueuedEvents = Structure.MaxQueuedEvents,
+			Auth = Structure.Auth,
 		},
 		Tokens = {},
 	}

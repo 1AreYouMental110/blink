@@ -12,11 +12,11 @@ end
 
 local function Fire(Reliable: boolean, ...)
 	local Arguments = { ... }
-	local Buffer = #Arguments == 2 and Arguments[1] or Arguments[2]
+	local Buffer = if typeof(Arguments[1]) == "buffer" then Arguments[1] else Arguments[2]
 	local Instances = Arguments[#Arguments]
 
 	Buffer = Clone(Buffer)
-	Instances = table.clone(Instances)
+	Instances = if typeof(Instances) == "table" then table.clone(Instances) else {}
 
 	Shared.Bridge:Fire("Client", Reliable and "BLINK_RELIABLE_REMOTE" or "BLINK_UNRELIABLE_REMOTE", Buffer, Instances)
 end

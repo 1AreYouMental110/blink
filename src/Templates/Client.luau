@@ -10,18 +10,28 @@ local Reliable: RemoteEvent = ReplicatedStorage:WaitForChild(BASE_EVENT_NAME .. 
 local Unreliable: UnreliableRemoteEvent = ReplicatedStorage:WaitForChild(BASE_EVENT_NAME .. "_UNRELIABLE_REMOTE") :: UnreliableRemoteEvent
 
 local function StepReplication()
+    FlushBits()
     if SendCursor <= 0 then
         return
     end
 
     local Buffer = buffer.create(SendCursor)
     buffer.copy(Buffer, 0, SendBuffer, 0, SendCursor)
-    Reliable:FireServer(Buffer, SendInstances)
+    if RuntimeConfig.MaxReliablePacketBytes > 0 and SendCursor > RuntimeConfig.MaxReliablePacketBytes then
+        DropPacket("Client", "Reliable", "MaxPacketBytes", SendCursor)
+    else
+        Reliable:FireServer(Buffer, InstancePayload(SendInstances))
+        TrackSend("Reliable", SendCursor, nil)
+    end
 
     SendSize = 64
     SendCursor = 0
     SendOffset = 0
-    SendBuffer = buffer.create(64)
+    SendBuffer = AcquireBuffer(64)
     table.clear(SendInstances)
+    SendBitByte = 0
+    SendBitCount = 0
+    SendStringIds = {}
+    NextSendStringId = 1
 end
 ]]

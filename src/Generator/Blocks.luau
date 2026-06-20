@@ -46,7 +46,7 @@ function Block.new<Parent>(Parent: Block?, Unique: string?): Block
 		Parent = Parent,
 		Indent = Indent,
 		Cursor = 1,
-		Unsafe = false,
+		Unsafe = if Parent then Parent.Unsafe else false,
 		Content = table.create(64),
 		Operation = {
 			Method = "None",

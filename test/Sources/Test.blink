@@ -6,6 +6,12 @@ option ServerOutput = "../../Network/Server.luau"
 option SyncValidation = true
 option WriteValidations = true
 option ManualReplication = false
+option MaxPacketBytes = 1048576
+option MaxUnreliablePacketBytes = 1000
+option RateLimitPerSecond = 0
+option MaxQueuedEvents = 256
+option MaxPendingInvokes = 256
+option InvokeTimeoutSeconds = 0
 
 import "./Indexers"
 import "./Sub-Sources/Source"
@@ -125,6 +131,20 @@ struct Example {
     }
 }
 
+struct PlayerStateData {
+    Health: u8,
+    Stamina: u8,
+    Equipped: string(0..32)?
+}
+
+channel PlayerState {
+    Scope: Player,
+    TickRate: 20,
+    Delta: true,
+    Data: PlayerStateData,
+    MaxQueuedEvents: 128
+}
+
 set PrimitiveFlag = {
     CFrame
 }
@@ -165,6 +185,9 @@ event SendOccupiedCell {
     From: Server,
     Type: Reliable,
     Call: SingleSync,
+    RateLimitPerSecond: 120,
+    RateLimitBurst: 240,
+    MaxQueuedEvents: 128,
     Data: IntegerVector
 }
 
@@ -487,6 +510,8 @@ event ReferenceOptional {
 
 function RemoteFunction {
     Yield: Coroutine,
+    InvokeTimeoutSeconds: 10,
+    MaxPendingInvokes: 128,
     Data: u8,
     Return: u8
 }
