@@ -41,10 +41,14 @@ local replay = Network.Capture.Replay(entries, {
         print(entry.PayloadSummary)
     end,
 })
+local rawReplay = Network.Capture.ReplayRaw(entries)
 Network.Capture.Stop()
 ```
 
 Entries include event name, direction, source or target, user id when available, payload size, accepted or dropped status, drop reason, timing, protocol version, schema version, and a redacted payload summary.
+Accepted and dropped entries also keep a cloned raw packet buffer so `ReplayRaw` can inject recorded bytes through the generated receive path. That mode exercises framing recovery, malformed packet drops, and decode behavior closer to wire replay than handler-only replay.
+
+Use `option CaptureRedactions = "Password,Token"` for schema-level defaults, `Capture.Start({ Redactions = ... })` for a capture-local override, or `Network.Capture.Redact(...)` at runtime. Redactions match field names inside payload summaries; raw buffers are retained for replay and should be stored with the same access controls as production packet captures.
 
 ## Inspector
 
@@ -116,6 +120,7 @@ option SecurityProfile = Production
 ```
 
 Strict mode fails on missing auth for client-to-server events, unlimited packet sizes, missing invoke timeout, missing rate limits, debug validation in production, unsafe output paths, and incompatible protocol settings.
+Diagnostics include the source file, line, and column when the option or declaration can be located.
 
 ## CI reports
 
@@ -129,6 +134,15 @@ blink config --capture-replay --yes
 blink config --golden-snapshots --yes
 blink config --compatibility --yes
 blink config --schema-docs --yes
+blink config --ci --yes
 ```
 
-`--load-sim` reports generated traffic estimates for 10, 50, 100, and 200 clients. `--golden-snapshots` prints schema and wire-hash metadata for snapshot review. Runtime tests should still lock exact bytes for representative exported serializers.
+`--ci` runs doctor, benchmark, load-sim, capture-replay, golden-snapshots, compatibility, and schema-docs in one noninteractive pass. `--load-sim` reports generated traffic estimates for 10, 50, 100, and 200 clients. `--golden-snapshots` prints schema and wire-hash metadata for snapshot review. Runtime tests should still lock exact bytes for representative exported serializers and wire features such as nested structs, maps and sets, optionals, dictionaries, invokes, prediction acks, and state deltas.
+
+In this repository, the full noninteractive validation command is:
+
+```sh
+lune run Test -- --ci
+```
+
+Run it from the `test` directory. It compiles the fixtures, runs the runtime tests, and verifies every CI report mode.

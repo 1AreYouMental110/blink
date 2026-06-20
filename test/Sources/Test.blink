@@ -15,6 +15,7 @@ option InvokeTimeoutSeconds = 0
 option Version = 2
 option MinimumSchemaVersion = 1
 option ProtocolMode = Negotiated
+option CaptureRedactions = "Secret,Token,Password"
 option CaptureLimit = 256
 
 import "./Indexers"
@@ -62,6 +63,7 @@ enum States = { A, B, C, D }
 
 set Flags8 = {F1, F2, F3, F4, F5, F6, F7, F8}
 export set GoldenFlags8 = {F1, F2, F3, F4, F5, F6, F7, F8}
+export set GoldenSet = {Alpha, Beta, Gamma}
 set Flags16 = {F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16}
 set Flags32 = {F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24, F25, F26, F27, F28, F29, F30, F31, F32}
 set Flags33 = {F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, F24, F25, F26, F27, F28, F29, F30, F31, F32, F33}
@@ -73,6 +75,7 @@ struct StructOfFlags {
 }
 
 map MapSimple = {[string]: u8}
+export map GoldenMap = {[string(0..16)]: u8}
 map MapComplex = {[string(0..20)]: u8(0..100)[8]}
 map MapReference = {[States]: States}?
 export map MapNested = {[MapSimple]: MapSimple}
@@ -135,6 +138,18 @@ struct Example {
         OptionalArray: u8[2]?
     }
 }
+
+export struct GoldenNested {
+    A: u8,
+    B: struct {
+        C: u16,
+        D: string(0..16)
+    },
+    E: u8[3],
+    F: u16?
+}
+
+export type GoldenOptional = u16?
 
 struct PlayerStateData {
     Health: u8,
@@ -434,6 +449,17 @@ event ReliableServer {
     Type: Reliable,
     Call: SingleSync,
     Data: u8
+}
+
+event SensitiveEvent {
+    From: Server,
+    Type: Reliable,
+    Call: SingleSync,
+    Data: struct {
+        Secret: string(0..16),
+        Token: string(0..16),
+        Public: u8
+    }
 }
 
 event ReliableServerAsync {

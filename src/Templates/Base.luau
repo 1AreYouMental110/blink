@@ -16,6 +16,7 @@ local RecieveSource: any = nil
 local RecieveChannel = "Reliable"
 local RecieveBitByte = 0
 local RecieveBitCount = 0
+local RecieveMessageStart = 0
 local RecieveFrameEnd = 0
 local RecieveFrameInstanceEnd = 0
 local RecievePredictionId: number? = nil
@@ -159,6 +160,55 @@ local SchemaRenames: {[string]: string} = {}
 local SchemaDeprecated: {[string]: true} = {}
 local RuntimeSupport = {}
 
+local function CloneBuffer(Source: buffer?, Start: number?, Size: number?): buffer?
+    if Source == nil then
+        return nil
+    end
+
+    local Offset = Start or 0
+    local Length = Size or (buffer.len(Source) - Offset)
+    local Target = buffer.create(Length)
+    buffer.copy(Target, 0, Source, Offset, Length)
+    return Target
+end
+
+local function CloneArray(Source: {any}?): {any}?
+    if Source == nil then
+        return nil
+    end
+
+    local Result = {}
+    for Index, Value in Source do
+        Result[Index] = Value
+    end
+    return Result
+end
+
+function RuntimeSupport.SetCaptureRedactions(Redactions: any)
+    table.clear(CaptureState.Redactions)
+
+    if Redactions == nil or Redactions == "" then
+        return
+    end
+
+    if type(Redactions) == "string" then
+        for _, Field in string.split(Redactions, ",") do
+            Field = string.gsub(Field, "^%s+", "")
+            Field = string.gsub(Field, "%s+$", "")
+            if Field ~= "" then
+                CaptureState.Redactions[Field] = true
+            end
+        end
+        return
+    end
+
+    for _, Field in Redactions do
+        CaptureState.Redactions[tostring(Field)] = true
+    end
+end
+
+RuntimeSupport.SetCaptureRedactions(RuntimeConfig.CaptureRedactions)
+
 local function MetricAdd(BucketName: string, Key: string, Amount: number?)
     local Bucket = Metrics[BucketName]
     Bucket[Key] = (Bucket[Key] or 0) + (Amount or 1)
@@ -210,6 +260,17 @@ function RuntimeSupport.RecordCapture(Entry: {[string]: any})
         return
     end
 
+    if Entry.RawBuffer ~= nil then
+        Entry.Buffer = CloneBuffer(Entry.RawBuffer, Entry.RawBufferStart, Entry.RawBufferSize)
+        Entry.RawBuffer = nil
+        Entry.RawBufferStart = nil
+        Entry.RawBufferSize = nil
+    end
+    if Entry.RawInstances ~= nil then
+        Entry.Instances = CloneArray(Entry.RawInstances)
+        Entry.RawInstances = nil
+    end
+
     Entry.Time = os.clock()
     Entry.ProtocolVersion = ActiveProtocolVersion or SendProtocolVersion or RuntimeConfig.ProtocolVersion
     Entry.SchemaVersion = RuntimeConfig.SchemaVersion
@@ -232,10 +293,7 @@ function RuntimeSupport.StartCapture(Options: {[string]: any}?)
             CaptureState.Limit = Options.Limit
         end
         if Options.Redactions then
-            table.clear(CaptureState.Redactions)
-            for _, Field in Options.Redactions do
-                CaptureState.Redactions[tostring(Field)] = true
-            end
+            RuntimeSupport.SetCaptureRedactions(Options.Redactions)
         end
     end
 end
@@ -269,6 +327,36 @@ function RuntimeSupport.ReplayCapture(Entries: {{[string]: any}}, Handlers: {[st
         local Handler = Handlers and Handlers[Entry.Name]
         if Handler then
             Handler(Entry)
+            Result.Replayed += 1
+        end
+    end
+
+    return Result
+end
+
+function RuntimeSupport.ReplayRawCapture(Entries: {{[string]: any}}, Injector: (({[string]: any}, buffer, {any}?) -> ())?)
+    local Result = {
+        Accepted = 0,
+        Dropped = 0,
+        Replayed = 0,
+        MissingRaw = 0
+    }
+
+    for _, Entry in Entries do
+        if Entry.Status == "dropped" then
+            Result.Dropped += 1
+        else
+            Result.Accepted += 1
+        end
+
+        local RawBuffer = Entry.Buffer or Entry.RawBuffer
+        if typeof(RawBuffer) ~= "buffer" then
+            Result.MissingRaw += 1
+            continue
+        end
+
+        if Injector then
+            Injector(Entry, RawBuffer, Entry.Instances or Entry.RawInstances)
             Result.Replayed += 1
         end
     end
@@ -320,7 +408,9 @@ local function DropPacket(Source: any, Channel: string, Reason: string, Size: nu
         Channel = Channel,
         Status = "dropped",
         Reason = Reason,
-        Size = Size or 0
+        Size = Size or 0,
+        RawBuffer = if typeof(RecieveBuffer) == "buffer" then RecieveBuffer else nil,
+        RawInstances = RecieveInstances
     })
 
     RunHooks("Drop", {
@@ -392,6 +482,7 @@ local function Configure(Options: {[string]: any})
     end
 
     CaptureState.Limit = RuntimeConfig.CaptureLimit
+    RuntimeSupport.SetCaptureRedactions(RuntimeConfig.CaptureRedactions)
     if ResetProtocolState then
         table.clear(PeerCapabilities)
         table.clear(PeerHandshakesSent)
@@ -758,7 +849,11 @@ local function TrackEventSend(Name: string, Channel: string, Size: number, Targe
         Channel = Channel,
         Status = "accepted",
         Size = Size,
-        Payload = Payload
+        Payload = Payload,
+        RawBuffer = SendBuffer,
+        RawBufferStart = SendCursor - Size,
+        RawBufferSize = Size,
+        RawInstances = SendInstances
     })
     RunHooks("AfterSend", {
         Name = Name,
@@ -778,7 +873,11 @@ local function TrackEventReceive(Name: string, Channel: string, Size: number, So
         Channel = Channel,
         Status = "accepted",
         Size = Size,
-        Payload = Payload
+        Payload = Payload,
+        RawBuffer = RecieveBuffer,
+        RawBufferStart = RecieveMessageStart,
+        RawBufferSize = RecieveCursor - RecieveMessageStart,
+        RawInstances = RecieveInstances
     })
     RunHooks("AfterReceive", {
         Name = Name,
@@ -1037,6 +1136,7 @@ end
 
 local function BeginReadMessage(PacketSize: number): number?
     AlignReadBits()
+    RecieveMessageStart = RecieveCursor
     RecieveFrameEnd = 0
     RecieveFrameInstanceEnd = RecieveInstanceCursor
     RecievePredictionId = nil
@@ -1069,6 +1169,7 @@ end
 local function EndReadMessage()
     if not UseProtocolV2() or RecieveFrameEnd <= 0 then
         ActiveProtocolVersion = nil
+        RecieveMessageStart = 0
         return
     end
 
@@ -1079,6 +1180,7 @@ local function EndReadMessage()
     RecieveFrameInstanceEnd = RecieveInstanceCursor
     RecievePredictionId = nil
     ActiveProtocolVersion = nil
+    RecieveMessageStart = 0
 end
 
 local function RecoverMessage()
@@ -1093,6 +1195,7 @@ local function RecoverMessage()
     RecieveFrameInstanceEnd = RecieveInstanceCursor
     RecievePredictionId = nil
     ActiveProtocolVersion = nil
+    RecieveMessageStart = 0
 end
 
 local function WriteStringValue(Value: string, LengthBytes: number)

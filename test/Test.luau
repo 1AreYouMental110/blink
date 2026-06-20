@@ -9,6 +9,7 @@ local Compiler = "init"
 local Sources = fs.readDir("./Sources")
 
 local COMPILE_TEST_FILE = "../../test/Sources/Test"
+local CI_MODE = table.find(process.args, "--ci") ~= nil
 local FORCE_COMPILE = table.find(process.args, "--compile") ~= nil
 local SKIP_COMPILE = table.find(process.args, "--no-compile") ~= nil
 
@@ -25,7 +26,7 @@ local function PrettyPrint(Color: stdio.Color, Message: string, DontReturn: bool
 	stdio.write(`{stdio.color(Color)}{Message}{not DontReturn and "\n" or ""}{stdio.color("reset")}`)
 end
 
-if FORCE_COMPILE or (not SKIP_COMPILE and stdio.prompt("confirm" :: "confirm", "Compile files?")) then
+if CI_MODE or FORCE_COMPILE or (not SKIP_COMPILE and stdio.prompt("confirm" :: "confirm", "Compile files?")) then
 	PrettyPrint("blue", "Clearing Network folder...")
 	if fs.isDir("../Network") then
 		fs.removeDir("../Network")
@@ -641,6 +642,52 @@ local function FireSignalSync(Signal, ...)
 	end
 end
 
+local function CloneBuffer(Source: buffer): buffer
+	local Size = buffer.len(Source)
+	local Target = buffer.create(Size)
+	buffer.copy(Target, 0, Source, 0, Size)
+	return Target
+end
+
+local function InstallScopedRemote(RemoteName: string)
+	ClientEnvironment.Instances[RemoteName] = {
+		FireServer = function(_self, Buffer, Instances)
+			Shared.Bridge:Fire(
+				"Client",
+				RemoteName,
+				CloneBuffer(Buffer),
+				if typeof(Instances) == "table" then table.clone(Instances) else {}
+			)
+		end,
+		OnClientEvent = Shared.Signal.new(),
+	}
+
+	ServerEnvironment.Instances[RemoteName] = {
+		FireClient = function(_self, _Player, Buffer, Instances)
+			Shared.Bridge:Fire(
+				"Server",
+				RemoteName,
+				CloneBuffer(Buffer),
+				if typeof(Instances) == "table" then table.clone(Instances) else {}
+			)
+		end,
+		FireAllClients = function(_self, Buffer, Instances)
+			Shared.Bridge:Fire(
+				"Server",
+				RemoteName,
+				CloneBuffer(Buffer),
+				if typeof(Instances) == "table" then table.clone(Instances) else {}
+			)
+		end,
+		OnServerEvent = Shared.Signal.new(),
+	}
+end
+
+local function InstallRemoteScope(Scope: string)
+	InstallScopedRemote(`{Scope}_BLINK_RELIABLE_REMOTE`)
+	InstallScopedRemote(`{Scope}_BLINK_UNRELIABLE_REMOTE`)
+end
+
 local function RandomBuffer(Size: number): buffer
 	local Buffer = buffer.create(Size)
 	for Offset = 0, Size - 1 do
@@ -650,18 +697,47 @@ local function RandomBuffer(Size: number): buffer
 	return Buffer
 end
 
+local BufferBytes: (buffer) -> { number }
+
 local function ExpectBytes(Name: string, Buffer: buffer, Expected: { number })
 	if buffer.len(Buffer) ~= #Expected then
-		ErrorPrint(`Golden snapshot "{Name}" expected {#Expected} bytes, got {buffer.len(Buffer)}.`)
+		ErrorPrint(
+			`Golden snapshot "{Name}" expected {#Expected} bytes, got {buffer.len(Buffer)}: {Format(BufferBytes(Buffer))}.`
+		)
 	end
 
 	for Offset = 0, #Expected - 1 do
 		local Got = buffer.readu8(Buffer, Offset)
 		local Expect = Expected[Offset + 1]
 		if Got ~= Expect then
-			ErrorPrint(`Golden snapshot "{Name}" byte {Offset} expected {Expect}, got {Got}.`)
+			ErrorPrint(
+				`Golden snapshot "{Name}" byte {Offset} expected {Expect}, got {Got}. Full bytes: {Format(
+					BufferBytes(Buffer)
+				)}.`
+			)
 		end
 	end
+end
+
+function BufferBytes(Buffer: buffer): { number }
+	local Bytes = {}
+	for Offset = 0, buffer.len(Buffer) - 1 do
+		table.insert(Bytes, buffer.readu8(Buffer, Offset))
+	end
+	return Bytes
+end
+
+local function FindCaptureBuffer(Entries: { any }, Name: string, Direction: string, Status: string?): buffer
+	local Seen = {}
+	for _, Entry in Entries do
+		table.insert(Seen, `{tostring(Entry.Name)}:{tostring(Entry.Direction)}:{tostring(Entry.Status)}`)
+		if Entry.Name == Name and Entry.Direction == Direction and (Status == nil or Entry.Status == Status) then
+			assert(typeof(Entry.Buffer) == "buffer", `Expected capture entry {Name}/{Direction} to include raw buffer.`)
+			return Entry.Buffer
+		end
+	end
+
+	error(`Expected capture entry {Name}/{Direction}. Saw: {table.concat(Seen, ", ")}`)
 end
 
 local function DroppedTotal(Module): number
@@ -1070,9 +1146,30 @@ RunClosure("CLI compile --yes", function()
 end)
 
 RunClosure("CI utility modes", function()
-	for _, Flag in { "--doctor", "--benchmark", "--load-sim", "--capture-replay", "--golden-snapshots", "--compatibility", "--schema-docs" } do
-		local Result = process.exec("lune", { "run", Compiler, COMPILE_TEST_FILE, "--", Flag, "--yes" }, { cwd = "../src/CLI" })
+	for _, Flag in
+		{
+			"--doctor",
+			"--benchmark",
+			"--load-sim",
+			"--capture-replay",
+			"--golden-snapshots",
+			"--compatibility",
+			"--schema-docs",
+			"--ci",
+		}
+	do
+		local Result = process.exec(
+			"lune",
+			{ "run", Compiler, COMPILE_TEST_FILE, "--", Flag, "--yes" },
+			{ cwd = "../src/CLI" }
+		)
 		assert(Result.ok, `{Flag} failed:\n{Result.stderr}`)
+		if Flag == "--schema-docs" then
+			assert(
+				string.find(Result.stdout, "Secret,Token,Password", 1, true),
+				"Expected schema docs to include capture redactions."
+			)
+		end
 	end
 
 	local StrictResult = process.exec(
@@ -1081,6 +1178,10 @@ RunClosure("CI utility modes", function()
 		{ cwd = "../src/CLI" }
 	)
 	assert(not StrictResult.ok, "Expected strict production mode to reject StrictBad.blink.")
+	assert(
+		string.find(`{StrictResult.stdout}\n{StrictResult.stderr}`, "StrictBad.blink:%d+:%d+") ~= nil,
+		"Expected strict diagnostics to include file, line, and column."
+	)
 end)
 
 RunClosure("Protocol negotiation accepts mixed v1 and v2", function()
@@ -1157,10 +1258,94 @@ RunClosure("Protocol negotiation accepts mixed v1 and v2", function()
 	})
 end)
 
+RunClosure("Real mixed-version generated fixtures", function()
+	for _, Fixture in { "MixedLegacy", "MixedNegotiated" } do
+		local Result = process.exec(
+			"lune",
+			{ "run", Compiler, `../../test/Sources/{Fixture}`, "--", "--yes" },
+			{ cwd = "../src/CLI" }
+		)
+		assert(Result.ok, `{Fixture} failed to compile:\n{Result.stderr}`)
+	end
+
+	InstallRemoteScope("MIXED")
+
+	local MixedLegacyClient = MockRequire("../Network/MixedLegacy/Client.luau", {
+		game = ClientEnvironment.game,
+		Color3 = ClientEnvironment.Color3,
+		DateTime = ClientEnvironment.DateTime,
+		BrickColor = ClientEnvironment.BrickColor,
+	})
+	local MixedLegacyServer = MockRequire("../Network/MixedLegacy/Server.luau", {
+		game = ServerEnvironment.game,
+		Color3 = ServerEnvironment.Color3,
+		DateTime = ServerEnvironment.DateTime,
+		BrickColor = ServerEnvironment.BrickColor,
+	})
+	local MixedNegotiatedClient = MockRequire("../Network/MixedNegotiated/Client.luau", {
+		game = ClientEnvironment.game,
+		Color3 = ClientEnvironment.Color3,
+		DateTime = ClientEnvironment.DateTime,
+		BrickColor = ClientEnvironment.BrickColor,
+	})
+	local MixedNegotiatedServer = MockRequire("../Network/MixedNegotiated/Server.luau", {
+		game = ServerEnvironment.game,
+		Color3 = ServerEnvironment.Color3,
+		DateTime = ServerEnvironment.DateTime,
+		BrickColor = ServerEnvironment.BrickColor,
+	})
+
+	do
+		local Result
+		local Disconnect = MixedNegotiatedServer.PingClient.On(function(Player, Value)
+			assert(tostring(Player) == "Player", `Expected Player source, got {Player}.`)
+			Result = Value
+		end)
+
+		MixedLegacyClient.PingClient.Fire(31)
+		MixedLegacyClient.StepReplication()
+		task.wait(1 / 30)
+		assert(Result == 31, `Expected negotiated server to decode legacy fixture packet, got {Result}.`)
+		Disconnect()
+	end
+
+	do
+		local Result
+		local Disconnect = MixedNegotiatedClient.PingServer.On(function(Value)
+			Result = Value
+		end)
+
+		MixedLegacyServer.PingServer.FireAll(32)
+		MixedLegacyServer.StepReplication()
+		task.wait(1 / 30)
+		assert(Result == 32, `Expected negotiated client to decode legacy fixture packet, got {Result}.`)
+		Disconnect()
+	end
+
+	do
+		local Result
+		local Disconnect = MixedLegacyServer.PingClient.On(function(Player, Value)
+			assert(tostring(Player) == "Player", `Expected Player source, got {Player}.`)
+			Result = Value
+		end)
+
+		MixedNegotiatedClient.Configure({
+			ProtocolVersion = 1,
+			ProtocolMode = "Legacy",
+			EnableProtocolHandshake = false,
+		})
+		MixedNegotiatedClient.PingClient.Fire(33)
+		MixedNegotiatedClient.StepReplication()
+		task.wait(1 / 30)
+		assert(Result == 33, `Expected legacy server to decode negotiated fixture in legacy mode, got {Result}.`)
+		Disconnect()
+	end
+end)
+
 RunClosure("Capture replay inspector and schema helpers", function()
 	Client.Capture.Clear()
 	Server.Capture.Clear()
-	Client.Capture.Start({ Limit = 64, Redactions = { "Secret" } })
+	Client.Capture.Start({ Limit = 64 })
 	Server.Capture.Start({ Limit = 64 })
 
 	local Disconnect = Client.ReliableServer.On(function() end)
@@ -1169,15 +1354,36 @@ RunClosure("Capture replay inspector and schema helpers", function()
 	task.wait(1 / 30)
 	Disconnect()
 
+	local SensitiveDisconnect = Client.SensitiveEvent.On(function() end)
+	Server.SensitiveEvent.FireAll({
+		Secret = "hide",
+		Token = "token",
+		Public = 7,
+	})
+	Server.StepReplication()
+	task.wait(1 / 30)
+	SensitiveDisconnect()
+
 	local Entries = Client.Capture.Entries()
 	local FoundReceive = false
+	local FoundRedaction = false
 	for _, Entry in Entries do
 		if Entry.Name == "ReliableServer" and Entry.Direction == "receive" and Entry.Status == "accepted" then
 			FoundReceive = true
-			assert(string.find(Entry.PayloadSummary or "", "42", 1, true), "Expected capture payload summary to include decoded value.")
+			assert(
+				string.find(Entry.PayloadSummary or "", "42", 1, true),
+				"Expected capture payload summary to include decoded value."
+			)
+			assert(typeof(Entry.Buffer) == "buffer", "Expected accepted capture entry to include raw buffer.")
+		elseif Entry.Name == "SensitiveEvent" and Entry.Direction == "receive" and Entry.Status == "accepted" then
+			FoundRedaction = true
+			assert(string.find(Entry.PayloadSummary or "", "Secret=%[redacted%]"), "Expected Secret to be redacted.")
+			assert(string.find(Entry.PayloadSummary or "", "Token=%[redacted%]"), "Expected Token to be redacted.")
+			assert(not string.find(Entry.PayloadSummary or "", "hide", 1, true), "Expected secret value to be removed.")
 		end
 	end
 	assert(FoundReceive, "Expected an accepted ReliableServer receive capture.")
+	assert(FoundRedaction, "Expected SensitiveEvent capture redaction.")
 
 	local Replayed = 0
 	local Replay = Client.Capture.Replay(Entries, {
@@ -1187,6 +1393,17 @@ RunClosure("Capture replay inspector and schema helpers", function()
 	})
 	assert(Replay.Accepted > 0, "Expected replay to count accepted entries.")
 	assert(Replayed > 0, "Expected replay handler to be called.")
+
+	local RawReplayed
+	local RawDisconnect = Client.ReliableServer.On(function(Value)
+		RawReplayed = Value
+	end)
+	local RawReplay = Client.Capture.ReplayRaw(Entries)
+	task.wait(1 / 30)
+	assert(RawReplay.Replayed > 0, "Expected raw replay to inject captured buffers.")
+	assert(RawReplay.MissingRaw < RawReplay.Accepted, "Expected accepted capture entries to retain raw buffers.")
+	assert(RawReplayed == 42, `Expected raw replay to decode ReliableServer value 42, got {RawReplayed}.`)
+	RawDisconnect()
 
 	Client.Inspector.Enable(true)
 	local Snapshot = Client.Inspector.Snapshot()
@@ -1269,23 +1486,169 @@ RunClosure("Replication adapter stubs", function()
 end)
 
 RunClosure("Golden binary snapshots", function()
-	ExpectBytes("Byte", Client.Byte.Write(5), { 5 })
-	ExpectBytes("GoldenFlags8", Client.GoldenFlags8.Write({
-		F1 = true,
-		F2 = false,
-		F3 = false,
-		F4 = false,
-		F5 = false,
-		F6 = false,
-		F7 = false,
-		F8 = true,
-	}), { 129 })
-
 	local Exact = buffer.create(9)
 	for Offset = 0, 8 do
 		buffer.writeu8(Exact, Offset, Offset)
 	end
-	ExpectBytes("ExactBuffer", Client.ExactBuffer.Write(Exact), { 0, 1, 2, 3, 4, 5, 6, 7, 8 })
+
+	local TypeSnapshots = {
+		{
+			Name = "primitive:u8",
+			Buffer = Client.Byte.Write(5),
+			Expected = { 5 },
+		},
+		{
+			Name = "set:flags8",
+			Buffer = Client.GoldenFlags8.Write({
+				F1 = true,
+				F2 = false,
+				F3 = false,
+				F4 = false,
+				F5 = false,
+				F6 = false,
+				F7 = false,
+				F8 = true,
+			}),
+			Expected = { 129 },
+		},
+		{
+			Name = "set:golden-set",
+			Buffer = Client.GoldenSet.Write({
+				Alpha = true,
+				Beta = false,
+				Gamma = true,
+			}),
+			Expected = { 5 },
+		},
+		{
+			Name = "optional:nil",
+			Buffer = Client.GoldenOptional.Write(nil),
+			Expected = {},
+		},
+		{
+			Name = "optional:u16",
+			Buffer = Client.GoldenOptional.Write(258),
+			Expected = { 1, 130, 2 },
+		},
+		{
+			Name = "buffer:exact",
+			Buffer = Client.ExactBuffer.Write(Exact),
+			Expected = { 0, 1, 2, 3, 4, 5, 6, 7, 8 },
+		},
+		{
+			Name = "array:nested",
+			Buffer = Client.MultiDimensionalArray.Write({ { { 1, 2 }, { 3 } } }),
+			Expected = { 1, 2, 2, 1, 2, 1, 3 },
+		},
+		{
+			Name = "map:string-u8",
+			Buffer = Client.GoldenMap.Write({
+				alpha = 3,
+				beta = 4,
+			}),
+			Expected = { 2, 5, 97, 108, 112, 104, 97, 3, 4, 98, 101, 116, 97, 4 },
+		},
+		{
+			Name = "struct:nested",
+			Buffer = Client.GoldenNested.Write({
+				A = 7,
+				B = {
+					C = 258,
+					D = "ok",
+				},
+				E = { 1, 2, 3 },
+				F = 513,
+			}),
+			Expected = { 7, 130, 2, 2, 111, 107, 1, 2, 3, 1, 129, 4 },
+		},
+	}
+
+	for _, Snapshot in TypeSnapshots do
+		ExpectBytes(Snapshot.Name, Snapshot.Buffer, Snapshot.Expected)
+	end
+
+	Client.Configure({
+		ProtocolVersion = 2,
+		ProtocolMode = "Strict",
+		AcceptProtocolVersion1 = false,
+		EnableProtocolHandshake = false,
+		RateLimitPerSecond = 0,
+	})
+	Server.Configure({
+		ProtocolVersion = 2,
+		ProtocolMode = "Strict",
+		AcceptProtocolVersion1 = false,
+		EnableProtocolHandshake = false,
+		RateLimitPerSecond = 0,
+	})
+	Client.Capture.Clear()
+	Server.Capture.Clear()
+	Client.Capture.Start({ Limit = 128 })
+	Server.Capture.Start({ Limit = 128 })
+
+	local EventDisconnect = Client.ReliableServer.On(function() end)
+	Server.ReliableServer.FireAll(9)
+	Server.StepReplication()
+	task.wait(1 / 30)
+	EventDisconnect()
+	ExpectBytes(
+		"wire:event",
+		FindCaptureBuffer(Server.Capture.Entries(), "ReliableServer", "send", "accepted"),
+		{ 27, 0, 1, 0, 9 }
+	)
+
+	Server.RemoteFunction.On(function(_Player, Value)
+		return Value + 1
+	end)
+	local InvokeResult = Client.RemoteFunction.Invoke(10)
+	assert(InvokeResult == 11, `Expected invoke result 11, got {InvokeResult}.`)
+	ExpectBytes(
+		"wire:invoke",
+		FindCaptureBuffer(Client.Capture.Entries(), "RemoteFunction", "send", "accepted"),
+		{ 37, 0, 2, 0, 6, 10 }
+	)
+
+	Client.ReliableClient.Predict(11)
+	Client.StepReplication()
+	task.wait(1 / 30)
+	ExpectBytes(
+		"wire:prediction",
+		FindCaptureBuffer(Client.Capture.Entries(), "ReliableClient", "send", "accepted"),
+		{ 30, 1, 1, 0, 1, 11 }
+	)
+
+	local StateDisconnect = Client.PlayerState.On(function() end)
+	Server.PlayerState.SetAll({
+		Health = 44,
+		Stamina = 55,
+		Equipped = "Bow",
+	})
+	task.wait(1 / 10)
+	Server.StepReplication()
+	task.wait(1 / 30)
+	StateDisconnect()
+	ExpectBytes(
+		"wire:state-channel",
+		FindCaptureBuffer(Server.Capture.Entries(), "PlayerState", "send", "accepted"),
+		{ 0, 0, 8, 0, 0, 44, 55, 1, 3, 66, 111, 119 }
+	)
+
+	Client.Capture.Stop()
+	Server.Capture.Stop()
+	Client.Configure({
+		ProtocolVersion = 2,
+		ProtocolMode = "Negotiated",
+		AcceptProtocolVersion1 = true,
+		EnableProtocolHandshake = true,
+		RateLimitPerSecond = 0,
+	})
+	Server.Configure({
+		ProtocolVersion = 2,
+		ProtocolMode = "Negotiated",
+		AcceptProtocolVersion1 = true,
+		EnableProtocolHandshake = true,
+		RateLimitPerSecond = 0,
+	})
 end)
 
 local MergeStruct: Server.MergeStruct = {

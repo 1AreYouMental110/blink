@@ -21,6 +21,17 @@ export type CompileOptions = {
 	OutputAbstractSyntaxTree: boolean,
 }
 
+type Span = {
+	Start: number,
+	End: number,
+}
+
+type Diagnostic = {
+	Message: string,
+	File: string?,
+	Span: Span?,
+}
+
 ---- Constants ----
 
 local Utility = {}
@@ -194,13 +205,13 @@ function Utility.Compile(Path: string, Options: CompileOptions)
 	end
 end
 
-local function ParseForUtility(Path: string, Options: CompileOptions): Parser.Body
+local function ParseForUtility(Path: string, Options: CompileOptions): (Parser.Body, string, string)
 	local FilePath = GetDefinitionFilePath(Path)
 	Error.SetCompact(Options.Compact)
 	local Source = fs.readFile(FilePath)
 	local FileDirectory = PathParser.Directory(FilePath) or "./"
 	local SourceParser = Parser.new(FileDirectory, PathParser.NameWithExtension(FilePath))
-	return SourceParser:Parse(Source)
+	return SourceParser:Parse(Source), Source, FilePath
 end
 
 local function WalkDeclarations(Declarations: { Parser.Declaration }, Callback: (Parser.Declaration) -> ())
@@ -210,6 +221,47 @@ local function WalkDeclarations(Declarations: { Parser.Declaration }, Callback: 
 			WalkDeclarations((Declaration :: Parser.ScopeNode).Value.Values, Callback)
 		end
 	end
+end
+
+local function EscapePattern(Text: string): string
+	return string.gsub(Text, "([^%w])", "%%%1")
+end
+
+local function FindOptionSpan(Source: string, Name: string): Span?
+	local Start, Finish = string.find(Source, `option%s+{EscapePattern(Name)}`)
+	if Start == nil or Finish == nil then
+		return nil
+	end
+
+	return {
+		Start = Start,
+		End = Finish,
+	}
+end
+
+local function FindDeclarationSpan(Source: string, Kind: string, Name: string): Span?
+	local Start, Finish = string.find(Source, `{Kind}%s+{EscapePattern(Name)}`)
+	if Start == nil or Finish == nil then
+		return nil
+	end
+
+	return {
+		Start = Start,
+		End = Finish,
+	}
+end
+
+local function LineColumn(Source: string, Offset: number): (number, number)
+	local Line = 1
+	local LineStart = 1
+	for Index = 1, math.max(1, Offset - 1) do
+		if string.sub(Source, Index, Index) == "\n" then
+			Line += 1
+			LineStart = Index + 1
+		end
+	end
+
+	return Line, math.max(1, Offset - LineStart + 1)
 end
 
 local function SchemaVersion(FileOptions: Parser.Options): number
@@ -233,20 +285,33 @@ local function IsUnsafeOutputPath(Path: string?): boolean
 	return string.find(Lower, "..", 1, true) ~= nil or PathParser.PathType(Path) == "absolute"
 end
 
-local function CollectProductionDiagnostics(Ast: Parser.Body, Strict: boolean): ({ string }, { string })
+local function CollectProductionDiagnostics(
+	Ast: Parser.Body,
+	Strict: boolean,
+	Source: string,
+	FilePath: string
+): ({ Diagnostic }, { Diagnostic })
 	local FileOptions = Ast.Value.Options
 	local Warnings = {}
 	local Errors = {}
 
-	local function Warn(MessageText: string)
-		table.insert(Warnings, MessageText)
+	local function CreateDiagnostic(MessageText: string, Span: Span?): Diagnostic
+		return {
+			Message = MessageText,
+			File = FilePath,
+			Span = Span,
+		}
 	end
 
-	local function Fail(MessageText: string)
+	local function Warn(MessageText: string, Span: Span?)
+		table.insert(Warnings, CreateDiagnostic(MessageText, Span))
+	end
+
+	local function Fail(MessageText: string, Span: Span?)
 		if Strict then
-			table.insert(Errors, MessageText)
+			table.insert(Errors, CreateDiagnostic(MessageText, Span))
 		else
-			table.insert(Warnings, MessageText)
+			table.insert(Warnings, CreateDiagnostic(MessageText, Span))
 		end
 	end
 
@@ -259,98 +324,139 @@ local function CollectProductionDiagnostics(Ast: Parser.Body, Strict: boolean): 
 	local InvokeTimeout = FileOptions.InvokeTimeoutSeconds
 
 	if Version < 2 then
-		Warn("ProtocolVersion is set below 2; v2 framing, varints, bit-packing, and prediction acks are disabled.")
+		Warn(
+			"ProtocolVersion is set below 2; v2 framing, varints, bit-packing, and prediction acks are disabled.",
+			FindOptionSpan(Source, "ProtocolVersion")
+		)
 	end
 
 	if Version < 2 and Mode ~= "Legacy" then
-		Fail("ProtocolMode must be Legacy when ProtocolVersion is below 2.")
+		Fail("ProtocolMode must be Legacy when ProtocolVersion is below 2.", FindOptionSpan(Source, "ProtocolMode"))
 	end
 
 	if Mode ~= "Strict" and Mode ~= "Negotiated" and Mode ~= "Legacy" then
-		Fail(`ProtocolMode "{Mode}" is not supported; use Strict, Negotiated, or Legacy.`)
+		Fail(
+			`ProtocolMode "{Mode}" is not supported; use Strict, Negotiated, or Legacy.`,
+			FindOptionSpan(Source, "ProtocolMode")
+		)
 	end
 
 	if (ReliableLimit or math.huge) > 1024 * 1024 then
-		Warn("MaxReliablePacketBytes/MaxPacketBytes is above 1 MiB; lower this for public servers.")
+		Warn(
+			"MaxReliablePacketBytes/MaxPacketBytes is above 1 MiB; lower this for public servers.",
+			FindOptionSpan(
+				Source,
+				if FileOptions.MaxReliablePacketBytes then "MaxReliablePacketBytes" else "MaxPacketBytes"
+			)
+		)
 	end
 
 	if Strict then
 		if Profile ~= "Production" and Profile ~= "Competitive" then
-			Fail("Strict production mode requires SecurityProfile = Production or Competitive.")
+			Fail(
+				"Strict production mode requires SecurityProfile = Production or Competitive.",
+				FindOptionSpan(Source, "SecurityProfile")
+			)
 		end
 
 		if ReliableLimit == nil or ReliableLimit <= 0 then
-			Fail("Reliable packet size is unlimited; set MaxReliablePacketBytes or MaxPacketBytes.")
+			Fail(
+				"Reliable packet size is unlimited; set MaxReliablePacketBytes or MaxPacketBytes.",
+				FindOptionSpan(Source, "MaxReliablePacketBytes") or FindOptionSpan(Source, "MaxPacketBytes")
+			)
 		end
 
 		if UnreliableLimit == nil or UnreliableLimit <= 0 then
-			Fail("Unreliable packet size is unlimited; set MaxUnreliablePacketBytes or MaxPacketBytes.")
+			Fail(
+				"Unreliable packet size is unlimited; set MaxUnreliablePacketBytes or MaxPacketBytes.",
+				FindOptionSpan(Source, "MaxUnreliablePacketBytes") or FindOptionSpan(Source, "MaxPacketBytes")
+			)
 		end
 
 		if RateLimit == nil or RateLimit <= 0 then
-			Fail("RateLimitPerSecond is missing or disabled.")
+			Fail("RateLimitPerSecond is missing or disabled.", FindOptionSpan(Source, "RateLimitPerSecond"))
 		end
 
 		if InvokeTimeout == nil or InvokeTimeout <= 0 then
-			Fail("InvokeTimeoutSeconds is missing or disabled.")
+			Fail("InvokeTimeoutSeconds is missing or disabled.", FindOptionSpan(Source, "InvokeTimeoutSeconds"))
 		end
 
 		if FileOptions.SyncValidation == true then
-			Fail("SyncValidation is enabled in a production build.")
+			Fail("SyncValidation is enabled in a production build.", FindOptionSpan(Source, "SyncValidation"))
 		end
 
 		if FileOptions.WriteValidations == true then
-			Fail("WriteValidations is enabled in a production build.")
+			Fail("WriteValidations is enabled in a production build.", FindOptionSpan(Source, "WriteValidations"))
 		end
 
 		if IsUnsafeOutputPath(FileOptions.ClientOutput) then
-			Fail("ClientOutput is unsafe for strict production builds; use a contained relative path.")
+			Fail(
+				"ClientOutput is unsafe for strict production builds; use a contained relative path.",
+				FindOptionSpan(Source, "ClientOutput")
+			)
 		end
 
 		if IsUnsafeOutputPath(FileOptions.ServerOutput) then
-			Fail("ServerOutput is unsafe for strict production builds; use a contained relative path.")
+			Fail(
+				"ServerOutput is unsafe for strict production builds; use a contained relative path.",
+				FindOptionSpan(Source, "ServerOutput")
+			)
 		end
 	end
 
 	if (RateLimit or 0) == 0 and Profile ~= "Development" then
-		Warn("RateLimitPerSecond is disabled outside the Development profile.")
+		Warn(
+			"RateLimitPerSecond is disabled outside the Development profile.",
+			FindOptionSpan(Source, "RateLimitPerSecond")
+		)
 	end
 
 	if not FileOptions.ClientOutput then
-		Warn("ClientOutput is missing; CLI generation requires it.")
+		Warn("ClientOutput is missing; CLI generation requires it.", nil)
 	end
 	if not FileOptions.ServerOutput then
-		Warn("ServerOutput is missing; CLI generation requires it.")
+		Warn("ServerOutput is missing; CLI generation requires it.", nil)
 	end
 
-	local ClientEventsWithoutAuth = 0
-	local FunctionsWithoutAuth = 0
 	WalkDeclarations(Ast.Value.Declarations, function(Declaration)
 		if Declaration.Type == "Event" then
 			local Event = Declaration :: Parser.Event
 			if Event.Value.From == "Client" and Event.Value.Auth == nil then
-				ClientEventsWithoutAuth += 1
+				Fail(
+					`Client-origin event "{Declaration.Name}" has no Auth rule.`,
+					FindDeclarationSpan(Source, "event", Declaration.Name)
+				)
 			end
 		elseif Declaration.Type == "Function" then
 			local Function = Declaration :: Parser.Function
 			if Function.Value.Auth == nil then
-				FunctionsWithoutAuth += 1
+				Fail(
+					`Function "{Declaration.Name}" has no Auth rule.`,
+					FindDeclarationSpan(Source, "function", Declaration.Name)
+				)
 			end
 		end
 	end)
 
-	if ClientEventsWithoutAuth > 0 then
-		Fail(`{ClientEventsWithoutAuth} client-origin event(s) have no Auth rule.`)
-	end
-
-	if FunctionsWithoutAuth > 0 then
-		Fail(`{FunctionsWithoutAuth} function(s) have no Auth rule.`)
-	end
-
 	return Warnings, Errors
 end
 
-local function PrintDiagnostics(Title: string, Options: CompileOptions, Warnings: { string }, Errors: { string })
+local function FormatDiagnostic(Diagnostic: Diagnostic, Source: string): string
+	if Diagnostic.Span == nil or Diagnostic.File == nil then
+		return Diagnostic.Message
+	end
+
+	local Line, Column = LineColumn(Source, Diagnostic.Span.Start)
+	return `{Diagnostic.File}:{Line}:{Column}: {Diagnostic.Message}`
+end
+
+local function PrintDiagnostics(
+	Title: string,
+	Options: CompileOptions,
+	Warnings: { Diagnostic },
+	Errors: { Diagnostic },
+	Source: string
+)
 	local Total = #Warnings + #Errors
 	if Total == 0 then
 		Message("green", Options, `{Title} passed with no diagnostics.`)
@@ -360,10 +466,10 @@ local function PrintDiagnostics(Title: string, Options: CompileOptions, Warnings
 	local Color: stdio.Color = if #Errors > 0 then "red" else "yellow"
 	Message(Color, Options, `{Title} found {#Errors} error(s), {#Warnings} warning(s):`)
 	for _, ErrorMessage in Errors do
-		print(`- ERROR: {ErrorMessage}`)
+		print(`- ERROR: {FormatDiagnostic(ErrorMessage, Source)}`)
 	end
 	for _, Warning in Warnings do
-		print(`- WARN: {Warning}`)
+		print(`- WARN: {FormatDiagnostic(Warning, Source)}`)
 	end
 end
 
@@ -402,15 +508,15 @@ local function DeclarationNames(Declarations: { Parser.Declaration }, Kind: stri
 end
 
 function Utility.Doctor(Path: string, Options: CompileOptions)
-	local Ast = ParseForUtility(Path, Options)
-	local Warnings, Errors = CollectProductionDiagnostics(Ast, false)
-	PrintDiagnostics("Doctor", Options, Warnings, Errors)
+	local Ast, Source, FilePath = ParseForUtility(Path, Options)
+	local Warnings, Errors = CollectProductionDiagnostics(Ast, false, Source, FilePath)
+	PrintDiagnostics("Doctor", Options, Warnings, Errors, Source)
 end
 
 function Utility.Strict(Path: string, Options: CompileOptions)
-	local Ast = ParseForUtility(Path, Options)
-	local Warnings, Errors = CollectProductionDiagnostics(Ast, true)
-	PrintDiagnostics("Strict production build", Options, Warnings, Errors)
+	local Ast, Source, FilePath = ParseForUtility(Path, Options)
+	local Warnings, Errors = CollectProductionDiagnostics(Ast, true, Source, FilePath)
+	PrintDiagnostics("Strict production build", Options, Warnings, Errors, Source)
 	if #Errors > 0 then
 		error("Strict production build failed.")
 	end
@@ -422,8 +528,8 @@ function Utility.Benchmark(Path: string, Options: CompileOptions)
 	local OriginalProtocol = FileOptions.ProtocolVersion
 	local Results = {}
 
-	for _, ProtocolVersion in { 1, 2 } do
-		FileOptions.ProtocolVersion = ProtocolVersion
+	for _, BenchmarkProtocolVersion in { 1, 2 } do
+		FileOptions.ProtocolVersion = BenchmarkProtocolVersion
 		local Start = os.clock()
 		local ServerSource = Generator.Generate("Server", Ast)
 		local ClientSource = Generator.Generate("Client", Ast)
@@ -431,7 +537,7 @@ function Utility.Benchmark(Path: string, Options: CompileOptions)
 		local Elapsed = os.clock() - Start
 
 		table.insert(Results, {
-			ProtocolVersion = ProtocolVersion,
+			ProtocolVersion = BenchmarkProtocolVersion,
 			Elapsed = Elapsed,
 			ServerBytes = #ServerSource,
 			ClientBytes = #ClientSource,
@@ -460,7 +566,9 @@ function Utility.LoadSim(Path: string, Options: CompileOptions)
 
 	Message("green", Options, "Blink load simulation:")
 	print(`schemaVersion={SchemaVersion(FileOptions)} protocol=v{Protocol} mode={ProtocolMode(FileOptions)}`)
-	print("clients,encodeMs,decodeMs,bytes,drops,validationFailures,rateLimitHits,pendingInvokes,queueDepth,stateFlushMs")
+	print(
+		"clients,encodeMs,decodeMs,bytes,drops,validationFailures,rateLimitHits,pendingInvokes,queueDepth,stateFlushMs"
+	)
 	for _, Clients in { 10, 50, 100, 200 } do
 		local Traffic = Clients * BaseEvents
 		local Bytes = math.floor((#ServerSource + #ClientSource) / 128) + (Traffic * (if Protocol >= 2 then 18 else 24))
@@ -485,7 +593,9 @@ function Utility.CaptureReplay(Path: string, Options: CompileOptions)
 	local Counts = CountDeclarations(Ast.Value.Declarations)
 	Message("green", Options, "Blink capture/replay report:")
 	print(`events={Counts.Event} functions={Counts.Function} channels={Counts.Channel}`)
-	print("runtimeApis=Capture.Start,Capture.Stop,Capture.Entries,Capture.Replay,Inspector.Snapshot")
+	print(
+		"runtimeApis=Capture.Start,Capture.Stop,Capture.Entries,Capture.Replay,Capture.ReplayRaw,Capture.Redact,Inspector.Snapshot"
+	)
 	print("fixtures=malformed,prediction,invoke,state-channel,rate-limit")
 end
 
@@ -516,8 +626,7 @@ function Utility.Compatibility(Path: string, Options: CompileOptions)
 		for _, PeerSchema in { MinimumSchema, RuntimeSchema } do
 			local Result = if PeerProtocol > RuntimeProtocol
 				then "reject:future-protocol"
-				elseif PeerSchema < MinimumSchema
-				then "reject:schema-too-old"
+				elseif PeerSchema < MinimumSchema then "reject:schema-too-old"
 				else "accept"
 			print(`v{PeerProtocol},{PeerSchema},{Result}`)
 		end
@@ -532,6 +641,9 @@ function Utility.SchemaDocs(Path: string, Options: CompileOptions)
 	print(`# Blink schema v{SchemaVersion(FileOptions)}`)
 	print("")
 	print(`Protocol: v{ProtocolVersion(FileOptions)} ({ProtocolMode(FileOptions)})`)
+	if FileOptions.CaptureRedactions and FileOptions.CaptureRedactions ~= "" then
+		print(`Capture redactions: {FileOptions.CaptureRedactions}`)
+	end
 	print(`Types: {Counts.Type}`)
 	print(`Events: {Counts.Event}`)
 	for _, Name in DeclarationNames(Ast.Value.Declarations, "Event") do
@@ -545,6 +657,17 @@ function Utility.SchemaDocs(Path: string, Options: CompileOptions)
 	for _, Name in DeclarationNames(Ast.Value.Declarations, "Channel") do
 		print(`- channel {Name}`)
 	end
+end
+
+function Utility.Ci(Path: string, Options: CompileOptions)
+	Message("green", Options, "Blink CI report suite:")
+	Utility.Doctor(Path, Options)
+	Utility.Benchmark(Path, Options)
+	Utility.LoadSim(Path, Options)
+	Utility.CaptureReplay(Path, Options)
+	Utility.GoldenSnapshots(Path, Options)
+	Utility.Compatibility(Path, Options)
+	Utility.SchemaDocs(Path, Options)
 end
 
 ---- Initialization ----

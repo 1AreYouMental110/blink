@@ -84,6 +84,10 @@ local ARGUMENTS: { [string]: Argument } = {
 		Aliases = { "--schema-docs" },
 		Description = "Print generated schema documentation",
 	},
+	Ci = {
+		Aliases = { "--ci" },
+		Description = "Run all noninteractive validation/report modes",
+	},
 }
 
 ---- Functions -----
@@ -178,6 +182,8 @@ elseif Arguments.Compatibility then
 	Compile.Compatibility(Path, CompileOptions)
 elseif Arguments.SchemaDocs then
 	Compile.SchemaDocs(Path, CompileOptions)
+elseif Arguments.Ci then
+	Compile.Ci(Path, CompileOptions)
 elseif not Arguments.Watch then
 	Compile.Compile(Path, CompileOptions)
 else

@@ -110,8 +110,16 @@ option ExposeMetrics = true
 option EnableMiddleware = true
 option EnablePrediction = true
 option EnableStateChannels = true
+option EnablePacketCapture = false
+option CaptureRedactions = "Password,Token"
+option CaptureLimit = 1024
 option UseEmptyInstanceOptimization = true
+option Version = 2
+option MinimumSchemaVersion = 1
 option ProtocolVersion = 2
+option ProtocolMode = Negotiated
+option AcceptProtocolVersion1 = true
+option EnableProtocolHandshake = true
 option UseVarints = true
 option UseBitPacking = true
 option UseStringDictionaries = false
@@ -127,10 +135,14 @@ Generated client and server modules expose:
 - `SetGroup`, `AddToGroup`, `RemoveFromGroup`, and `GetGroupPlayers` for named audiences.
 - `Prediction.Begin`, `Prediction.Ack`, and `Prediction.Rollback`.
 - `State.DefineChannel` for local dirty-state channels.
+- `Capture.Start`, `Capture.Entries`, `Capture.Replay`, `Capture.ReplayRaw`, and `Capture.Redact`.
 
 Server-origin events also expose `FireGroup(groupName, ...)`. Client-origin events expose `Predict(...)`, which sends the event and returns a local prediction id.
 
 `ProtocolVersion = 2` enables length-prefixed event frames, per-event recovery inside a packed reliable packet, prediction sequence ids and acks, optional integer varints, bit-packed booleans/optional presence, optional string dictionaries, and buffer pooling. Set individual `Use...` flags to disable a v2 wire optimization during rollout.
+`ProtocolMode = Negotiated` accepts compatible v1 peers while capability handshakes roll out; switch to `Strict` once every peer is on the new protocol or `Legacy` when intentionally emitting v1 packets.
+
+`CaptureRedactions` is a comma-separated default list of payload field names to hide in capture summaries. Raw buffers are still retained for `Capture.ReplayRaw`, so store capture exports as sensitive data when they come from production traffic.
 
 State channels can also be declared in schema:
 ```blink copy
