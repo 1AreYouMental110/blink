@@ -1,0 +1,134 @@
+# Production Upgrades
+
+Blink can now generate rollout and operations helpers alongside the normal client, server, and type files.
+
+## Protocol rollout
+
+Use protocol v2 with negotiated rollout when a live server must accept older generated clients during deploys.
+
+```blink
+option ProtocolVersion = 2
+option ProtocolMode = Negotiated
+option AcceptProtocolVersion1 = true
+option EnableProtocolHandshake = true
+```
+
+Generated modules send a capability handshake before their first packet. The receiver records the peer protocol and schema version, accepts v1 packets while no compatible v2 handshake is present, and rejects future or too-old schemas through safe drops instead of decoding with the wrong wire format.
+
+Runtime helpers:
+
+```lua
+Network.Protocol.Info(player)
+Network.Protocol.QueueHandshake(player)
+Network.Protocol.Peers
+```
+
+Use `ProtocolMode = Strict` after all clients are upgraded, or `ProtocolMode = Legacy` when intentionally emitting v1 packets.
+
+## Packet capture and replay
+
+Capture is disabled by default unless `option EnablePacketCapture = true` is set or `Capture.Start()` is called.
+
+```lua
+Network.Capture.Start({
+    Limit = 512,
+    Redactions = { "Password", "Token" },
+})
+
+local entries = Network.Capture.Entries()
+local replay = Network.Capture.Replay(entries, {
+    Purchase = function(entry)
+        print(entry.PayloadSummary)
+    end,
+})
+Network.Capture.Stop()
+```
+
+Entries include event name, direction, source or target, user id when available, payload size, accepted or dropped status, drop reason, timing, protocol version, schema version, and a redacted payload summary.
+
+## Inspector
+
+Inspector is intended for Studio and diagnostics builds.
+
+```lua
+Network.Inspector.Enable(true)
+local snapshot = Network.Inspector.Snapshot()
+```
+
+Snapshots include metrics, captured packets, invoke state, peer protocol state, packet drops, validation failures, rate-limit decisions, and runtime configuration.
+
+## Schema versioning
+
+Set the generated schema version with `Version` or `SchemaVersion`.
+
+```blink
+option Version = 3
+option MinimumSchemaVersion = 2
+```
+
+Generated migration helpers:
+
+```lua
+Network.Schema.RegisterMigration(2, function(payload)
+    payload.NewName = payload.OldName
+    payload.OldName = nil
+    return payload
+end)
+
+Network.Schema.SetDefault("Team", "Neutral")
+Network.Schema.RenameField("OldName", "NewName")
+Network.Schema.DeprecateField("LegacyField")
+
+local migrated, version = Network.Schema.Migrate(payload, 2)
+```
+
+State channels and packet captures carry schema version metadata so old captures and rollout clients can be checked before replaying or decoding.
+
+## Cross-server adapters
+
+Generated adapters wrap Roblox services without coupling a schema to a specific topology.
+
+```lua
+local messaging = Network.Replication.MessagingService("match-events")
+messaging.PublishGroup("party-42", payload)
+messaging.PublishZone("WorldState", "forest", payload)
+messaging.PublishMatch(game.JobId, payload)
+
+local memory = Network.Replication.MemoryStore("match-state")
+memory.SetZone("WorldState", "forest", "snapshot", payload, 60)
+```
+
+The helpers reuse Blink group, zone, and match naming so teams, rooms, zones, parties, and match servers can share the same scoping model.
+
+## Strict production mode
+
+Run strict checks before writing production outputs:
+
+```sh
+blink path/to/config --strict --yes
+```
+
+or enforce it in the schema:
+
+```blink
+option StrictProduction = true
+option SecurityProfile = Production
+```
+
+Strict mode fails on missing auth for client-to-server events, unlimited packet sizes, missing invoke timeout, missing rate limits, debug validation in production, unsafe output paths, and incompatible protocol settings.
+
+## CI reports
+
+All report modes are noninteractive and safe for CI:
+
+```sh
+blink config --doctor --yes
+blink config --benchmark --yes
+blink config --load-sim --yes
+blink config --capture-replay --yes
+blink config --golden-snapshots --yes
+blink config --compatibility --yes
+blink config --schema-docs --yes
+```
+
+`--load-sim` reports generated traffic estimates for 10, 50, 100, and 200 clients. `--golden-snapshots` prints schema and wire-hash metadata for snapshot review. Runtime tests should still lock exact bytes for representative exported serializers.

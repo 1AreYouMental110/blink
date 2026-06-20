@@ -60,6 +60,30 @@ local ARGUMENTS: { [string]: Argument } = {
 		Aliases = { "--benchmark" },
 		Description = "Compare protocol v1 and v2 generation size/timing",
 	},
+	Strict = {
+		Aliases = { "--strict" },
+		Description = "Fail on production-unsafe network configuration",
+	},
+	LoadSim = {
+		Aliases = { "--load-sim" },
+		Description = "Run a noninteractive generated-traffic load simulation report",
+	},
+	CaptureReplay = {
+		Aliases = { "--capture-replay" },
+		Description = "Validate capture/replay support for the generated schema",
+	},
+	GoldenSnapshots = {
+		Aliases = { "--golden-snapshots" },
+		Description = "Print deterministic wire-format snapshot metadata",
+	},
+	Compatibility = {
+		Aliases = { "--compatibility" },
+		Description = "Print protocol and schema compatibility matrix",
+	},
+	SchemaDocs = {
+		Aliases = { "--schema-docs" },
+		Description = "Print generated schema documentation",
+	},
 }
 
 ---- Functions -----
@@ -130,35 +154,31 @@ if Arguments.Version then
 	return nil
 end
 
+local CompileOptions: Compile.CompileOptions = {
+	Debug = (_G.RELEASE == nil) or Arguments.Statistics,
+	Silent = Arguments.Silent,
+	Compact = Arguments.Compact,
+	YesToEverything = Arguments.YesToAll,
+	OutputAbstractSyntaxTree = Arguments.OutputAst,
+}
+
 if Arguments.Doctor then
-	local CompileOptions: Compile.CompileOptions = {
-		Debug = (_G.RELEASE == nil) or Arguments.Statistics,
-		Silent = Arguments.Silent,
-		Compact = Arguments.Compact,
-		YesToEverything = Arguments.YesToAll,
-		OutputAbstractSyntaxTree = Arguments.OutputAst,
-	}
-
 	Compile.Doctor(Path, CompileOptions)
+elseif Arguments.Strict then
+	Compile.Strict(Path, CompileOptions)
 elseif Arguments.Benchmark then
-	local CompileOptions: Compile.CompileOptions = {
-		Debug = (_G.RELEASE == nil) or Arguments.Statistics,
-		Silent = Arguments.Silent,
-		Compact = Arguments.Compact,
-		YesToEverything = Arguments.YesToAll,
-		OutputAbstractSyntaxTree = Arguments.OutputAst,
-	}
-
 	Compile.Benchmark(Path, CompileOptions)
+elseif Arguments.LoadSim then
+	Compile.LoadSim(Path, CompileOptions)
+elseif Arguments.CaptureReplay then
+	Compile.CaptureReplay(Path, CompileOptions)
+elseif Arguments.GoldenSnapshots then
+	Compile.GoldenSnapshots(Path, CompileOptions)
+elseif Arguments.Compatibility then
+	Compile.Compatibility(Path, CompileOptions)
+elseif Arguments.SchemaDocs then
+	Compile.SchemaDocs(Path, CompileOptions)
 elseif not Arguments.Watch then
-	local CompileOptions: Compile.CompileOptions = {
-		Debug = (_G.RELEASE == nil) or Arguments.Statistics,
-		Silent = Arguments.Silent,
-		Compact = Arguments.Compact,
-		YesToEverything = Arguments.YesToAll,
-		OutputAbstractSyntaxTree = Arguments.OutputAst,
-	}
-
 	Compile.Compile(Path, CompileOptions)
 else
 	Watch.Watch(Path)

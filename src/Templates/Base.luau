@@ -19,13 +19,19 @@ local RecieveBitCount = 0
 local RecieveFrameEnd = 0
 local RecieveFrameInstanceEnd = 0
 local RecievePredictionId: number? = nil
+local ActiveProtocolVersion: number? = nil
+local SendProtocolVersion: number? = nil
 
 local RecieveInstances = {}
 local RecieveInstanceCursor = 0
+local Allocate: (number) -> number
+local Read: (number) -> number
 
 local Null = newproxy()
 local Tombstone = newproxy()
 local PREDICTION_ACK_INDEX = 255
+local CAPABILITY_HANDSHAKE_INDEX = 254
+local SERVER_PEER_KEY = "__server"
 
 type Entry = {
     value: any,
@@ -94,6 +100,14 @@ local function IsPlayerActive(Player: any): boolean
     return not Success or Parent ~= nil
 end
 
+local function TryGetUserId(Source: any): number?
+    local Success, UserId = pcall(function()
+        return Source.UserId
+    end)
+
+    return if Success and type(UserId) == "number" then UserId else nil
+end
+
 local AuthRules: {[string]: (any) -> boolean} = {
     AlivePlayer = function(Context)
         local Source = Context.Source
@@ -128,10 +142,138 @@ local PredictionState = {
 }
 
 local StateChannels: {[string]: any} = {}
+local PeerCapabilities: {[any]: any} = {}
+local PeerHandshakesSent: {[any]: boolean} = {}
+local CaptureState = {
+    Enabled = false,
+    Entries = {},
+    Redactions = {} :: {[string]: true},
+    Limit = 1024
+}
+local InspectorState = {
+    Enabled = false
+}
+local SchemaMigrations: {[number]: (any) -> any} = {}
+local SchemaDefaults: {[string]: any} = {}
+local SchemaRenames: {[string]: string} = {}
+local SchemaDeprecated: {[string]: true} = {}
+local RuntimeSupport = {}
 
 local function MetricAdd(BucketName: string, Key: string, Amount: number?)
     local Bucket = Metrics[BucketName]
     Bucket[Key] = (Bucket[Key] or 0) + (Amount or 1)
+end
+
+function RuntimeSupport.PeerKey(Source: any): any
+    return Source or SERVER_PEER_KEY
+end
+
+function RuntimeSupport.SummarizeValue(Value: any, Depth: number?): string
+    local Depth = Depth or 0
+    local Kind = typeof(Value)
+    if Kind == "buffer" then
+        return `buffer({buffer.len(Value)})`
+    elseif Kind == "Instance" then
+        return tostring(Value)
+    elseif Kind ~= "table" then
+        return tostring(Value)
+    end
+
+    if Depth >= 2 then
+        return "{...}"
+    end
+
+    local Parts = {}
+    local Count = 0
+    for Key, Child in Value do
+        if Key == "n" then
+            continue
+        end
+
+        Count += 1
+        if Count > 8 then
+            table.insert(Parts, "...")
+            break
+        end
+
+        local KeyText = tostring(Key)
+        local ChildText = if CaptureState.Redactions[KeyText] then "[redacted]" else RuntimeSupport.SummarizeValue(Child, Depth + 1)
+        table.insert(Parts, `{KeyText}={ChildText}`)
+    end
+
+    table.sort(Parts)
+    return `{Kind}({table.concat(Parts, ",")})`
+end
+
+function RuntimeSupport.RecordCapture(Entry: {[string]: any})
+    if not CaptureState.Enabled and not RuntimeConfig.EnablePacketCapture and not InspectorState.Enabled and not RuntimeConfig.EnableInspector then
+        return
+    end
+
+    Entry.Time = os.clock()
+    Entry.ProtocolVersion = ActiveProtocolVersion or SendProtocolVersion or RuntimeConfig.ProtocolVersion
+    Entry.SchemaVersion = RuntimeConfig.SchemaVersion
+    if Entry.Payload ~= nil then
+        Entry.PayloadSummary = RuntimeSupport.SummarizeValue(Entry.Payload)
+        Entry.Payload = nil
+    end
+
+    table.insert(CaptureState.Entries, Entry)
+    local Limit = CaptureState.Limit or RuntimeConfig.CaptureLimit
+    while #CaptureState.Entries > Limit do
+        table.remove(CaptureState.Entries, 1)
+    end
+end
+
+function RuntimeSupport.StartCapture(Options: {[string]: any}?)
+    CaptureState.Enabled = true
+    if Options then
+        if Options.Limit then
+            CaptureState.Limit = Options.Limit
+        end
+        if Options.Redactions then
+            table.clear(CaptureState.Redactions)
+            for _, Field in Options.Redactions do
+                CaptureState.Redactions[tostring(Field)] = true
+            end
+        end
+    end
+end
+
+function RuntimeSupport.StopCapture()
+    CaptureState.Enabled = false
+end
+
+function RuntimeSupport.ClearCapture()
+    table.clear(CaptureState.Entries)
+end
+
+function RuntimeSupport.CaptureEntries()
+    return table.clone(CaptureState.Entries)
+end
+
+function RuntimeSupport.ReplayCapture(Entries: {{[string]: any}}, Handlers: {[string]: (any) -> any}?)
+    local Result = {
+        Accepted = 0,
+        Dropped = 0,
+        Replayed = 0
+    }
+
+    for _, Entry in Entries do
+        if Entry.Status == "dropped" then
+            Result.Dropped += 1
+            continue
+        end
+
+        Result.Accepted += 1
+        local Handler = Handlers and Handlers[Entry.Name]
+        if Handler then
+            Handler(Entry)
+            Result.Replayed += 1
+        end
+    end
+
+    return Result
 end
 
 local function RunHooks(Name: string, Payload: any): boolean
@@ -171,6 +313,15 @@ local function DropPacket(Source: any, Channel: string, Reason: string, Size: nu
     elseif Reason == "AuthRejected" then
         MetricAdd("ValidationFailures", Channel)
     end
+
+    RuntimeSupport.RecordCapture({
+        Direction = "receive",
+        Source = tostring(Source),
+        Channel = Channel,
+        Status = "dropped",
+        Reason = Reason,
+        Size = Size or 0
+    })
 
     RunHooks("Drop", {
         Source = Source,
@@ -228,12 +379,22 @@ local function CheckAuth(RuleName: string?, Context: any): boolean
 end
 
 local function Configure(Options: {[string]: any})
+    local ResetProtocolState = false
     for Key, Value in Options do
         if RuntimeConfig[Key] == nil then
             error(`[Blink]: Unknown runtime option "{Key}".`)
         end
 
         RuntimeConfig[Key] = Value
+        if Key == "ProtocolVersion" or Key == "ProtocolMode" or Key == "AcceptProtocolVersion1" or Key == "EnableProtocolHandshake" or Key == "SchemaVersion" or Key == "MinimumSchemaVersion" then
+            ResetProtocolState = true
+        end
+    end
+
+    CaptureState.Limit = RuntimeConfig.CaptureLimit
+    if ResetProtocolState then
+        table.clear(PeerCapabilities)
+        table.clear(PeerHandshakesSent)
     end
 end
 
@@ -253,6 +414,7 @@ local function GetMetrics()
 
     Copy.PendingInvokes = PendingInvokes
     Copy.PendingInvokesByName = table.clone(PendingInvokesByName)
+    Copy.CapturedPackets = #CaptureState.Entries
     return Copy
 end
 
@@ -309,8 +471,131 @@ local function InstancePayload(Instances: {Instance})
     return Instances
 end
 
+function RuntimeSupport.CurrentProtocolVersion(): number
+    return SendProtocolVersion or ActiveProtocolVersion or RuntimeConfig.ProtocolVersion
+end
+
 local function UseProtocolV2(): boolean
-    return RuntimeConfig.ProtocolVersion >= 2
+    return RuntimeSupport.CurrentProtocolVersion() >= 2
+end
+
+function RuntimeSupport.ResolveReceiveProtocolVersion(Source: any): number
+    if RuntimeConfig.ProtocolMode == "Legacy" then
+        return 1
+    elseif RuntimeConfig.ProtocolMode == "Strict" then
+        return RuntimeConfig.ProtocolVersion
+    end
+
+    local Capability = PeerCapabilities[RuntimeSupport.PeerKey(Source)]
+    if Capability then
+        return math.min(RuntimeConfig.ProtocolVersion, Capability.ProtocolVersion or 1)
+    end
+
+    return if RuntimeConfig.AcceptProtocolVersion1 then 1 else RuntimeConfig.ProtocolVersion
+end
+
+function RuntimeSupport.IsPeerCompatible(ProtocolVersion: number, SchemaVersion: number): boolean
+    return ProtocolVersion <= RuntimeConfig.ProtocolVersion and SchemaVersion >= RuntimeConfig.MinimumSchemaVersion
+end
+
+function RuntimeSupport.WriteCapabilityHandshake()
+    if not RuntimeConfig.EnableProtocolHandshake or RuntimeConfig.ProtocolVersion < 2 or RuntimeConfig.ProtocolMode == "Legacy" then
+        return
+    end
+
+    local PreviousProtocolVersion = SendProtocolVersion
+    SendProtocolVersion = 1
+
+    local IndexOffset = Allocate(1)
+    buffer.writeu8(SendBuffer, IndexOffset, CAPABILITY_HANDSHAKE_INDEX)
+    local ProtocolOffset = Allocate(1)
+    buffer.writeu8(SendBuffer, ProtocolOffset, RuntimeConfig.ProtocolVersion)
+    local SchemaOffset = Allocate(2)
+    buffer.writeu16(SendBuffer, SchemaOffset, RuntimeConfig.SchemaVersion)
+    local MinimumSchemaOffset = Allocate(2)
+    buffer.writeu16(SendBuffer, MinimumSchemaOffset, RuntimeConfig.MinimumSchemaVersion)
+    local Hash = RuntimeConfig.SchemaHash
+    local HashLength = math.min(#Hash, 255)
+    local HashLengthOffset = Allocate(1)
+    buffer.writeu8(SendBuffer, HashLengthOffset, HashLength)
+    local HashOffset = Allocate(HashLength)
+    buffer.writestring(SendBuffer, HashOffset, Hash, HashLength)
+
+    SendProtocolVersion = PreviousProtocolVersion
+end
+
+function RuntimeSupport.QueueCapabilityHandshake(Target: any?)
+    if not RuntimeConfig.EnableProtocolHandshake or RuntimeConfig.ProtocolVersion < 2 or RuntimeConfig.ProtocolMode == "Legacy" then
+        return
+    end
+
+    local Key = RuntimeSupport.PeerKey(Target)
+    if PeerHandshakesSent[Key] then
+        return
+    end
+
+    RuntimeSupport.WriteCapabilityHandshake()
+    PeerHandshakesSent[Key] = true
+end
+
+function RuntimeSupport.ReadCapabilityHandshake(Source: any, Channel: string, PacketSize: number): boolean
+    local Success, ProtocolVersion, SchemaVersion, MinimumSchemaVersion, SchemaHash = pcall(function()
+        local ProtocolVersion = buffer.readu8(RecieveBuffer, Read(1))
+        local SchemaVersion = buffer.readu16(RecieveBuffer, Read(2))
+        local MinimumSchemaVersion = buffer.readu16(RecieveBuffer, Read(2))
+        local HashLength = buffer.readu8(RecieveBuffer, Read(1))
+        local SchemaHash = buffer.readstring(RecieveBuffer, Read(HashLength), HashLength)
+        return ProtocolVersion, SchemaVersion, MinimumSchemaVersion, SchemaHash
+    end)
+
+    if not Success then
+        DropPacket(Source, Channel, "MalformedHandshake", PacketSize)
+        return false
+    end
+
+    local Compatible = RuntimeSupport.IsPeerCompatible(ProtocolVersion, SchemaVersion)
+    PeerCapabilities[RuntimeSupport.PeerKey(Source)] = {
+        ProtocolVersion = ProtocolVersion,
+        SchemaVersion = SchemaVersion,
+        MinimumSchemaVersion = MinimumSchemaVersion,
+        SchemaHash = SchemaHash,
+        Compatible = Compatible,
+        LastSeen = os.clock()
+    }
+
+    RuntimeSupport.RecordCapture({
+        Name = "$handshake",
+        Direction = "receive",
+        Source = tostring(Source),
+        Channel = Channel,
+        Status = if Compatible then "accepted" else "dropped",
+        Reason = if Compatible then nil else "IncompatibleProtocol",
+        Size = PacketSize,
+        Payload = {
+            ProtocolVersion = ProtocolVersion,
+            SchemaVersion = SchemaVersion,
+            MinimumSchemaVersion = MinimumSchemaVersion,
+            SchemaHash = SchemaHash
+        }
+    })
+
+    if not Compatible then
+        DropPacket(Source, Channel, "IncompatibleProtocol", PacketSize)
+        return false
+    end
+
+    return true
+end
+
+function RuntimeSupport.ProtocolInfo(Source: any?)
+    local Capability = PeerCapabilities[RuntimeSupport.PeerKey(Source)]
+    return {
+        LocalProtocolVersion = RuntimeConfig.ProtocolVersion,
+        LocalSchemaVersion = RuntimeConfig.SchemaVersion,
+        MinimumSchemaVersion = RuntimeConfig.MinimumSchemaVersion,
+        ProtocolMode = RuntimeConfig.ProtocolMode,
+        Peer = Capability
+    }
 end
 
 local function UseVarints(): boolean
@@ -411,7 +696,7 @@ local function FlushBits()
     SendBitCount = 0
 end
 
-local function Allocate(Bytes: number)
+function Allocate(Bytes: number)
     FlushBits()
     return RawAllocate(Bytes)
 end
@@ -464,8 +749,17 @@ local function TrackSend(Channel: string, Size: number, Target: any?)
     })
 end
 
-local function TrackEventSend(Name: string, Channel: string, Size: number, Target: any?)
+local function TrackEventSend(Name: string, Channel: string, Size: number, Target: any?, Payload: any?)
     MetricAdd("EventBytesSent", Name, Size)
+    RuntimeSupport.RecordCapture({
+        Name = Name,
+        Direction = "send",
+        Target = tostring(Target),
+        Channel = Channel,
+        Status = "accepted",
+        Size = Size,
+        Payload = Payload
+    })
     RunHooks("AfterSend", {
         Name = Name,
         Channel = Channel,
@@ -474,8 +768,18 @@ local function TrackEventSend(Name: string, Channel: string, Size: number, Targe
     })
 end
 
-local function TrackEventReceive(Name: string, Channel: string, Size: number, Source: any?)
+local function TrackEventReceive(Name: string, Channel: string, Size: number, Source: any?, Payload: any?)
     MetricAdd("EventBytesReceived", Name, Size)
+    RuntimeSupport.RecordCapture({
+        Name = Name,
+        Direction = "receive",
+        Source = tostring(Source),
+        UserId = TryGetUserId(Source),
+        Channel = Channel,
+        Status = "accepted",
+        Size = Size,
+        Payload = Payload
+    })
     RunHooks("AfterReceive", {
         Name = Name,
         Source = Source,
@@ -566,7 +870,7 @@ local function ValidateIncoming(Source: any, Channel: string, IncomingBuffer: an
     return Size
 end
 
-local function Read(Bytes: number)
+function Read(Bytes: number)
     AlignReadBits()
     return RawRead(Bytes)
 end
@@ -736,6 +1040,7 @@ local function BeginReadMessage(PacketSize: number): number?
     RecieveFrameEnd = 0
     RecieveFrameInstanceEnd = RecieveInstanceCursor
     RecievePredictionId = nil
+    ActiveProtocolVersion = RuntimeSupport.ResolveReceiveProtocolVersion(RecieveSource)
 
     if not UseProtocolV2() then
         return buffer.readu8(RecieveBuffer, Read(1))
@@ -763,6 +1068,7 @@ end
 
 local function EndReadMessage()
     if not UseProtocolV2() or RecieveFrameEnd <= 0 then
+        ActiveProtocolVersion = nil
         return
     end
 
@@ -772,6 +1078,7 @@ local function EndReadMessage()
     RecieveFrameEnd = 0
     RecieveFrameInstanceEnd = RecieveInstanceCursor
     RecievePredictionId = nil
+    ActiveProtocolVersion = nil
 end
 
 local function RecoverMessage()
@@ -785,6 +1092,7 @@ local function RecoverMessage()
     RecieveFrameEnd = 0
     RecieveFrameInstanceEnd = RecieveInstanceCursor
     RecievePredictionId = nil
+    ActiveProtocolVersion = nil
 end
 
 local function WriteStringValue(Value: string, LengthBytes: number)
@@ -1229,6 +1537,174 @@ local function RunStateFlushers()
             warn(`[Blink]: State channel flusher failed: {Error}`)
         end
     end
+end
+
+function RuntimeSupport.RegisterMigration(FromVersion: number, Callback: (any) -> any)
+    SchemaMigrations[FromVersion] = Callback
+end
+
+function RuntimeSupport.SetSchemaDefault(Field: string, Value: any)
+    SchemaDefaults[Field] = Value
+end
+
+function RuntimeSupport.RenameSchemaField(From: string, To: string)
+    SchemaRenames[From] = To
+end
+
+function RuntimeSupport.DeprecateSchemaField(Field: string)
+    SchemaDeprecated[Field] = true
+end
+
+function RuntimeSupport.ApplySchemaTransforms(Payload: any)
+    if type(Payload) ~= "table" then
+        return Payload
+    end
+
+    local Result = table.clone(Payload)
+    for From, To in SchemaRenames do
+        if Result[From] ~= nil and Result[To] == nil then
+            Result[To] = Result[From]
+            Result[From] = nil
+        end
+    end
+
+    for Field, Value in SchemaDefaults do
+        if Result[Field] == nil then
+            Result[Field] = Value
+        end
+    end
+
+    for Field in SchemaDeprecated do
+        Result[Field] = nil
+    end
+
+    return Result
+end
+
+function RuntimeSupport.MigratePayload(Payload: any, FromVersion: number?)
+    local Version = FromVersion or RuntimeConfig.SchemaVersion
+    local Result = RuntimeSupport.ApplySchemaTransforms(Payload)
+    while Version < RuntimeConfig.SchemaVersion do
+        local Migration = SchemaMigrations[Version]
+        if Migration then
+            Result = Migration(Result)
+        end
+        Version += 1
+    end
+
+    return RuntimeSupport.ApplySchemaTransforms(Result), RuntimeConfig.SchemaVersion
+end
+
+function RuntimeSupport.SchemaInfo()
+    return {
+        Version = RuntimeConfig.SchemaVersion,
+        MinimumVersion = RuntimeConfig.MinimumSchemaVersion,
+        Hash = RuntimeConfig.SchemaHash,
+        Defaults = table.clone(SchemaDefaults),
+        Renames = table.clone(SchemaRenames),
+        Deprecated = table.clone(SchemaDeprecated)
+    }
+end
+
+function RuntimeSupport.SetInspectorEnabled(Enabled: boolean)
+    InspectorState.Enabled = Enabled
+end
+
+function RuntimeSupport.InspectorSnapshot()
+    if not InspectorState.Enabled and not RuntimeConfig.EnableInspector then
+        error("[Blink]: Inspector is disabled. Set RuntimeConfig.EnableInspector or call Inspector.Enable(true).")
+    end
+
+    return {
+        Metrics = GetMetrics(),
+        Protocol = RuntimeSupport.ProtocolInfo(nil),
+        Peers = table.clone(PeerCapabilities),
+        Capture = RuntimeSupport.CaptureEntries(),
+        Runtime = {
+            ProtocolVersion = RuntimeConfig.ProtocolVersion,
+            ProtocolMode = RuntimeConfig.ProtocolMode,
+            SchemaVersion = RuntimeConfig.SchemaVersion,
+            SecurityProfile = RuntimeConfig.SecurityProfile
+        }
+    }
+end
+
+function RuntimeSupport.CreateMessagingServiceAdapter(Topic: string, Service: any?)
+    if not RuntimeConfig.EnableReplicationAdapters then
+        error("[Blink]: Replication adapters are disabled by RuntimeConfig.EnableReplicationAdapters.")
+    end
+
+    local MessagingService = Service or game:GetService("MessagingService")
+    local Adapter = {}
+
+    function Adapter.Publish(Channel: string, Payload: any)
+        return MessagingService:PublishAsync(Topic, {
+            Channel = Channel,
+            Payload = Payload,
+            SchemaVersion = RuntimeConfig.SchemaVersion,
+            ProtocolVersion = RuntimeConfig.ProtocolVersion
+        })
+    end
+
+    function Adapter.Subscribe(Handler: (any) -> ())
+        return MessagingService:SubscribeAsync(Topic, function(Message)
+            Handler(Message.Data)
+        end)
+    end
+
+    function Adapter.PublishGroup(GroupName: string, Payload: any)
+        return Adapter.Publish(`group:{GroupName}`, Payload)
+    end
+
+    function Adapter.PublishZone(ChannelName: string, ZoneName: string, Payload: any)
+        return Adapter.Publish(`zone:{ChannelName}:{ZoneName}`, Payload)
+    end
+
+    function Adapter.PublishMatch(MatchServerId: string, Payload: any)
+        return Adapter.Publish(`match:{MatchServerId}`, Payload)
+    end
+
+    return Adapter
+end
+
+function RuntimeSupport.CreateMemoryStoreAdapter(Name: string, Service: any?)
+    if not RuntimeConfig.EnableReplicationAdapters then
+        error("[Blink]: Replication adapters are disabled by RuntimeConfig.EnableReplicationAdapters.")
+    end
+
+    local MemoryStoreService = Service or game:GetService("MemoryStoreService")
+    local Store = MemoryStoreService:GetSortedMap(Name)
+    local Adapter = {}
+
+    function Adapter.Set(Scope: string, Key: string, Payload: any, ExpirationSeconds: number?)
+        return Store:SetAsync(`{Scope}:{Key}`, {
+            Payload = Payload,
+            SchemaVersion = RuntimeConfig.SchemaVersion,
+            ProtocolVersion = RuntimeConfig.ProtocolVersion
+        }, ExpirationSeconds or 60)
+    end
+
+    function Adapter.Get(Scope: string, Key: string)
+        return Store:GetAsync(`{Scope}:{Key}`)
+    end
+
+    function Adapter.Remove(Scope: string, Key: string)
+        return Store:RemoveAsync(`{Scope}:{Key}`)
+    end
+
+    function Adapter.SetGroup(GroupName: string, Key: string, Payload: any, ExpirationSeconds: number?)
+        return Adapter.Set(`group:{GroupName}`, Key, Payload, ExpirationSeconds)
+    end
+
+    function Adapter.SetZone(ChannelName: string, ZoneName: string, Key: string, Payload: any, ExpirationSeconds: number?)
+        return Adapter.Set(`zone:{ChannelName}:{ZoneName}`, Key, Payload, ExpirationSeconds)
+    end
+
+    function Adapter.SetMatch(MatchServerId: string, Key: string, Payload: any, ExpirationSeconds: number?)
+        return Adapter.Set(`match:{MatchServerId}`, Key, Payload, ExpirationSeconds)
+    end
+
+    return Adapter
 end
 
 local Events: any = {

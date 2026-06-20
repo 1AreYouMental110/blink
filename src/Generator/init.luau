@@ -121,6 +121,10 @@ local function BooleanLiteral(Value: boolean?, Default: boolean): string
 	return if Value ~= nil then tostring(Value) else tostring(Default)
 end
 
+local function StringLiteral(Value: string?, Default: string): string
+	return `"{Value or Default}"`
+end
+
 local function RuntimeConfigLines(): { string }
 	local Profile = Options.SecurityProfile or "Development"
 	local ProfileDefaults = {
@@ -154,9 +158,17 @@ local function RuntimeConfigLines(): { string }
 	}
 	local Defaults = ProfileDefaults[Profile] or ProfileDefaults.Development
 	local MaxPacketBytes = Options.MaxPacketBytes or Defaults.MaxPacketBytes
+	local SchemaVersion = Options.SchemaVersion or Options.Version or 1
+	local ProtocolMode = Options.ProtocolMode or "Negotiated"
 	return {
 		"local RuntimeConfig = {\n",
 		`\tProtocolVersion = {NumberLiteral(Options.ProtocolVersion, 2)},\n`,
+		`\tProtocolMode = {StringLiteral(ProtocolMode, "Negotiated")},\n`,
+		`\tAcceptProtocolVersion1 = {BooleanLiteral(Options.AcceptProtocolVersion1, true)},\n`,
+		`\tEnableProtocolHandshake = {BooleanLiteral(Options.EnableProtocolHandshake, true)},\n`,
+		`\tSchemaVersion = {NumberLiteral(SchemaVersion, 1)},\n`,
+		`\tMinimumSchemaVersion = {NumberLiteral(Options.MinimumSchemaVersion, 1)},\n`,
+		`\tSchemaHash = "schema-{SchemaVersion}",\n`,
 		`\tSecurityProfile = "{Profile}",\n`,
 		`\tMaxReliablePacketBytes = {NumberLiteral(Options.MaxReliablePacketBytes, MaxPacketBytes)},\n`,
 		`\tMaxUnreliablePacketBytes = {NumberLiteral(Options.MaxUnreliablePacketBytes, math.min(MaxPacketBytes, Defaults.MaxUnreliablePacketBytes))},\n`,
@@ -175,6 +187,10 @@ local function RuntimeConfigLines(): { string }
 		`\tUseStringDictionaries = {BooleanLiteral(Options.UseStringDictionaries, false)},\n`,
 		`\tUseBufferPooling = {BooleanLiteral(Options.UseBufferPooling, true)},\n`,
 		`\tBufferPoolLimit = {NumberLiteral(Options.BufferPoolLimit, 64)},\n`,
+		`\tEnablePacketCapture = {BooleanLiteral(Options.EnablePacketCapture, false)},\n`,
+		`\tCaptureLimit = {NumberLiteral(Options.CaptureLimit, 1024)},\n`,
+		`\tEnableInspector = {BooleanLiteral(Options.EnableInspector, false)},\n`,
+		`\tEnableReplicationAdapters = {BooleanLiteral(Options.EnableReplicationAdapters, true)},\n`,
 		"}\n",
 	}
 end
@@ -231,9 +247,9 @@ local function AddReceiveGuards(Block: Blocks.Block, Name: string, Reliability: 
 	end
 end
 
-local function AddAfterReceive(Block: Blocks.Block, Name: string, Reliability: string)
+local function AddAfterReceive(Block: Blocks.Block, Name: string, Reliability: string, PayloadExpression: string?)
 	local Source = SourceExpression()
-	Block:Line(`TrackEventReceive("{Name}", "{Reliability}", RecieveCursor - EventStart, {Source})`)
+	Block:Line(`TrackEventReceive("{Name}", "{Reliability}", RecieveCursor - EventStart, {Source}, {PayloadExpression or "nil"})`)
 	if Context == "Server" then
 		Block:Line("if RuntimeConfig.ProtocolVersion >= 2 and RecievePredictionId ~= nil then")
 		Block:Line("Load(PlayersMap[Player])", Block.Indent + 1)
@@ -267,9 +283,11 @@ local function AddTrackedWrite(
 	Reliability: string,
 	WriteEvent: string,
 	Target: string?,
-	PredictionId: string?
+	PredictionId: string?,
+	PayloadExpression: string?
 )
 	Block:Line(`if not BeforeSend("{Name}", "{Reliability}", {Target or "nil"}) then DropPacket({Target or "nil"}, "{Reliability}", "MiddlewareRejected") return end`)
+	Block:Line("RuntimeSupport.QueueCapabilityHandshake(nil)")
 	Block:Line("local PreviousCursor = SendCursor")
 	if PredictionId then
 		Block:Line("local PreviousPredictionId = SendPredictionId")
@@ -279,7 +297,7 @@ local function AddTrackedWrite(
 	if PredictionId then
 		Block:Line("SendPredictionId = PreviousPredictionId")
 	end
-	Block:Line(`TrackEventSend("{Name}", "{Reliability}", SendCursor - PreviousCursor, {Target or "nil"})`)
+	Block:Line(`TrackEventSend("{Name}", "{Reliability}", SendCursor - PreviousCursor, {Target or "nil"}, {PayloadExpression or "nil"})`)
 end
 
 local function PushRuntimeApi(Target: Builder.Builder, Indent: number)
@@ -290,6 +308,37 @@ local function PushRuntimeApi(Target: Builder.Builder, Indent: number)
 	Target.Push(`Use = Use,`, 0, Indent)
 	Target.Push(`UseAuth = UseAuth,`, 0, Indent)
 	Target.Push(`CancelInvocations = CancelInvocations,`, 0, Indent)
+	Target.Push(`Protocol = table.freeze(\{`, 0, Indent)
+	Target.Push(`Info = RuntimeSupport.ProtocolInfo,`, 0, Indent + 1)
+	Target.Push(`QueueHandshake = RuntimeSupport.QueueCapabilityHandshake,`, 0, Indent + 1)
+	Target.Push(`Peers = PeerCapabilities,`, 0, Indent + 1)
+	Target.Push(`}),`, 0, Indent)
+	Target.Push(`Capture = table.freeze(\{`, 0, Indent)
+	Target.Push(`Start = RuntimeSupport.StartCapture,`, 0, Indent + 1)
+	Target.Push(`Stop = RuntimeSupport.StopCapture,`, 0, Indent + 1)
+	Target.Push(`Clear = RuntimeSupport.ClearCapture,`, 0, Indent + 1)
+	Target.Push(`Entries = RuntimeSupport.CaptureEntries,`, 0, Indent + 1)
+	Target.Push(`Replay = RuntimeSupport.ReplayCapture,`, 0, Indent + 1)
+	Target.Push(`}),`, 0, Indent)
+	Target.Push(`Inspector = table.freeze(\{`, 0, Indent)
+	Target.Push(`Enable = RuntimeSupport.SetInspectorEnabled,`, 0, Indent + 1)
+	Target.Push(`Snapshot = RuntimeSupport.InspectorSnapshot,`, 0, Indent + 1)
+	Target.Push(`}),`, 0, Indent)
+	Target.Push(`Schema = table.freeze(\{`, 0, Indent)
+	Target.Push(`Version = RuntimeConfig.SchemaVersion,`, 0, Indent + 1)
+	Target.Push(`MinimumVersion = RuntimeConfig.MinimumSchemaVersion,`, 0, Indent + 1)
+	Target.Push(`Hash = RuntimeConfig.SchemaHash,`, 0, Indent + 1)
+	Target.Push(`Info = RuntimeSupport.SchemaInfo,`, 0, Indent + 1)
+	Target.Push(`RegisterMigration = RuntimeSupport.RegisterMigration,`, 0, Indent + 1)
+	Target.Push(`Migrate = RuntimeSupport.MigratePayload,`, 0, Indent + 1)
+	Target.Push(`SetDefault = RuntimeSupport.SetSchemaDefault,`, 0, Indent + 1)
+	Target.Push(`RenameField = RuntimeSupport.RenameSchemaField,`, 0, Indent + 1)
+	Target.Push(`DeprecateField = RuntimeSupport.DeprecateSchemaField,`, 0, Indent + 1)
+	Target.Push(`}),`, 0, Indent)
+	Target.Push(`Replication = table.freeze(\{`, 0, Indent)
+	Target.Push(`MessagingService = RuntimeSupport.CreateMessagingServiceAdapter,`, 0, Indent + 1)
+	Target.Push(`MemoryStore = RuntimeSupport.CreateMemoryStoreAdapter,`, 0, Indent + 1)
+	Target.Push(`}),`, 0, Indent)
 	Target.Push(`SetGroup = SetGroup,`, 0, Indent)
 	Target.Push(`AddToGroup = AddToGroup,`, 0, Indent)
 	Target.Push(`RemoveFromGroup = RemoveFromGroup,`, 0, Indent)
@@ -671,7 +720,7 @@ function Declarations.Event(Declaration: Parser.Event)
 		AddReceiveGuards(Block, Declaration.Name, Reliability, Value)
 		Block:Line(`local Success, {Arguments} = pcall({Util.GetPath(Identifier, false, Scope)})`)
 		AddDecodeFailureGuard(Block, Declaration.Name, Reliability, DecodeError)
-		AddAfterReceive(Block, Declaration.Name, Reliability)
+		AddAfterReceive(Block, Declaration.Name, Reliability, `table.pack({Arguments})`)
 
 		local Disconnect = Blocks.Function("", "", "()")
 		if IsSingle then
@@ -759,7 +808,7 @@ function Declarations.Event(Declaration: Parser.Event)
 				`Push({Queue}, table.pack({Context == "Server" and "Player, " or ""}{Arguments}))`
 			)
 			:End()
-		AddAfterReceive(Block, Declaration.Name, Reliability)
+		AddAfterReceive(Block, Declaration.Name, Reliability, `table.pack({Arguments})`)
 
 		local IterTypes = `number, {Context == "Server" and "Player, " or ""}{Types}`
 
@@ -795,11 +844,11 @@ function Declarations.Event(Declaration: Parser.Event)
 	elseif Context == "Client" then
 		local Fire = Blocks.Function(Casing.Fire, Values, "()", true)
 		if IsReliable then
-			AddTrackedWrite(Fire, Declaration.Name, Reliability, WriteEvent)
+			AddTrackedWrite(Fire, Declaration.Name, Reliability, WriteEvent, nil, nil, `table.pack({Arguments})`)
 		else
 			Fire:Line(`local Previous = Save()`)
 			Fire:Line(`Load()`)
-			AddTrackedWrite(Fire, Declaration.Name, Reliability, WriteEvent)
+			AddTrackedWrite(Fire, Declaration.Name, Reliability, WriteEvent, nil, nil, `table.pack({Arguments})`)
 			Fire:Line("local Buffer = buffer.create(SendCursor)")
 			Fire:Line("buffer.copy(Buffer, 0, SendBuffer, 0, SendCursor)")
 			Fire:Compare("RuntimeConfig.MaxUnreliablePacketBytes > 0 and SendCursor", "RuntimeConfig.MaxUnreliablePacketBytes", "Greater")
@@ -820,11 +869,11 @@ function Declarations.Event(Declaration: Parser.Event)
 			local Predict = Blocks.Function(Casing.Predict, Values, "number", true)
 			Predict:Line(`local PredictionId = BeginPrediction("{Declaration.Name}", table.pack({Arguments}))`)
 			if IsReliable then
-				AddTrackedWrite(Predict, Declaration.Name, Reliability, WriteEvent, nil, "PredictionId")
+				AddTrackedWrite(Predict, Declaration.Name, Reliability, WriteEvent, nil, "PredictionId", `table.pack({Arguments})`)
 			else
 				Predict:Line(`local Previous = Save()`)
 				Predict:Line(`Load()`)
-				AddTrackedWrite(Predict, Declaration.Name, Reliability, WriteEvent, nil, "PredictionId")
+				AddTrackedWrite(Predict, Declaration.Name, Reliability, WriteEvent, nil, "PredictionId", `table.pack({Arguments})`)
 				Predict:Line("local Buffer = buffer.create(SendCursor)")
 				Predict:Line("buffer.copy(Buffer, 0, SendBuffer, 0, SendCursor)")
 				Predict:Compare("RuntimeConfig.MaxUnreliablePacketBytes > 0 and SendCursor", "RuntimeConfig.MaxUnreliablePacketBytes", "Greater")
@@ -844,11 +893,11 @@ function Declarations.Event(Declaration: Parser.Event)
 		local Fire = Blocks.Function(Casing.Fire, `Player: Player, {Values}`, "()", true)
 		if IsReliable then
 			Fire:Line("Load(PlayersMap[Player])")
-			AddTrackedWrite(Fire, Declaration.Name, Reliability, WriteEvent, "Player")
+			AddTrackedWrite(Fire, Declaration.Name, Reliability, WriteEvent, "Player", nil, `table.pack({Arguments})`)
 			Fire:Line("PlayersMap[Player] = Save()")
 		else
 			Fire:Line("Load()")
-			AddTrackedWrite(Fire, Declaration.Name, Reliability, WriteEvent, "Player")
+			AddTrackedWrite(Fire, Declaration.Name, Reliability, WriteEvent, "Player", nil, `table.pack({Arguments})`)
 			Fire:Lines(UNRELIABLE_BODY, 1)
 			Fire:Compare("RuntimeConfig.MaxUnreliablePacketBytes > 0 and SendCursor", "RuntimeConfig.MaxUnreliablePacketBytes", "Greater")
 				:Line(`DropPacket(Player, "Unreliable", "MaxPacketBytes", SendCursor)`)
@@ -862,12 +911,12 @@ function Declarations.Event(Declaration: Parser.Event)
 		local FireAll = Blocks.Function(Casing.FireAll, Values, "()", true)
 		if IsReliable then
 			FireAll:Line("Load()")
-			AddTrackedWrite(FireAll, Declaration.Name, Reliability, WriteEvent)
+			AddTrackedWrite(FireAll, Declaration.Name, Reliability, WriteEvent, nil, nil, `table.pack({Arguments})`)
 			FireAll:Line(RELIABLE_BODY.Header)
 			FireAll:Iterator("_", "Player", "Players:GetPlayers()"):Lines(RELIABLE_BODY.Body, 2):End()
 		else
 			FireAll:Line("Load()")
-			AddTrackedWrite(FireAll, Declaration.Name, Reliability, WriteEvent)
+			AddTrackedWrite(FireAll, Declaration.Name, Reliability, WriteEvent, nil, nil, `table.pack({Arguments})`)
 			FireAll:Lines(UNRELIABLE_BODY, 1)
 			FireAll:Compare("RuntimeConfig.MaxUnreliablePacketBytes > 0 and SendCursor", "RuntimeConfig.MaxUnreliablePacketBytes", "Greater")
 				:Line(`DropPacket(nil, "Unreliable", "MaxPacketBytes", SendCursor)`)
@@ -881,12 +930,12 @@ function Declarations.Event(Declaration: Parser.Event)
 		local FireList = Blocks.Function(Casing.FireList, `List: \{Player\}, {Values}`, "()", true)
 		if IsReliable then
 			FireList:Line("Load()")
-			AddTrackedWrite(FireList, Declaration.Name, Reliability, WriteEvent)
+			AddTrackedWrite(FireList, Declaration.Name, Reliability, WriteEvent, nil, nil, `table.pack({Arguments})`)
 			FireList:Line(RELIABLE_BODY.Header)
 			FireList:Iterator("_", "Player", "List"):Lines(RELIABLE_BODY.Body, 2):End()
 		else
 			FireList:Line("Load()")
-			AddTrackedWrite(FireList, Declaration.Name, Reliability, WriteEvent)
+			AddTrackedWrite(FireList, Declaration.Name, Reliability, WriteEvent, nil, nil, `table.pack({Arguments})`)
 			FireList:Lines(UNRELIABLE_BODY, 1)
 			FireList:Compare("RuntimeConfig.MaxUnreliablePacketBytes > 0 and SendCursor", "RuntimeConfig.MaxUnreliablePacketBytes", "Greater")
 				:Line(`DropPacket(nil, "Unreliable", "MaxPacketBytes", SendCursor)`)
@@ -902,7 +951,7 @@ function Declarations.Event(Declaration: Parser.Event)
 		local FireExcept = Blocks.Function(Casing.FireExcept, `Except: Player, {Values}`, "()", true)
 		if IsReliable then
 			FireExcept:Line("Load()")
-			AddTrackedWrite(FireExcept, Declaration.Name, Reliability, WriteEvent)
+			AddTrackedWrite(FireExcept, Declaration.Name, Reliability, WriteEvent, nil, nil, `table.pack({Arguments})`)
 			FireExcept:Line(RELIABLE_BODY.Header)
 			FireExcept:Iterator("_", "Player", "Players:GetPlayers()")
 				:Compare("Player", "Except", "Equals")
@@ -912,7 +961,7 @@ function Declarations.Event(Declaration: Parser.Event)
 				:End()
 		else
 			FireExcept:Line("Load()")
-			AddTrackedWrite(FireExcept, Declaration.Name, Reliability, WriteEvent)
+			AddTrackedWrite(FireExcept, Declaration.Name, Reliability, WriteEvent, nil, nil, `table.pack({Arguments})`)
 			FireExcept:Lines(UNRELIABLE_BODY, 1)
 			FireExcept:Compare("RuntimeConfig.MaxUnreliablePacketBytes > 0 and SendCursor", "RuntimeConfig.MaxUnreliablePacketBytes", "Greater")
 				:Line(`DropPacket(nil, "Unreliable", "MaxPacketBytes", SendCursor)`)
@@ -931,12 +980,12 @@ function Declarations.Event(Declaration: Parser.Event)
 		local FireGroup = Blocks.Function(Casing.FireGroup, `GroupName: string, {Values}`, "()", true)
 		if IsReliable then
 			FireGroup:Line("Load()")
-			AddTrackedWrite(FireGroup, Declaration.Name, Reliability, WriteEvent)
+			AddTrackedWrite(FireGroup, Declaration.Name, Reliability, WriteEvent, nil, nil, `table.pack({Arguments})`)
 			FireGroup:Line(RELIABLE_BODY.Header)
 			FireGroup:Iterator("_", "Player", "GetGroupPlayers(GroupName)"):Lines(RELIABLE_BODY.Body, 2):End()
 		else
 			FireGroup:Line("Load()")
-			AddTrackedWrite(FireGroup, Declaration.Name, Reliability, WriteEvent)
+			AddTrackedWrite(FireGroup, Declaration.Name, Reliability, WriteEvent, nil, nil, `table.pack({Arguments})`)
 			FireGroup:Lines(UNRELIABLE_BODY, 1)
 			FireGroup:Compare("RuntimeConfig.MaxUnreliablePacketBytes > 0 and SendCursor", "RuntimeConfig.MaxUnreliablePacketBytes", "Greater")
 				:Line(`DropPacket(GroupName, "Unreliable", "MaxPacketBytes", SendCursor)`)
@@ -1044,7 +1093,7 @@ function Declarations.Function(Declaration: Parser.Function)
 		local DecodeError = string.split(DataArguments, ",")[1] or "Value"
 		Block:Line(`local Success, {DataArguments} = pcall({Util.GetPath(DataIdentifier, false, Scope)})`)
 		AddDecodeFailureGuard(Block, Name, "Reliable", DecodeError)
-		AddAfterReceive(Block, Name, "Reliable")
+		AddAfterReceive(Block, Name, "Reliable", `table.pack({DataArguments})`)
 		Block:Compare(Connection, "nil", "Not")
 			:Line(`task.spawn({Connection}, Player, {DataArguments}, InvocationIdentifier)`)
 			:Branch("Default")
@@ -1115,7 +1164,7 @@ function Declarations.Function(Declaration: Parser.Function)
 		AddReceiveGuards(Block, Name, "Reliable", Value)
 		Block:Line("local InvocationIdentifier = buffer.readu8(RecieveBuffer, Read(1))")
 		Block:Lines(Deserialize.Content, Block.Indent + 1)
-		AddAfterReceive(Block, Name, "Reliable")
+		AddAfterReceive(Block, Name, "Reliable", `table.pack({ReturnArguments})`)
 		Block:Line("local Invocation = ClearInvocation(InvocationIdentifier)")
 		Block:Compare("Invocation", "nil", "Not")
 			:Line(`task.spawn(Invocation.Thread, Success, {ReturnArguments})`)
@@ -1316,11 +1365,11 @@ function Declarations.Channel(Declaration: Parser.Channel)
 			FunctionBlock:Line(`if not IsPlayerActive({Target}) then return end`)
 			if IsReliable then
 				FunctionBlock:Line(`Load(PlayersMap[{Target}])`)
-				AddTrackedWrite(FunctionBlock, Declaration.Name, Reliability, `{Writer}({Argument})`, Target)
+				AddTrackedWrite(FunctionBlock, Declaration.Name, Reliability, `{Writer}({Argument})`, Target, nil, `table.pack({Argument})`)
 				FunctionBlock:Line(`PlayersMap[{Target}] = Save()`)
 			else
 				FunctionBlock:Line("Load()")
-				AddTrackedWrite(FunctionBlock, Declaration.Name, Reliability, `{Writer}({Argument})`, Target)
+				AddTrackedWrite(FunctionBlock, Declaration.Name, Reliability, `{Writer}({Argument})`, Target, nil, `table.pack({Argument})`)
 				FunctionBlock:Lines(UNRELIABLE_BODY, 1)
 				FunctionBlock:Compare("RuntimeConfig.MaxUnreliablePacketBytes > 0 and SendCursor", "RuntimeConfig.MaxUnreliablePacketBytes", "Greater")
 					:Line(`DropPacket({Target}, "Unreliable", "MaxPacketBytes", SendCursor)`)
@@ -2125,7 +2174,12 @@ function Generator.Generate(FileContext: Context, AbstractSyntaxTree: Parser.Bod
 	Reliables:Line("local FrameSuccess, Index = pcall(BeginReadMessage, Size)")
 	Reliables:Line("if not FrameSuccess then DropPacket(" .. SourceExpression() .. ', "Reliable", "MalformedPacket", Size) RecoverMessage() continue end')
 	Reliables:Line("if Index == nil then continue end")
-	Reliables:Line("if Index == PREDICTION_ACK_INDEX then")
+	Reliables:Line("if Index == CAPABILITY_HANDSHAKE_INDEX then")
+	Reliables:Line("RuntimeSupport.ReadCapabilityHandshake(" .. SourceExpression() .. ', "Reliable", Size)', Reliables.Indent + 1)
+	Reliables:Line("EndReadMessage()", Reliables.Indent + 1)
+	Reliables:Line("continue", Reliables.Indent + 1)
+	Reliables:Line("end")
+	Reliables:Line("if RuntimeSupport.CurrentProtocolVersion() >= 2 and Index == PREDICTION_ACK_INDEX then")
 	Reliables:Line("ReadPredictionAckPayload()", Reliables.Indent + 1)
 	Reliables:Line("EndReadMessage()", Reliables.Indent + 1)
 	Reliables:Line("continue", Reliables.Indent + 1)
@@ -2133,7 +2187,12 @@ function Generator.Generate(FileContext: Context, AbstractSyntaxTree: Parser.Bod
 	Unreliables:Line("local FrameSuccess, Index = pcall(BeginReadMessage, Size)")
 	Unreliables:Line("if not FrameSuccess then DropPacket(" .. SourceExpression() .. ', "Unreliable", "MalformedPacket", Size) RecoverMessage() continue end')
 	Unreliables:Line("if Index == nil then continue end")
-	Unreliables:Line("if Index == PREDICTION_ACK_INDEX then")
+	Unreliables:Line("if Index == CAPABILITY_HANDSHAKE_INDEX then")
+	Unreliables:Line("RuntimeSupport.ReadCapabilityHandshake(" .. SourceExpression() .. ', "Unreliable", Size)', Unreliables.Indent + 1)
+	Unreliables:Line("EndReadMessage()", Unreliables.Indent + 1)
+	Unreliables:Line("continue", Unreliables.Indent + 1)
+	Unreliables:Line("end")
+	Unreliables:Line("if RuntimeSupport.CurrentProtocolVersion() >= 2 and Index == PREDICTION_ACK_INDEX then")
 	Unreliables:Line("ReadPredictionAckPayload()", Unreliables.Indent + 1)
 	Unreliables:Line("EndReadMessage()", Unreliables.Indent + 1)
 	Unreliables:Line("continue", Unreliables.Indent + 1)

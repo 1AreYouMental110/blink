@@ -107,6 +107,17 @@ export type Options = {
 	UseBufferPooling: boolean?,
 	BufferPoolLimit: number?,
 	SecurityProfile: string?,
+	Version: number?,
+	SchemaVersion: number?,
+	MinimumSchemaVersion: number?,
+	ProtocolMode: string?,
+	AcceptProtocolVersion1: boolean?,
+	EnableProtocolHandshake: boolean?,
+	EnablePacketCapture: boolean?,
+	CaptureLimit: number?,
+	EnableInspector: boolean?,
+	EnableReplicationAdapters: boolean?,
+	StrictProduction: boolean?,
 }
 
 export type Body = Node<"Body", {
@@ -265,6 +276,17 @@ local OPTIONS: { [string]: Lexer.Types } = {
 	UseBufferPooling = "Boolean",
 	BufferPoolLimit = "Number",
 	SecurityProfile = "Identifier",
+	Version = "Number",
+	SchemaVersion = "Number",
+	MinimumSchemaVersion = "Number",
+	ProtocolMode = "Identifier",
+	AcceptProtocolVersion1 = "Boolean",
+	EnableProtocolHandshake = "Boolean",
+	EnablePacketCapture = "Boolean",
+	CaptureLimit = "Number",
+	EnableInspector = "Boolean",
+	EnableReplicationAdapters = "Boolean",
+	StrictProduction = "Boolean",
 }
 
 local EVENT: { EventOption } = {

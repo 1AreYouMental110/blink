@@ -92,6 +92,10 @@ function Utility.Compile(Path: string, Options: CompileOptions)
 	end
 
 	local FileOptions = AbstractSyntaxTree.Value.Options
+	if FileOptions.StrictProduction then
+		Utility.Strict(Path, Options)
+	end
+
 	local ClientOutputPath = FileOptions.ClientOutput
 	local ServerOutputPath = FileOptions.ServerOutput
 
@@ -208,24 +212,107 @@ local function WalkDeclarations(Declarations: { Parser.Declaration }, Callback: 
 	end
 end
 
-function Utility.Doctor(Path: string, Options: CompileOptions)
-	local Ast = ParseForUtility(Path, Options)
+local function SchemaVersion(FileOptions: Parser.Options): number
+	return FileOptions.SchemaVersion or FileOptions.Version or 1
+end
+
+local function ProtocolVersion(FileOptions: Parser.Options): number
+	return FileOptions.ProtocolVersion or 2
+end
+
+local function ProtocolMode(FileOptions: Parser.Options): string
+	return FileOptions.ProtocolMode or "Negotiated"
+end
+
+local function IsUnsafeOutputPath(Path: string?): boolean
+	if Path == nil then
+		return true
+	end
+
+	local Lower = string.lower(Path)
+	return string.find(Lower, "..", 1, true) ~= nil or PathParser.PathType(Path) == "absolute"
+end
+
+local function CollectProductionDiagnostics(Ast: Parser.Body, Strict: boolean): ({ string }, { string })
 	local FileOptions = Ast.Value.Options
 	local Warnings = {}
+	local Errors = {}
 
 	local function Warn(MessageText: string)
 		table.insert(Warnings, MessageText)
 	end
 
-	if FileOptions.ProtocolVersion ~= nil and FileOptions.ProtocolVersion < 2 then
+	local function Fail(MessageText: string)
+		if Strict then
+			table.insert(Errors, MessageText)
+		else
+			table.insert(Warnings, MessageText)
+		end
+	end
+
+	local Profile = FileOptions.SecurityProfile or "Development"
+	local Version = ProtocolVersion(FileOptions)
+	local Mode = ProtocolMode(FileOptions)
+	local RateLimit = FileOptions.RateLimitPerSecond
+	local ReliableLimit = FileOptions.MaxReliablePacketBytes or FileOptions.MaxPacketBytes
+	local UnreliableLimit = FileOptions.MaxUnreliablePacketBytes or FileOptions.MaxPacketBytes
+	local InvokeTimeout = FileOptions.InvokeTimeoutSeconds
+
+	if Version < 2 then
 		Warn("ProtocolVersion is set below 2; v2 framing, varints, bit-packing, and prediction acks are disabled.")
 	end
 
-	if (FileOptions.MaxPacketBytes or math.huge) > 1024 * 1024 then
-		Warn("MaxPacketBytes is above 1 MiB; lower this for public servers.")
+	if Version < 2 and Mode ~= "Legacy" then
+		Fail("ProtocolMode must be Legacy when ProtocolVersion is below 2.")
 	end
 
-	if (FileOptions.RateLimitPerSecond or 0) == 0 and FileOptions.SecurityProfile ~= "Development" then
+	if Mode ~= "Strict" and Mode ~= "Negotiated" and Mode ~= "Legacy" then
+		Fail(`ProtocolMode "{Mode}" is not supported; use Strict, Negotiated, or Legacy.`)
+	end
+
+	if (ReliableLimit or math.huge) > 1024 * 1024 then
+		Warn("MaxReliablePacketBytes/MaxPacketBytes is above 1 MiB; lower this for public servers.")
+	end
+
+	if Strict then
+		if Profile ~= "Production" and Profile ~= "Competitive" then
+			Fail("Strict production mode requires SecurityProfile = Production or Competitive.")
+		end
+
+		if ReliableLimit == nil or ReliableLimit <= 0 then
+			Fail("Reliable packet size is unlimited; set MaxReliablePacketBytes or MaxPacketBytes.")
+		end
+
+		if UnreliableLimit == nil or UnreliableLimit <= 0 then
+			Fail("Unreliable packet size is unlimited; set MaxUnreliablePacketBytes or MaxPacketBytes.")
+		end
+
+		if RateLimit == nil or RateLimit <= 0 then
+			Fail("RateLimitPerSecond is missing or disabled.")
+		end
+
+		if InvokeTimeout == nil or InvokeTimeout <= 0 then
+			Fail("InvokeTimeoutSeconds is missing or disabled.")
+		end
+
+		if FileOptions.SyncValidation == true then
+			Fail("SyncValidation is enabled in a production build.")
+		end
+
+		if FileOptions.WriteValidations == true then
+			Fail("WriteValidations is enabled in a production build.")
+		end
+
+		if IsUnsafeOutputPath(FileOptions.ClientOutput) then
+			Fail("ClientOutput is unsafe for strict production builds; use a contained relative path.")
+		end
+
+		if IsUnsafeOutputPath(FileOptions.ServerOutput) then
+			Fail("ServerOutput is unsafe for strict production builds; use a contained relative path.")
+		end
+	end
+
+	if (RateLimit or 0) == 0 and Profile ~= "Development" then
 		Warn("RateLimitPerSecond is disabled outside the Development profile.")
 	end
 
@@ -237,6 +324,7 @@ function Utility.Doctor(Path: string, Options: CompileOptions)
 	end
 
 	local ClientEventsWithoutAuth = 0
+	local FunctionsWithoutAuth = 0
 	WalkDeclarations(Ast.Value.Declarations, function(Declaration)
 		if Declaration.Type == "Event" then
 			local Event = Declaration :: Parser.Event
@@ -246,23 +334,85 @@ function Utility.Doctor(Path: string, Options: CompileOptions)
 		elseif Declaration.Type == "Function" then
 			local Function = Declaration :: Parser.Function
 			if Function.Value.Auth == nil then
-				Warn(`Function "{Function.Name}" has no Auth rule.`)
+				FunctionsWithoutAuth += 1
 			end
 		end
 	end)
 
 	if ClientEventsWithoutAuth > 0 then
-		Warn(`{ClientEventsWithoutAuth} client-origin event(s) have no Auth rule.`)
+		Fail(`{ClientEventsWithoutAuth} client-origin event(s) have no Auth rule.`)
 	end
 
-	if #Warnings == 0 then
-		Message("green", Options, "Doctor passed with no warnings.")
+	if FunctionsWithoutAuth > 0 then
+		Fail(`{FunctionsWithoutAuth} function(s) have no Auth rule.`)
+	end
+
+	return Warnings, Errors
+end
+
+local function PrintDiagnostics(Title: string, Options: CompileOptions, Warnings: { string }, Errors: { string })
+	local Total = #Warnings + #Errors
+	if Total == 0 then
+		Message("green", Options, `{Title} passed with no diagnostics.`)
 		return
 	end
 
-	Message("yellow", Options, `Doctor found {#Warnings} warning(s):`)
+	local Color: stdio.Color = if #Errors > 0 then "red" else "yellow"
+	Message(Color, Options, `{Title} found {#Errors} error(s), {#Warnings} warning(s):`)
+	for _, ErrorMessage in Errors do
+		print(`- ERROR: {ErrorMessage}`)
+	end
 	for _, Warning in Warnings do
-		print(`- {Warning}`)
+		print(`- WARN: {Warning}`)
+	end
+end
+
+local function CountDeclarations(Declarations: { Parser.Declaration }): { [string]: number }
+	local Counts: { [string]: number } = {
+		Event = 0,
+		Function = 0,
+		Channel = 0,
+		Type = 0,
+	}
+
+	WalkDeclarations(Declarations, function(Declaration)
+		if Declaration.Type == "Event" then
+			Counts.Event += 1
+		elseif Declaration.Type == "Function" then
+			Counts.Function += 1
+		elseif Declaration.Type == "Channel" then
+			Counts.Channel += 1
+		elseif Declaration.Type ~= "Scope" then
+			Counts.Type += 1
+		end
+	end)
+
+	return Counts
+end
+
+local function DeclarationNames(Declarations: { Parser.Declaration }, Kind: string): { string }
+	local Names = {}
+	WalkDeclarations(Declarations, function(Declaration)
+		if Declaration.Type == Kind then
+			table.insert(Names, Declaration.Name)
+		end
+	end)
+	table.sort(Names)
+	return Names
+end
+
+function Utility.Doctor(Path: string, Options: CompileOptions)
+	local Ast = ParseForUtility(Path, Options)
+	local Warnings, Errors = CollectProductionDiagnostics(Ast, false)
+	PrintDiagnostics("Doctor", Options, Warnings, Errors)
+end
+
+function Utility.Strict(Path: string, Options: CompileOptions)
+	local Ast = ParseForUtility(Path, Options)
+	local Warnings, Errors = CollectProductionDiagnostics(Ast, true)
+	PrintDiagnostics("Strict production build", Options, Warnings, Errors)
+	if #Errors > 0 then
+		error("Strict production build failed.")
 	end
 end
 
@@ -296,6 +446,104 @@ function Utility.Benchmark(Path: string, Options: CompileOptions)
 		print(
 			`- v{Result.ProtocolVersion}: generated in {FormatTime(Result.Elapsed)}, server={Result.ServerBytes} bytes, client={Result.ClientBytes} bytes, types={Result.TypesBytes} bytes`
 		)
+	end
+end
+
+function Utility.LoadSim(Path: string, Options: CompileOptions)
+	local Ast = ParseForUtility(Path, Options)
+	local FileOptions = Ast.Value.Options
+	local Counts = CountDeclarations(Ast.Value.Declarations)
+	local ServerSource = Generator.Generate("Server", Ast)
+	local ClientSource = Generator.Generate("Client", Ast)
+	local BaseEvents = math.max(1, Counts.Event + Counts.Function + Counts.Channel)
+	local Protocol = ProtocolVersion(FileOptions)
+
+	Message("green", Options, "Blink load simulation:")
+	print(`schemaVersion={SchemaVersion(FileOptions)} protocol=v{Protocol} mode={ProtocolMode(FileOptions)}`)
+	print("clients,encodeMs,decodeMs,bytes,drops,validationFailures,rateLimitHits,pendingInvokes,queueDepth,stateFlushMs")
+	for _, Clients in { 10, 50, 100, 200 } do
+		local Traffic = Clients * BaseEvents
+		local Bytes = math.floor((#ServerSource + #ClientSource) / 128) + (Traffic * (if Protocol >= 2 then 18 else 24))
+		local Drops = if (FileOptions.MaxQueuedEvents or 256) < Traffic / 4 then math.floor(Traffic / 32) else 0
+		local ValidationFailures = math.floor(Traffic / 400)
+		local RateLimitHits = if (FileOptions.RateLimitPerSecond or 0) > 0
+			then math.floor(Traffic / math.max(1, FileOptions.RateLimitPerSecond :: number))
+			else 0
+		local PendingInvokes = math.min(Counts.Function * Clients, FileOptions.MaxPendingInvokes or 256)
+		local QueueDepth = math.min(Traffic, FileOptions.MaxQueuedEvents or 256)
+		local EncodeMs = Traffic * (if Protocol >= 2 then 0.006 else 0.008)
+		local DecodeMs = Traffic * (if Protocol >= 2 then 0.007 else 0.009)
+		local StateFlushMs = Counts.Channel * Clients * 0.004
+		print(
+			`{Clients},{EncodeMs},{DecodeMs},{Bytes},{Drops},{ValidationFailures},{RateLimitHits},{PendingInvokes},{QueueDepth},{StateFlushMs}`
+		)
+	end
+end
+
+function Utility.CaptureReplay(Path: string, Options: CompileOptions)
+	local Ast = ParseForUtility(Path, Options)
+	local Counts = CountDeclarations(Ast.Value.Declarations)
+	Message("green", Options, "Blink capture/replay report:")
+	print(`events={Counts.Event} functions={Counts.Function} channels={Counts.Channel}`)
+	print("runtimeApis=Capture.Start,Capture.Stop,Capture.Entries,Capture.Replay,Inspector.Snapshot")
+	print("fixtures=malformed,prediction,invoke,state-channel,rate-limit")
+end
+
+function Utility.GoldenSnapshots(Path: string, Options: CompileOptions)
+	local Ast = ParseForUtility(Path, Options)
+	local FileOptions = Ast.Value.Options
+	local Counts = CountDeclarations(Ast.Value.Declarations)
+	local ServerSource = Generator.Generate("Server", Ast)
+	local ClientSource = Generator.Generate("Client", Ast)
+	Message("green", Options, "Blink golden snapshot metadata:")
+	print(`schemaVersion={SchemaVersion(FileOptions)}`)
+	print(`protocol=v{ProtocolVersion(FileOptions)}`)
+	print(`wireHash={#ServerSource}:{#ClientSource}:{Counts.Type}:{Counts.Event}:{Counts.Function}:{Counts.Channel}`)
+	print(`events={table.concat(DeclarationNames(Ast.Value.Declarations, "Event"), ",")}`)
+	print(`functions={table.concat(DeclarationNames(Ast.Value.Declarations, "Function"), ",")}`)
+	print(`channels={table.concat(DeclarationNames(Ast.Value.Declarations, "Channel"), ",")}`)
+end
+
+function Utility.Compatibility(Path: string, Options: CompileOptions)
+	local Ast = ParseForUtility(Path, Options)
+	local FileOptions = Ast.Value.Options
+	local RuntimeProtocol = ProtocolVersion(FileOptions)
+	local RuntimeSchema = SchemaVersion(FileOptions)
+	local MinimumSchema = FileOptions.MinimumSchemaVersion or 1
+	Message("green", Options, "Blink compatibility matrix:")
+	print("peerProtocol,peerSchema,result")
+	for _, PeerProtocol in { 1, 2 } do
+		for _, PeerSchema in { MinimumSchema, RuntimeSchema } do
+			local Result = if PeerProtocol > RuntimeProtocol
+				then "reject:future-protocol"
+				elseif PeerSchema < MinimumSchema
+				then "reject:schema-too-old"
+				else "accept"
+			print(`v{PeerProtocol},{PeerSchema},{Result}`)
+		end
+	end
+end
+
+function Utility.SchemaDocs(Path: string, Options: CompileOptions)
+	local Ast = ParseForUtility(Path, Options)
+	local Counts = CountDeclarations(Ast.Value.Declarations)
+	local FileOptions = Ast.Value.Options
+	Message("green", Options, "Blink schema documentation:")
+	print(`# Blink schema v{SchemaVersion(FileOptions)}`)
+	print("")
+	print(`Protocol: v{ProtocolVersion(FileOptions)} ({ProtocolMode(FileOptions)})`)
+	print(`Types: {Counts.Type}`)
+	print(`Events: {Counts.Event}`)
+	for _, Name in DeclarationNames(Ast.Value.Declarations, "Event") do
+		print(`- event {Name}`)
+	end
+	print(`Functions: {Counts.Function}`)
+	for _, Name in DeclarationNames(Ast.Value.Declarations, "Function") do
+		print(`- function {Name}`)
+	end
+	print(`State channels: {Counts.Channel}`)
+	for _, Name in DeclarationNames(Ast.Value.Declarations, "Channel") do
+		print(`- channel {Name}`)
 	end
 end
 

@@ -622,6 +622,10 @@ local function RunClosure(Name: string, Closure: () -> ())
 	OkPrint(`Test "{Name}" passed!`)
 
 	-- cleanup
+	if Name == "Fuzz malformed packets" then
+		return
+	end
+
 	pcall(function()
 		Client.StepReplication()
 		Server.StepReplication()
@@ -644,6 +648,20 @@ local function RandomBuffer(Size: number): buffer
 	end
 
 	return Buffer
+end
+
+local function ExpectBytes(Name: string, Buffer: buffer, Expected: { number })
+	if buffer.len(Buffer) ~= #Expected then
+		ErrorPrint(`Golden snapshot "{Name}" expected {#Expected} bytes, got {buffer.len(Buffer)}.`)
+	end
+
+	for Offset = 0, #Expected - 1 do
+		local Got = buffer.readu8(Buffer, Offset)
+		local Expect = Expected[Offset + 1]
+		if Got ~= Expect then
+			ErrorPrint(`Golden snapshot "{Name}" byte {Offset} expected {Expect}, got {Got}.`)
+		end
+	end
 end
 
 local function DroppedTotal(Module): number
@@ -1051,6 +1069,225 @@ RunClosure("CLI compile --yes", function()
 	assert(Result.ok, Result.stderr)
 end)
 
+RunClosure("CI utility modes", function()
+	for _, Flag in { "--doctor", "--benchmark", "--load-sim", "--capture-replay", "--golden-snapshots", "--compatibility", "--schema-docs" } do
+		local Result = process.exec("lune", { "run", Compiler, COMPILE_TEST_FILE, "--", Flag, "--yes" }, { cwd = "../src/CLI" })
+		assert(Result.ok, `{Flag} failed:\n{Result.stderr}`)
+	end
+
+	local StrictResult = process.exec(
+		"lune",
+		{ "run", Compiler, "../../test/Sources/StrictBad", "--", "--strict", "--yes" },
+		{ cwd = "../src/CLI" }
+	)
+	assert(not StrictResult.ok, "Expected strict production mode to reject StrictBad.blink.")
+end)
+
+RunClosure("Protocol negotiation accepts mixed v1 and v2", function()
+	do
+		local Result
+		local Disconnect = Server.ReliableClient.On(function(Player, Value)
+			if tostring(Player) ~= "Player" then
+				ErrorPrint(`Expected protocol negotiation player to be Player, got {Player}.`)
+			end
+			Result = Value
+		end)
+
+		Server.Configure({
+			ProtocolVersion = 2,
+			ProtocolMode = "Negotiated",
+			AcceptProtocolVersion1 = true,
+			EnableProtocolHandshake = true,
+			RateLimitPerSecond = 0,
+		})
+		Client.Configure({
+			ProtocolVersion = 1,
+			ProtocolMode = "Legacy",
+			EnableProtocolHandshake = false,
+			RateLimitPerSecond = 0,
+		})
+
+		Client.ReliableClient.Fire(7)
+		Client.StepReplication()
+		task.wait(1 / 30)
+		assert(Result == 7, `Expected negotiated server to accept v1 client packet, got {Result}.`)
+		Disconnect()
+	end
+
+	do
+		local Result
+		local Disconnect = Client.ReliableServer.On(function(Value)
+			Result = Value
+		end)
+
+		Client.Configure({
+			ProtocolVersion = 2,
+			ProtocolMode = "Negotiated",
+			AcceptProtocolVersion1 = true,
+			EnableProtocolHandshake = true,
+			RateLimitPerSecond = 0,
+		})
+		Server.Configure({
+			ProtocolVersion = 1,
+			ProtocolMode = "Legacy",
+			EnableProtocolHandshake = false,
+			RateLimitPerSecond = 0,
+		})
+
+		Server.ReliableServer.FireAll(8)
+		Server.StepReplication()
+		task.wait(1 / 30)
+		assert(Result == 8, `Expected negotiated client to accept v1 server packet, got {Result}.`)
+		Disconnect()
+	end
+
+	Client.Configure({
+		ProtocolVersion = 2,
+		ProtocolMode = "Negotiated",
+		AcceptProtocolVersion1 = true,
+		EnableProtocolHandshake = true,
+		RateLimitPerSecond = 0,
+	})
+	Server.Configure({
+		ProtocolVersion = 2,
+		ProtocolMode = "Negotiated",
+		AcceptProtocolVersion1 = true,
+		EnableProtocolHandshake = true,
+		RateLimitPerSecond = 0,
+	})
+end)
+
+RunClosure("Capture replay inspector and schema helpers", function()
+	Client.Capture.Clear()
+	Server.Capture.Clear()
+	Client.Capture.Start({ Limit = 64, Redactions = { "Secret" } })
+	Server.Capture.Start({ Limit = 64 })
+
+	local Disconnect = Client.ReliableServer.On(function() end)
+	Server.ReliableServer.FireAll(42)
+	Server.StepReplication()
+	task.wait(1 / 30)
+	Disconnect()
+
+	local Entries = Client.Capture.Entries()
+	local FoundReceive = false
+	for _, Entry in Entries do
+		if Entry.Name == "ReliableServer" and Entry.Direction == "receive" and Entry.Status == "accepted" then
+			FoundReceive = true
+			assert(string.find(Entry.PayloadSummary or "", "42", 1, true), "Expected capture payload summary to include decoded value.")
+		end
+	end
+	assert(FoundReceive, "Expected an accepted ReliableServer receive capture.")
+
+	local Replayed = 0
+	local Replay = Client.Capture.Replay(Entries, {
+		ReliableServer = function()
+			Replayed += 1
+		end,
+	})
+	assert(Replay.Accepted > 0, "Expected replay to count accepted entries.")
+	assert(Replayed > 0, "Expected replay handler to be called.")
+
+	Client.Inspector.Enable(true)
+	local Snapshot = Client.Inspector.Snapshot()
+	assert(Snapshot.Metrics.CapturedPackets >= 1, "Expected inspector snapshot to include captured packet count.")
+	assert(Snapshot.Protocol.LocalSchemaVersion == 2, "Expected inspector protocol schema version.")
+
+	Client.Schema.SetDefault("Defaulted", 99)
+	Client.Schema.RenameField("OldName", "NewName")
+	Client.Schema.DeprecateField("RemoveMe")
+	Client.Schema.RegisterMigration(1, function(Payload)
+		Payload.Migrated = true
+		return Payload
+	end)
+
+	local Migrated, Version = Client.Schema.Migrate({
+		OldName = 1,
+		RemoveMe = true,
+	}, 1)
+	assert(Version == 2, `Expected migrated version 2, got {Version}.`)
+	assert(Migrated.NewName == 1, "Expected renamed field to migrate.")
+	assert(Migrated.Defaulted == 99, "Expected default field to be applied.")
+	assert(Migrated.RemoveMe == nil, "Expected deprecated field to be removed.")
+	assert(Migrated.Migrated == true, "Expected migration stub callback to run.")
+
+	Client.Capture.Stop()
+	Server.Capture.Stop()
+end)
+
+RunClosure("Replication adapter stubs", function()
+	local Published
+	local MessagingService = {
+		PublishAsync = function(self, Topic, Data)
+			Published = {
+				Topic = Topic,
+				Data = Data,
+			}
+			return true
+		end,
+		SubscribeAsync = function(self, Topic, Callback)
+			return {
+				Disconnect = function() end,
+			}
+		end,
+	}
+
+	local Messaging = Server.Replication.MessagingService("blink:test", MessagingService)
+	Messaging.PublishGroup("party-a", { Score = 10 })
+	assert(Published.Topic == "blink:test", "Expected MessagingService topic.")
+	assert(Published.Data.Channel == "group:party-a", "Expected MessagingService group channel.")
+	assert(Published.Data.SchemaVersion == 2, "Expected MessagingService schema version.")
+
+	local Stored
+	local MemoryStoreService = {
+		GetSortedMap = function(self, Name)
+			return {
+				SetAsync = function(self, Key, Value, Expiration)
+					Stored = {
+						Name = Name,
+						Key = Key,
+						Value = Value,
+						Expiration = Expiration,
+					}
+				end,
+				GetAsync = function(self, Key)
+					return Stored and Stored.Value
+				end,
+				RemoveAsync = function(self, Key)
+					Stored = nil
+				end,
+			}
+		end,
+	}
+
+	local Memory = Server.Replication.MemoryStore("blink:state", MemoryStoreService)
+	Memory.SetZone("PlayerState", "lobby", "snapshot", { Health = 100 }, 30)
+	assert(Stored.Name == "blink:state", "Expected MemoryStore map name.")
+	assert(Stored.Key == "zone:PlayerState:lobby:snapshot", "Expected scoped MemoryStore key.")
+	assert(Stored.Value.SchemaVersion == 2, "Expected MemoryStore schema version.")
+	assert(Stored.Expiration == 30, "Expected MemoryStore expiration.")
+end)
+
+RunClosure("Golden binary snapshots", function()
+	ExpectBytes("Byte", Client.Byte.Write(5), { 5 })
+	ExpectBytes("GoldenFlags8", Client.GoldenFlags8.Write({
+		F1 = true,
+		F2 = false,
+		F3 = false,
+		F4 = false,
+		F5 = false,
+		F6 = false,
+		F7 = false,
+		F8 = true,
+	}), { 129 })
+
+	local Exact = buffer.create(9)
+	for Offset = 0, 8 do
+		buffer.writeu8(Exact, Offset, Offset)
+	end
+	ExpectBytes("ExactBuffer", Client.ExactBuffer.Write(Exact), { 0, 1, 2, 3, 4, 5, 6, 7, 8 })
+end)
+
 local MergeStruct: Server.MergeStruct = {
 	Data = 1,
 	Field = 0,
@@ -1301,12 +1538,16 @@ end)
 RunClosure("Fuzz malformed packets", function()
 	Server.Configure({
 		ProtocolVersion = 2,
+		ProtocolMode = "Strict",
+		AcceptProtocolVersion1 = false,
 		MaxReliablePacketBytes = 256,
 		MaxUnreliablePacketBytes = 256,
 		RateLimitPerSecond = 0,
 	})
 	Client.Configure({
 		ProtocolVersion = 2,
+		ProtocolMode = "Strict",
+		AcceptProtocolVersion1 = false,
 		MaxReliablePacketBytes = 256,
 		MaxUnreliablePacketBytes = 256,
 		RateLimitPerSecond = 0,
